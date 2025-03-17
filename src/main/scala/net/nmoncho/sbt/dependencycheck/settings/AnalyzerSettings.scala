@@ -31,43 +31,43 @@ import sbt._
   *
   * For more information, see <a href="https://jeremylong.github.io/DependencyCheck/analyzers/index.html">File Type Analyzers</a>
   *
-  * @param archiveEnabled Whether or not the Archive analyzer is enabled.
+  * @param archiveEnabled whether the Archive analyzer is enabled.
   * @param artifactory Artifactory Settings.
-  * @param autoconfEnabled Whether or not the autoconf analyzer should be used.
-  * @param cmakeEnabled Whether or not the CMake analyzer is enabled.
-  * @param cpanFileEnabled Whether or not the Perl CPAN File analyzer is enabled.
-  * @param cpeEnabled Whether or not the CPE analyzer is enabled.
-  * @param cpeSuppressionEnabled Whether or not the CPE Suppression analyzer is enabled.
-  * @param dartEnabled Whether or not the Dart analyzer is enabled.
-  * @param dependencyBundlingEnabled Whether or not the Dependency Bundling analyzer is enabled.
-  * @param dependencyMergingEnabled Whether or not the Dependency Merging analyzer is enabled.
+  * @param autoconfEnabled whether the autoconf analyzer should be used.
+  * @param cmakeEnabled whether the CMake analyzer is enabled.
+  * @param cpanFileEnabled whether the Perl CPAN File analyzer is enabled.
+  * @param cpeEnabled whether the CPE analyzer is enabled.
+  * @param cpeSuppressionEnabled whether the CPE Suppression analyzer is enabled.
+  * @param dartEnabled whether the Dart analyzer is enabled.
+  * @param dependencyBundlingEnabled whether the Dependency Bundling analyzer is enabled.
+  * @param dependencyMergingEnabled whether the Dependency Merging analyzer is enabled.
   * @param dotNet .NET Settings.
   * @param elixir Elixir Settings
-  * @param experimentalEnabled Whether or not experimental analyzers are enabled.
-  * @param failOnUnusedSuppressionRule Whether the Unused Suppression Rule analyzer should fail if there are unused rules.
-  * @param falsePositiveEnabled Whether or not the False Positive analyzer is enabled.
-  * @param filenameEnabled Whether or not the Filename analyzer is enabled.
-  * @param fileVersionEnabled Whether or not the File Version analyzer is enabled.
+  * @param experimentalEnabled whether experimental analyzers are enabled.
+  * @param failOnUnusedSuppressionRule whether the Unused Suppression Rule analyzer should fail if there are unused rules.
+  * @param falsePositiveEnabled whether the False Positive analyzer is enabled.
+  * @param filenameEnabled whether the Filename analyzer is enabled.
+  * @param fileVersionEnabled whether the File Version analyzer is enabled.
   * @param golang Golang Settings.
   * @param hints Hints Settings.
-  * @param jarEnabled Whether or not the JAR analyzer is enabled.
-  * @param knownExploitedEnabled Whether or not the Known Exploited Vulnerabilities analyzer is enabled.
+  * @param jarEnabled whether the JAR analyzer is enabled.
+  * @param knownExploitedEnabled whether the Known Exploited Vulnerabilities analyzer is enabled.
   * @param mavenCentral Maven Central Settings
-  * @param mavenInstallEnabled Whether or not the Maven Install analyzer is enabled.
+  * @param mavenInstallEnabled whether the Maven Install analyzer is enabled.
   * @param nexus Nexus Settings.
   * @param node Node Settings
-  * @param nvdCveEnabled Whether or not the NVD CVE analyzer is enabled.
-  * @param openSslEnabled Whether or not the OpenSSL analyzer is enabled.
+  * @param nvdCveEnabled whether the NVD CVE analyzer is enabled.
+  * @param openSslEnabled whether the OpenSSL analyzer is enabled.
   * @param ossIndex OSS Index Settings.
   * @param php PHP Settings.
   * @param pnmp PNPM Settings.
   * @param python Python Settings.
-  * @param retiredEnabled Whether or not the retired analyzers are enabled.
+  * @param retiredEnabled whether the retired analyzers are enabled.
   * @param retireJS RetireJS Settings.
   * @param ruby Ruby Settings.
   * @param swift Swift Settings.
-  * @param versionFilterEnabled Whether or not the Version Filter analyzer is enabled.
-  * @param vulnerabilitySuppressionEnabled Whether or not the Vulnerability Suppression analyzer is enabled.
+  * @param versionFilterEnabled whether the Version Filter analyzer is enabled.
+  * @param vulnerabilitySuppressionEnabled whether the Vulnerability Suppression analyzer is enabled.
   * @param yarn Yarn Settings.
   */
 case class AnalyzerSettings(
@@ -278,6 +278,16 @@ object AnalyzerSettings {
     yarn
   )
 
+  /** Artifactory Settings
+    *
+    * @param enabled whether Artifactory is enabled
+    * @param url Artifactory search URL
+    * @param parallelAnalysis whether should use parallel processing
+    * @param apiToken Artifactory API token
+    * @param username Artifactory username
+    * @param bearerToken Artifactory bearer token
+    * @param usesProxy whether the proxy should be used to reach Artifactory
+    */
   case class Artifactory(
       enabled: Option[Boolean],
       url: Option[URL],
@@ -314,6 +324,15 @@ object AnalyzerSettings {
       new Artifactory(enabled, url, parallelAnalysis, apiToken, username, bearerToken, usesProxy)
   }
 
+  /** .NET Settings
+    *
+    * @param assemblyEnabled whether the .NET Assembly analyzer is enabled
+    * @param assemblyPath The path to dotnet core, if available
+    * @param nuspecEnabled whether the .NET Nuspec analyzer is enabled
+    * @param nugetConfEnabled whether the .NET Nuget packages. config analyzer is enabled
+    * @param libManEnabled whether the Libman analyzer is enabled
+    * @param msBuildProjectEnabled whether the .NET MSBuild Project analyzer is enabled
+    */
   case class DotNet(
       assemblyEnabled: Option[Boolean],
       assemblyPath: Option[File],
@@ -354,6 +373,11 @@ object AnalyzerSettings {
       )
   }
 
+  /** Elixir Settings
+    *
+    * @param mixAuditEnabled whether the Elixir mix audit analyzer is enabled
+    * @param mixAuditPath The path to mix_audit, if available
+    */
   case class Elixir(
       mixAuditEnabled: Option[Boolean],
       mixAuditPath: Option[File]
@@ -372,6 +396,12 @@ object AnalyzerSettings {
       new Elixir(mixAuditEnabled, mixAuditPath)
   }
 
+  /** Golang Settings
+    *
+    * @param dependencyAnalyzerEnabled whether the Golang Dep analyzer is enabled
+    * @param moduleAnalyzerEnabled whether the Golang Mod analyzer is enabled
+    * @param path The path to go, if available
+    */
   case class Golang(
       dependencyAnalyzerEnabled: Option[Boolean],
       moduleAnalyzerEnabled: Option[Boolean],
@@ -396,6 +426,11 @@ object AnalyzerSettings {
       new Golang(dependencyAnalyzerEnabled, moduleAnalyzerEnabled, path)
   }
 
+  /** Hints Settings
+    *
+    * @param enabled whether the Hint analyzer is enabled
+    * @param hintsFile path to the hints file
+    */
   case class Hints(enabled: Option[Boolean], hintsFile: Option[String]) {
     def apply(settings: Settings): Unit = {
       settings.set(ANALYZER_HINT_ENABLED, enabled)
@@ -406,89 +441,27 @@ object AnalyzerSettings {
   object Hints {
     val Default: Hints = new Hints(None, None)
 
+    /** Enable the Hints backed by a file
+      */
     def enable(file: File): Hints = new Hints(Some(true), Some(file.getAbsolutePath))
 
+    /** Enable the Hints backed by a URL
+      */
     def enable(url: URL): Hints = new Hints(Some(true), Some(url.toExternalForm))
   }
 
-  case class Nexus(
-      enabled: Option[Boolean],
-      url: Option[URL],
-      username: Option[String],
-      password: Option[String],
-      usesProxy: Option[Boolean]
-  ) {
-
-    def apply(settings: Settings): Unit = {
-      settings.set(ANALYZER_NEXUS_ENABLED, enabled)
-      settings.set(ANALYZER_NEXUS_URL, url)
-      settings.set(ANALYZER_CENTRAL_USER, username)
-      settings.set(ANALYZER_CENTRAL_PASSWORD, password)
-      settings.set(ANALYZER_NEXUS_USES_PROXY, usesProxy)
-    }
-
-  }
-
-  object Nexus {
-    val Default: Nexus = new Nexus(None, None, None, None, None)
-
-    def apply(
-        enabled: Option[Boolean]   = None,
-        url: Option[URL]           = None,
-        username: Option[String]   = None,
-        password: Option[String]   = None,
-        usesProxy: Option[Boolean] = None
-    ): Nexus =
-      new Nexus(enabled, url, username, password, usesProxy)
-  }
-
-  case class Node(
-      auditEnabled: Option[Boolean],
-      auditUrl: Option[URL],
-      auditSkipDevDependencies: Option[Boolean],
-      auditUsesCache: Option[Boolean],
-      packageEnabled: Option[Boolean],
-      packageSkipDevDependencies: Option[Boolean],
-      npmCpeEnabled: Option[Boolean]
-  ) {
-
-    def apply(settings: Settings): Unit = {
-      settings.set(ANALYZER_NODE_AUDIT_ENABLED, auditEnabled)
-      settings.set(ANALYZER_NODE_AUDIT_URL, auditUrl)
-      settings.set(ANALYZER_NODE_AUDIT_SKIPDEV, auditSkipDevDependencies)
-      settings.set(ANALYZER_NODE_AUDIT_USE_CACHE, auditSkipDevDependencies)
-
-      settings.set(ANALYZER_NODE_PACKAGE_ENABLED, packageEnabled)
-      settings.set(ANALYZER_NODE_PACKAGE_SKIPDEV, packageSkipDevDependencies)
-
-      settings.set(ANALYZER_NPM_CPE_ENABLED, npmCpeEnabled)
-    }
-
-  }
-
-  object Node {
-    val Default: Node = new Node(None, None, None, None, None, None, None)
-
-    def apply(
-        auditEnabled: Option[Boolean]               = None,
-        auditUrl: Option[URL]                       = None,
-        auditSkipDevDependencies: Option[Boolean]   = None,
-        auditUsesCache: Option[Boolean]             = None,
-        packageEnabled: Option[Boolean]             = None,
-        packageSkipDevDependencies: Option[Boolean] = None,
-        npmCpeEnabled: Option[Boolean]              = None
-    ): Node =
-      new Node(
-        auditEnabled,
-        auditUrl,
-        auditSkipDevDependencies,
-        auditUsesCache,
-        packageEnabled,
-        packageSkipDevDependencies,
-        npmCpeEnabled
-      )
-  }
-
+  /** Maven Central Settings
+    *
+    * @param enabled whether the Maven Central analyzer is enabled
+    * @param url the Maven Central search URL
+    * @param query the Maven Central search query
+    * @param usesCache whether Maven Central search results will be cached
+    * @param retryCount the Maven Central analyzer request retry count
+    * @param parallelAnalysis whether the Maven Central analyzer should use parallel processing
+    * @param username the Username to obtain content from Maven Central. For use when the central content URL is reconfigured to a site requiring HTTP-Basic-authentication
+    * @param password the Password to obtain content from Maven Central. For use when the central content URL is reconfigured to a site requiring HTTP-Basic-authentication
+    * @param bearerToken the token to obtain content from Maven Central from an HTTP-Bearer-auth protected location. For use when the central content URL is reconfigured to a site requiring HTTP-Bearer-authentication
+    */
   case class MavenCentral(
       enabled: Option[Boolean],
       url: Option[URL],
@@ -543,6 +516,113 @@ object AnalyzerSettings {
       )
   }
 
+  /** Nexus Settings
+    *
+    * @param enabled whether the Nexus analyzer is enabled
+    * @param url the Nexus search URL
+    * @param username the Nexus search credentials username
+    * @param password the Nexus search credentials password
+    * @param usesProxy whether to use the proxy to reach Nexus
+    */
+  case class Nexus(
+      enabled: Option[Boolean],
+      url: Option[URL],
+      username: Option[String],
+      password: Option[String],
+      usesProxy: Option[Boolean]
+  ) {
+
+    def apply(settings: Settings): Unit = {
+      settings.set(ANALYZER_NEXUS_ENABLED, enabled)
+      settings.set(ANALYZER_NEXUS_URL, url)
+      settings.set(ANALYZER_CENTRAL_USER, username)
+      settings.set(ANALYZER_CENTRAL_PASSWORD, password)
+      settings.set(ANALYZER_NEXUS_USES_PROXY, usesProxy)
+    }
+
+  }
+
+  object Nexus {
+    val Default: Nexus = new Nexus(None, None, None, None, None)
+
+    def apply(
+        enabled: Option[Boolean]   = None,
+        url: Option[URL]           = None,
+        username: Option[String]   = None,
+        password: Option[String]   = None,
+        usesProxy: Option[Boolean] = None
+    ): Nexus =
+      new Nexus(enabled, url, username, password, usesProxy)
+  }
+
+  /** Node Settings
+    *
+    * @param auditEnabled whether the Node Audit analyzer is enabled
+    * @param auditUrl the URL to the Node Audit API
+    * @param auditSkipDevDependencies whether the Node Audit analyzer should skip devDependencies
+    * @param auditUsesCache whether node audit analyzer results will be cached
+    * @param packageEnabled whether the Node Package analyzer is enabled
+    * @param packageSkipDevDependencies whether the Node Package analyzer should skip devDependencies
+    * @param npmCpeEnabled where the NPM CPE analyzer is enabled
+    */
+  case class Node(
+      auditEnabled: Option[Boolean],
+      auditUrl: Option[URL],
+      auditSkipDevDependencies: Option[Boolean],
+      auditUsesCache: Option[Boolean],
+      packageEnabled: Option[Boolean],
+      packageSkipDevDependencies: Option[Boolean],
+      npmCpeEnabled: Option[Boolean]
+  ) {
+
+    def apply(settings: Settings): Unit = {
+      settings.set(ANALYZER_NODE_AUDIT_ENABLED, auditEnabled)
+      settings.set(ANALYZER_NODE_AUDIT_URL, auditUrl)
+      settings.set(ANALYZER_NODE_AUDIT_SKIPDEV, auditSkipDevDependencies)
+      settings.set(ANALYZER_NODE_AUDIT_USE_CACHE, auditSkipDevDependencies)
+
+      settings.set(ANALYZER_NODE_PACKAGE_ENABLED, packageEnabled)
+      settings.set(ANALYZER_NODE_PACKAGE_SKIPDEV, packageSkipDevDependencies)
+
+      settings.set(ANALYZER_NPM_CPE_ENABLED, npmCpeEnabled)
+    }
+
+  }
+
+  object Node {
+    val Default: Node = new Node(None, None, None, None, None, None, None)
+
+    def apply(
+        auditEnabled: Option[Boolean]               = None,
+        auditUrl: Option[URL]                       = None,
+        auditSkipDevDependencies: Option[Boolean]   = None,
+        auditUsesCache: Option[Boolean]             = None,
+        packageEnabled: Option[Boolean]             = None,
+        packageSkipDevDependencies: Option[Boolean] = None,
+        npmCpeEnabled: Option[Boolean]              = None
+    ): Node =
+      new Node(
+        auditEnabled,
+        auditUrl,
+        auditSkipDevDependencies,
+        auditUsesCache,
+        packageEnabled,
+        packageSkipDevDependencies,
+        npmCpeEnabled
+      )
+  }
+
+  /** Sonatype OSS Index Settings
+    *
+    * @param enabled whether the Sonatype OSS Index analyzer is enabled
+    * @param url the Sonatype OSS Index URL
+    * @param batchSize the Sonatype OSS batch-size
+    * @param requestDelay the Sonatype OSS Request Delay. Amount of time in seconds to wait before executing a request against the Sonatype OSS Rest API
+    * @param useCache whether the Sonatype OSS Index should use a local cache
+    * @param warnOnlyOnRemoteErrors only warning about Sonatype OSS Index remote errors instead of failing the request
+    * @param username the Sonatype OSS Index user
+    * @param password the Sonatype OSS Index password
+    */
   case class OssIndex(
       enabled: Option[Boolean],
       url: Option[URL],
@@ -592,6 +672,11 @@ object AnalyzerSettings {
       )
   }
 
+  /** PHP Settings
+    *
+    * @param composerLockEnabled whether the PHP composer lock file analyzer is enabled
+    * @param composerLockSkipDevDependencies whether the PHP composer lock file analyzer should skip dev packages
+    */
   case class Php(
       composerLockEnabled: Option[Boolean],
       composerLockSkipDevDependencies: Option[Boolean]
@@ -613,6 +698,11 @@ object AnalyzerSettings {
       new Php(composerLockEnabled, composerLockSkipDevDependencies)
   }
 
+  /** pnpm Settings
+    *
+    * @param auditEnabled whether the pnpm Audit analyzer is enabled
+    * @param path the path to pnpm if available
+    */
   case class Pnpm(
       auditEnabled: Option[Boolean],
       path: Option[File]
@@ -631,6 +721,14 @@ object AnalyzerSettings {
       new Pnpm(auditEnabled, path)
   }
 
+  /** Python Settings
+    *
+    * @param pipEnabled whether the pip analyzer is enabled
+    * @param pipFileEnabled whether the pipfile analyzer is enabled
+    * @param distributionEnabled whether the Python Distribution analyzer is enabled
+    * @param packageEnabled whether the Python Package analyzer is enabled
+    * @param poetryEnabled whether the Poetry analyzer is enabled
+    */
   case class Python(
       pipEnabled: Option[Boolean],
       pipFileEnabled: Option[Boolean],
@@ -663,6 +761,18 @@ object AnalyzerSettings {
       new Python(pipEnabled, pipFileEnabled, distributionEnabled, packageEnabled, poetryEnabled)
   }
 
+  /** RetireJS Settings
+    *
+    * @param enabled hether the RetireJS analyzer is enabled
+    * @param forceUpdate whether the RetireJS repository will be updated regardless of the autoupdate settings
+    * @param filters whether the RetireJS analyzer file content filters
+    * @param filterNonVulnerable whether the RetireJS analyzer should filter out non-vulnerable dependencies
+    * @param url the URL to the RetireJS repository
+    * @param username the RetireJS Repository username. For use when the RetireJS Repository is mirrored on a site requiring HTTP-Basic-authentication
+    * @param password the RetireJS Repository password. For use when the RetireJS Repository is mirrored on a site requiring HTTP-Basic-authentication
+    * @param bearerToken the token to download the RetireJS JSON data from an HTTP-Bearer-auth protected location. For use when the RetireJS Repository is mirrored on a site requiring HTTP-Bearer-authentication.
+    * @param validForHours to control the skipping of the check for CVE updates
+    */
   case class RetireJS(
       enabled: Option[Boolean],
       forceUpdate: Option[Boolean],
@@ -717,6 +827,13 @@ object AnalyzerSettings {
       )
   }
 
+  /** Ruby Settings
+    *
+    * @param gemSpecEnabled whether the Ruby Gemspec Analyzer is enabled
+    * @param bundleAuditEnabled whether the Ruby Bundler Audit analyzer is enabled
+    * @param bundleAuditPath The path to bundle-audit, if available
+    * @param bundleAuditWorkingDirectory bundle-audit working directory
+    */
   case class Ruby(
       gemSpecEnabled: Option[Boolean],
       bundleAuditEnabled: Option[Boolean],
@@ -744,6 +861,13 @@ object AnalyzerSettings {
       new Ruby(gemSpecEnabled, bundleAuditEnabled, bundleAuditPath, bundleAuditWorkingDirectory)
   }
 
+  /** Swift Settings
+    *
+    * @param packageManagerEnabled whether the SWIFT package manager analyzer is enabled
+    * @param packageResolvedEnabled whether the SWIFT package resolved analyzer is enabled
+    * @param carthageEnabled whether the carthage analyzer is enabled
+    * @param cocoapodsEnabled whether the cocoapods analyzer is enabled
+    */
   case class Swift(
       packageManagerEnabled: Option[Boolean],
       packageResolvedEnabled: Option[Boolean],
@@ -771,6 +895,11 @@ object AnalyzerSettings {
       new Swift(packageManagerEnabled, packageResolvedEnabled, carthageEnabled, cocoapodsEnabled)
   }
 
+  /** Yarn Settings
+    *
+    * @param auditEnabled whether the Yarn Audit analyzer is enabled
+    * @param path the path to Yarn if available
+    */
   case class Yarn(
       auditEnabled: Option[Boolean],
       path: Option[File]

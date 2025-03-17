@@ -41,16 +41,15 @@ lazy val root = (project in file("."))
       Opts.compile.deprecation :+
       Opts.compile.unchecked :+
       "-feature" :+
-      "-Ywarn-unused" :+
-      "-Xlog-implicits"),
+      "-Ywarn-unused"),
     libraryDependencies ++= Seq(
       dependencyCheck,
       munit % Test
     ),
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
-        case "2.12" =>
-          "1.9.0" // set minimum sbt version so we have `sbtPluginPublishLegacyMavenStyle`
+        // set minimum sbt version so we have `sbtPluginPublishLegacyMavenStyle`
+        case "2.12" => "1.9.0"
       }
     },
     scriptedLaunchOpts := {
@@ -59,5 +58,3 @@ lazy val root = (project in file("."))
     },
     scriptedBufferLog := false
   )
-
-// See https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html for instructions on how to publish to Sonatype.

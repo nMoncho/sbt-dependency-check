@@ -61,17 +61,20 @@ object LoadSettings {
     }.get
 
     baseSettings.setBoolean(AUTO_UPDATE, dependencyCheckAutoUpdate.value)
-    dependencyCheckConnectionTimeout.value.foreach(
-      baseSettings.setInt(CONNECTION_TIMEOUT, _)
+    dependencyCheckConnectionTimeout.value.foreach(value =>
+      baseSettings.setInt(CONNECTION_TIMEOUT, value.toMillis.toInt)
     )
-    dependencyCheckConnectionReadTimeout.value.foreach(
-      baseSettings.setInt(CONNECTION_READ_TIMEOUT, _)
+    dependencyCheckConnectionReadTimeout.value.foreach(value =>
+      baseSettings.setInt(CONNECTION_READ_TIMEOUT, value.toMillis.toInt)
     )
     dependencyCheckJUnitFailBuildOnCVSS.value.foreach(value =>
       baseSettings.setFloat(JUNIT_FAIL_ON_CVSS, value.toFloat)
     )
     dependencyCheckAnalysisTimeout.value.foreach(value =>
       baseSettings.setInt(ANALYSIS_TIMEOUT, value.toMinutes.toInt)
+    )
+    dependencyCheckDataDirectory.value.foreach(folder =>
+      baseSettings.setStringIfNotEmpty(DATA_DIRECTORY, folder.getAbsolutePath)
     )
 
     dependencyCheckAnalyzer.value(baseSettings)

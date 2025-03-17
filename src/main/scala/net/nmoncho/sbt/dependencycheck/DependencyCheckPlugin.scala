@@ -51,6 +51,7 @@ object DependencyCheckPlugin extends AutoPlugin {
     dependencyCheckJUnitFailBuildOnCVSS := None,
     dependencyCheckFormats := List(Format.HTML),
     dependencyCheckAnalysisTimeout := None,
+    dependencyCheckDataDirectory := None,
     dependencyCheckAnalyzer := AnalyzerSettings.Default,
     dependencyCheckSuppressionFiles := SuppressionFilesSettings.Default,
     dependencyCheckScopes := ScopesSettings.Default,

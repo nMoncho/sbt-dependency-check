@@ -21,6 +21,14 @@
 
 package net.nmoncho.sbt.dependencycheck.settings
 
+/** Defines what Library Dependency Scopes are included in the analysis
+  *
+  * @param compile whether Compile dependencies should be considered
+  * @param test whether Test dependencies should be considered
+  * @param runtime whether Runtime dependencies should be considered
+  * @param provided whether Provided dependencies should be considered
+  * @param optional whether Optional dependencies should be considered
+  */
 case class ScopesSettings(
     compile: Boolean,
     test: Boolean,
