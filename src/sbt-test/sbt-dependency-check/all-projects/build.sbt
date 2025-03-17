@@ -1,3 +1,5 @@
+import net.nmoncho.sbt.dependencycheck.settings._
+
 lazy val commonSettings = Seq(
   organization := "net.vonbuchholtz",
   version := "0.1.0",
@@ -8,7 +10,8 @@ lazy val root = (project in file("."))
   .aggregate(core)
   .settings(commonSettings: _*)
   .settings(
-    dependencyCheckFailBuildOnCVSS := 0
+    dependencyCheckFailBuildOnCVSS := 0,
+    dependencyCheckNvdApi := sys.env.get("NVD_API_KEY").map(key => NvdApiSettings(key)).getOrElse(NvdApiSettings.Default),
   )
 
 lazy val core = (project in file("core"))
