@@ -74,7 +74,7 @@ object Keys {
   lazy val dependencyCheckSettingsFile: SettingKey[File] = settingKey(
     "Where to look for the 'dependencycheck.properties' file. If this file exists, it will act as default, which values can be overridden by other SBT SettingKeys. Can be an external file, or a resource."
   )
-  lazy val dependencyCheckAnalyzer: SettingKey[AnalyzerSettings] = settingKey(
+  lazy val dependencyCheckAnalyzers: SettingKey[AnalyzerSettings] = settingKey(
     "Settings for the different analyzers used during the analysis."
   )
   lazy val dependencyCheckSuppressionFiles: SettingKey[SuppressionFilesSettings] = settingKey(
