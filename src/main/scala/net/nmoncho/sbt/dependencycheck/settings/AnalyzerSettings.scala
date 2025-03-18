@@ -237,7 +237,7 @@ object AnalyzerSettings {
       versionFilterEnabled: Option[Boolean]            = None,
       vulnerabilitySuppressionEnabled: Option[Boolean] = None,
       yarn: Yarn                                       = Yarn.Default
-  ): AnalyzerSettings = AnalyzerSettings(
+  ): AnalyzerSettings = new AnalyzerSettings(
     archiveEnabled,
     artifactory,
     autoconfEnabled,
