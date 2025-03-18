@@ -153,45 +153,46 @@ If you don't care about a particular Analyzer, feel free to ignore it, leaving t
 
 Settings are grouped by either analyzer, tool, or language:
 
-| Setting                           | Description                                                                                      | Default |
-|:----------------------------------|:-------------------------------------------------------------------------------------------------|:--------|
-| `archiveEnabled`                  | whether or not the Archive analyzer is enabled.                                                  | `true`  |
-| `artifactory`                     | Artifactory Settings.                                                                            |         |
-| `autoconfEnabled`                 | whether or not the autoconf analyzer should be used.                                             | `true`  |
-| `cmakeEnabled`                    | whether or not the CMake analyzer is enabled.                                                    | `true`  |
-| `cpanFileEnabled`                 | whether or not the Perl CPAN File analyzer is enabled.                                           | `true`  |
-| `cpeEnabled`                      | whether or not the CPE analyzer is enabled.                                                      | `true`  |
-| `cpeSuppressionEnabled`           | whether or not the CPE Suppression analyzer is enabled.                                          | `true`  |
-| `dartEnabled`                     | whether or not the Dart analyzer is enabled.                                                     | `true`  |
-| `dependencyBundlingEnabled`       | whether or not the Dependency Bundling analyzer is enabled.                                      | `true`  |
-| `dependencyMergingEnabled`        | whether or not the Dependency Merging analyzer is enabled.                                       | `true`  |
-| `dotNet`                          | .NET Settings.                                                                                   |         |
-| `elixir`                          | Elixir Settings                                                                                  |         |
-| `experimentalEnabled`             | whether or not experimental analyzers are enabled.                                               | `false` |
-| `failOnUnusedSuppressionRule`     | whether the Unused Suppression Rule analyzer should fail if there are unused rules.              | `false` |
-| `falsePositiveEnabled`            | whether or not the False Positive analyzer is enabled.                                           | `true`  |
-| `filenameEnabled`                 | whether or not the Filename analyzer is enabled.                                                 | `true`  |
-| `fileVersionEnabled`              | whether or not the File Version analyzer is enabled (reads the PE headers of DLL and EXE files). | `true`  |
-| `golang`                          | Golang Settings.                                                                                 |         |
-| `hints`                           | Hints Settings.                                                                                  |         |
-| `jarEnabled`                      | whether or not the JAR analyzer is enabled.                                                      | `true`  |
-| `knownExploitedVulnerabilities`   | Known Exploited Vulnerabilities settings.                                                        |         |
-| `mavenCentral`                    | Maven Central Settings                                                                           |         |
-| `mavenInstallEnabled`             | whether or not the Maven Install analyzer is enabled.                                            | `true`  |
-| `nexus`                           | Nexus Settings.                                                                                  |         |
-| `node`                            | Node Settings                                                                                    |         |
-| `nvdCveEnabled`                   | whether or not the NVD CVE analyzer is enabled.                                                  | `true`  |
-| `openSslEnabled`                  | whether or not the OpenSSL analyzer is enabled.                                                  | `true`  |
-| `php`                             | PHP Settings.                                                                                    |         |
-| `pnmp`                            | PNPM Settings.                                                                                   |         |
-| `python`                          | Python Settings.                                                                                 |         |
-| `retiredEnabled`                  | whether or not the retired analyzers are enabled.                                                | `false` |
-| `retireJS`                        | RetireJS Settings.                                                                               |         |
-| `ruby`                            | Ruby Settings.                                                                                   |         |
-| `swift`                           | Swift Settings.                                                                                  |         |
-| `versionFilterEnabled`            | whether or not the Version Filter analyzer is enabled.                                           | `true`  |
-| `vulnerabilitySuppressionEnabled` | whether or not the Vulnerability Suppression analyzer is enabled.                                | `true`  |
-| `yarn`                            | Yarn Settings.                                                                                   |         |
+| Setting                           | Description                                                                                             | Default |
+|:----------------------------------|:--------------------------------------------------------------------------------------------------------|:--------|
+| `additionalZipExtensions`         | additional file extensions to be treated like a ZIP files, the contents will be extracted and analyzed. | `None`  |
+| `archiveEnabled`                  | whether or not the Archive analyzer is enabled.                                                         | `true`  |
+| `artifactory`                     | Artifactory Settings.                                                                                   |         |
+| `autoconfEnabled`                 | whether or not the autoconf analyzer should be used.                                                    | `true`  |
+| `cmakeEnabled`                    | whether or not the CMake analyzer is enabled.                                                           | `true`  |
+| `cpanFileEnabled`                 | whether or not the Perl CPAN File analyzer is enabled.                                                  | `true`  |
+| `cpeEnabled`                      | whether or not the CPE analyzer is enabled.                                                             | `true`  |
+| `cpeSuppressionEnabled`           | whether or not the CPE Suppression analyzer is enabled.                                                 | `true`  |
+| `dartEnabled`                     | whether or not the Dart analyzer is enabled.                                                            | `true`  |
+| `dependencyBundlingEnabled`       | whether or not the Dependency Bundling analyzer is enabled.                                             | `true`  |
+| `dependencyMergingEnabled`        | whether or not the Dependency Merging analyzer is enabled.                                              | `true`  |
+| `dotNet`                          | .NET Settings.                                                                                          |         |
+| `elixir`                          | Elixir Settings                                                                                         |         |
+| `experimentalEnabled`             | whether or not experimental analyzers are enabled.                                                      | `false` |
+| `failOnUnusedSuppressionRule`     | whether the Unused Suppression Rule analyzer should fail if there are unused rules.                     | `false` |
+| `falsePositiveEnabled`            | whether or not the False Positive analyzer is enabled.                                                  | `true`  |
+| `filenameEnabled`                 | whether or not the Filename analyzer is enabled.                                                        | `true`  |
+| `fileVersionEnabled`              | whether or not the File Version analyzer is enabled (reads the PE headers of DLL and EXE files).        | `true`  |
+| `golang`                          | Golang Settings.                                                                                        |         |
+| `hints`                           | Hints Settings.                                                                                         |         |
+| `jarEnabled`                      | whether or not the JAR analyzer is enabled.                                                             | `true`  |
+| `knownExploitedVulnerabilities`   | Known Exploited Vulnerabilities settings.                                                               |         |
+| `mavenCentral`                    | Maven Central Settings                                                                                  |         |
+| `mavenInstallEnabled`             | whether or not the Maven Install analyzer is enabled.                                                   | `true`  |
+| `nexus`                           | Nexus Settings.                                                                                         |         |
+| `node`                            | Node Settings                                                                                           |         |
+| `nvdCveEnabled`                   | whether or not the NVD CVE analyzer is enabled.                                                         | `true`  |
+| `openSslEnabled`                  | whether or not the OpenSSL analyzer is enabled.                                                         | `true`  |
+| `php`                             | PHP Settings.                                                                                           |         |
+| `pnmp`                            | PNPM Settings.                                                                                          |         |
+| `python`                          | Python Settings.                                                                                        |         |
+| `retiredEnabled`                  | whether or not the retired analyzers are enabled.                                                       | `false` |
+| `retireJS`                        | RetireJS Settings.                                                                                      |         |
+| `ruby`                            | Ruby Settings.                                                                                          |         |
+| `swift`                           | Swift Settings.                                                                                         |         |
+| `versionFilterEnabled`            | whether or not the Version Filter analyzer is enabled.                                                  | `true`  |
+| `vulnerabilitySuppressionEnabled` | whether or not the Vulnerability Suppression analyzer is enabled.                                       | `true`  |
+| `yarn`                            | Yarn Settings.                                                                                          |         |
 
 Most of the settings here are picked up from either the default `dependencycheck.properties`, or from source, thus these
 tables try to gather them as best effort.

@@ -112,7 +112,7 @@ To migrate your project from Alexander v. Buchholtz's "sbt-dependency-check"` pl
 | `dependencyCheckSwiftEnabled`                        | Moved to `dependencyCheckAnalyzers` under the `swift` field.                         |
 | `dependencyCheckSwiftPackageResolvedAnalyzerEnabled` | Moved to `dependencyCheckAnalyzers` under the `swift` field.                         |
 | `dependencyCheckYarnAuditAnalyzerEnabled`            | Moved to `dependencyCheckAnalyzers` under the `yarn` field.                          |
-| `dependencyCheckZipExtensions`                       | `TODO`                                                                               |
+| `dependencyCheckZipExtensions`                       | Moved to `dependencyCheckAnalyzers` under the `additionalZipExtensions` field.       |
 
 
 ### Advanced Configuration
