@@ -71,6 +71,7 @@ import sbt._
   * @param yarn Yarn Settings.
   */
 case class AnalyzerSettings(
+    additionalZipExtensions: Option[Seq[String]],
     archiveEnabled: Option[Boolean],
     artifactory: AnalyzerSettings.Artifactory,
     autoconfEnabled: Option[Boolean],
@@ -112,6 +113,7 @@ case class AnalyzerSettings(
 ) {
 
   def apply(settings: Settings): Unit = {
+    settings.set(ADDITIONAL_ZIP_EXTENSIONS, additionalZipExtensions.map(_.mkString(",")))
     settings.set(ANALYZER_ARCHIVE_ENABLED, archiveEnabled)
     settings.set(ANALYZER_AUTOCONF_ENABLED, autoconfEnabled)
     settings.set(ANALYZER_CMAKE_ENABLED, cmakeEnabled)
@@ -158,6 +160,7 @@ case class AnalyzerSettings(
 object AnalyzerSettings {
 
   val Default: AnalyzerSettings = new AnalyzerSettings(
+    additionalZipExtensions         = None,
     archiveEnabled                  = None,
     artifactory                     = Artifactory.Default,
     autoconfEnabled                 = None,
@@ -199,6 +202,7 @@ object AnalyzerSettings {
   )
 
   def apply(
+      additionalZipExtensions: Option[Seq[String]]         = None,
       archiveEnabled: Option[Boolean]                      = None,
       artifactory: Artifactory                             = Artifactory.Default,
       autoconfEnabled: Option[Boolean]                     = None,
@@ -238,6 +242,7 @@ object AnalyzerSettings {
       vulnerabilitySuppressionEnabled: Option[Boolean]     = None,
       yarn: Yarn                                           = Yarn.Default
   ): AnalyzerSettings = new AnalyzerSettings(
+    additionalZipExtensions,
     archiveEnabled,
     artifactory,
     autoconfEnabled,
