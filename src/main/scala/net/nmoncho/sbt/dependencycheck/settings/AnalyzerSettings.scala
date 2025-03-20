@@ -51,7 +51,7 @@ import sbt._
   * @param golang Golang Settings.
   * @param hints Hints Settings.
   * @param jarEnabled whether the JAR analyzer is enabled.
-  * @param knownExploitedEnabled whether the Known Exploited Vulnerabilities analyzer is enabled.
+  * @param knownExploitedVulnerabilities Known Exploited Vulnerabilities settings.
   * @param mavenCentral Maven Central Settings
   * @param mavenInstallEnabled whether the Maven Install analyzer is enabled.
   * @param nexus Nexus Settings.
@@ -91,7 +91,7 @@ case class AnalyzerSettings(
     golang: AnalyzerSettings.Golang,
     hints: AnalyzerSettings.Hints,
     jarEnabled: Option[Boolean],
-    knownExploitedEnabled: Option[Boolean],
+    knownExploitedVulnerabilities: AnalyzerSettings.KnownExploitedVulnerabilities,
     mavenCentral: AnalyzerSettings.MavenCentral,
     mavenInstallEnabled: Option[Boolean],
     nexus: AnalyzerSettings.Nexus,
@@ -128,7 +128,6 @@ case class AnalyzerSettings(
     settings.set(ANALYZER_FILE_NAME_ENABLED, filenameEnabled)
     settings.set(ANALYZER_PE_ENABLED, fileVersionEnabled)
     settings.set(ANALYZER_JAR_ENABLED, jarEnabled)
-    settings.set(ANALYZER_KNOWN_EXPLOITED_ENABLED, knownExploitedEnabled)
     settings.set(ANALYZER_MAVEN_INSTALL_ENABLED, mavenInstallEnabled)
     settings.set(ANALYZER_NVD_CVE_ENABLED, nvdCveEnabled)
     settings.set(ANALYZER_OPENSSL_ENABLED, openSslEnabled)
@@ -141,6 +140,7 @@ case class AnalyzerSettings(
     elixir(settings)
     golang(settings)
     hints(settings)
+    knownExploitedVulnerabilities(settings)
     mavenCentral(settings)
     nexus(settings)
     node(settings)
@@ -178,7 +178,7 @@ object AnalyzerSettings {
     golang                          = Golang.Default,
     hints                           = Hints.Default,
     jarEnabled                      = None,
-    knownExploitedEnabled           = None,
+    knownExploitedVulnerabilities   = KnownExploitedVulnerabilities.Default,
     mavenCentral                    = MavenCentral.Default,
     mavenInstallEnabled             = None,
     nexus                           = Nexus.Default,
@@ -199,44 +199,44 @@ object AnalyzerSettings {
   )
 
   def apply(
-      archiveEnabled: Option[Boolean]                  = None,
-      artifactory: Artifactory                         = Artifactory.Default,
-      autoconfEnabled: Option[Boolean]                 = None,
-      cmakeEnabled: Option[Boolean]                    = None,
-      cpanFileEnabled: Option[Boolean]                 = None,
-      cpeEnabled: Option[Boolean]                      = None,
-      cpeSuppressionEnabled: Option[Boolean]           = None,
-      dartEnabled: Option[Boolean]                     = None,
-      dependencyBundlingEnabled: Option[Boolean]       = None,
-      dependencyMergingEnabled: Option[Boolean]        = None,
-      dotNet: DotNet                                   = DotNet.Default,
-      elixir: Elixir                                   = Elixir.Default,
-      experimentalEnabler: Option[Boolean]             = None,
-      failOnUnusedSuppressionRule: Option[Boolean]     = None,
-      falsePositiveEnabled: Option[Boolean]            = None,
-      filenameEnabled: Option[Boolean]                 = None,
-      fileVersionEnabled: Option[Boolean]              = None,
-      golang: Golang                                   = Golang.Default,
-      hints: Hints                                     = Hints.Default,
-      jarEnabled: Option[Boolean]                      = None,
-      knownExploitedEnabled: Option[Boolean]           = None,
-      mavenCentral: MavenCentral                       = MavenCentral.Default,
-      mavenInstallEnabled: Option[Boolean]             = None,
-      nexus: Nexus                                     = Nexus.Default,
-      node: Node                                       = Node.Default,
-      nvdCveEnabled: Option[Boolean]                   = None,
-      openSslEnabled: Option[Boolean]                  = None,
-      ossIndex: OssIndex                               = OssIndex.Default,
-      php: Php                                         = Php.Default,
-      pnmp: Pnpm                                       = Pnpm.Default,
-      python: Python                                   = Python.Default,
-      retiredEnabled: Option[Boolean]                  = None,
-      retireJS: RetireJS                               = RetireJS.Default,
-      ruby: Ruby                                       = Ruby.Default,
-      swift: Swift                                     = Swift.Default,
-      versionFilterEnabled: Option[Boolean]            = None,
-      vulnerabilitySuppressionEnabled: Option[Boolean] = None,
-      yarn: Yarn                                       = Yarn.Default
+      archiveEnabled: Option[Boolean]                      = None,
+      artifactory: Artifactory                             = Artifactory.Default,
+      autoconfEnabled: Option[Boolean]                     = None,
+      cmakeEnabled: Option[Boolean]                        = None,
+      cpanFileEnabled: Option[Boolean]                     = None,
+      cpeEnabled: Option[Boolean]                          = None,
+      cpeSuppressionEnabled: Option[Boolean]               = None,
+      dartEnabled: Option[Boolean]                         = None,
+      dependencyBundlingEnabled: Option[Boolean]           = None,
+      dependencyMergingEnabled: Option[Boolean]            = None,
+      dotNet: DotNet                                       = DotNet.Default,
+      elixir: Elixir                                       = Elixir.Default,
+      experimentalEnabler: Option[Boolean]                 = None,
+      failOnUnusedSuppressionRule: Option[Boolean]         = None,
+      falsePositiveEnabled: Option[Boolean]                = None,
+      filenameEnabled: Option[Boolean]                     = None,
+      fileVersionEnabled: Option[Boolean]                  = None,
+      golang: Golang                                       = Golang.Default,
+      hints: Hints                                         = Hints.Default,
+      jarEnabled: Option[Boolean]                          = None,
+      knownExploitedEnabled: KnownExploitedVulnerabilities = KnownExploitedVulnerabilities.Default,
+      mavenCentral: MavenCentral                           = MavenCentral.Default,
+      mavenInstallEnabled: Option[Boolean]                 = None,
+      nexus: Nexus                                         = Nexus.Default,
+      node: Node                                           = Node.Default,
+      nvdCveEnabled: Option[Boolean]                       = None,
+      openSslEnabled: Option[Boolean]                      = None,
+      ossIndex: OssIndex                                   = OssIndex.Default,
+      php: Php                                             = Php.Default,
+      pnmp: Pnpm                                           = Pnpm.Default,
+      python: Python                                       = Python.Default,
+      retiredEnabled: Option[Boolean]                      = None,
+      retireJS: RetireJS                                   = RetireJS.Default,
+      ruby: Ruby                                           = Ruby.Default,
+      swift: Swift                                         = Swift.Default,
+      versionFilterEnabled: Option[Boolean]                = None,
+      vulnerabilitySuppressionEnabled: Option[Boolean]     = None,
+      yarn: Yarn                                           = Yarn.Default
   ): AnalyzerSettings = new AnalyzerSettings(
     archiveEnabled,
     artifactory,
@@ -448,6 +448,54 @@ object AnalyzerSettings {
     /** Enable the Hints backed by a URL
       */
     def enable(url: URL): Hints = new Hints(Some(true), Some(url.toExternalForm))
+  }
+
+  /** Known Exploited Vulnerabilities Settings
+    *
+    * @param enabled whether the Known Exploited Vulnerabilities analyzer is enabled.
+    * @param url the URL to retrieve the Known Exploited Vulnerabilities
+    * @param username the known exploited vulnerabilities username. For use when known exploited vulnerabilities are mirrored locally on a site requiring HTTP-Basic-authentication
+    * @param password the known exploited vulnerabilities password. For use when known exploited vulnerabilities are mirrored locally on a site requiring HTTP-Basic-authentication
+    * @param bearerToken the known exploited vulnerabilities bearer token. For use when known exploited vulnerabilities are mirrored locally on a site requiring HTTP-Bearer-authentication
+    * @param validForHours controls the skipping of the check for Known Exploited Vulnerabilities updates.
+    */
+  case class KnownExploitedVulnerabilities(
+      enabled: Option[Boolean],
+      url: Option[URL],
+      username: Option[String],
+      password: Option[String],
+      bearerToken: Option[String],
+      validForHours: Option[Int]
+  ) {
+    def apply(settings: Settings): Unit = {
+      settings.set(ANALYZER_KNOWN_EXPLOITED_ENABLED, enabled)
+      settings.set(KEV_URL, url)
+      settings.set(KEV_USER, username)
+      settings.set(KEV_PASSWORD, password)
+      settings.set(KEV_BEARER_TOKEN, bearerToken)
+      settings.set(KEV_CHECK_VALID_FOR_HOURS, url)
+    }
+  }
+
+  object KnownExploitedVulnerabilities {
+    val Default: KnownExploitedVulnerabilities =
+      new KnownExploitedVulnerabilities(None, None, None, None, None, None)
+
+    def apply(
+        enabled: Option[Boolean]    = None,
+        url: Option[URL]            = None,
+        username: Option[String]    = None,
+        password: Option[String]    = None,
+        bearerToken: Option[String] = None,
+        validForHours: Option[Int]  = None
+    ): KnownExploitedVulnerabilities = new KnownExploitedVulnerabilities(
+      enabled,
+      url,
+      username,
+      password,
+      bearerToken,
+      validForHours
+    )
   }
 
   /** Maven Central Settings

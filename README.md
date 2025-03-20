@@ -175,7 +175,7 @@ Settings are grouped by either analyzer, tool, or language:
 | `golang`                          | Golang Settings.                                                                                 |         |
 | `hints`                           | Hints Settings.                                                                                  |         |
 | `jarEnabled`                      | whether or not the JAR analyzer is enabled.                                                      | `true`  |
-| `knownExploitedEnabled`           | whether or not the Known Exploited Vulnerabilities analyzer is enabled.                          | `true`  |
+| `knownExploitedVulnerabilities`   | Known Exploited Vulnerabilities settings.                                                        |         |
 | `mavenCentral`                    | Maven Central Settings                                                                           |         |
 | `mavenInstallEnabled`             | whether or not the Maven Install analyzer is enabled.                                            | `true`  |
 | `nexus`                           | Nexus Settings.                                                                                  |         |
@@ -240,6 +240,17 @@ tables try to gather them as best effort.
 |:------------|:-------------------------------------|:--------|
 | `enabled`   | whether the Hint analyzer is enabled | `true`  |
 | `hintsFile` | path to the hints file               | `null`  |
+
+##### Known Exploited Vulnerabilities Settings
+
+| Setting         | Description                                                                                                                                                        | Default                                                                               |
+|:----------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------|
+| `enabled`       | whether the Known Exploited Vulnerabilities analyzer is enabled                                                                                                    | `true`                                                                                |
+| `url`           | the URL to retrieve the Known Exploited Vulnerabilities                                                                                                            | `https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json` |
+| `username`      | the known exploited vulnerabilities username. For use when known exploited vulnerabilities are mirrored locally on a site requiring HTTP-Basic-authentication      | `null`                                                                                |
+| `password`      | the known exploited vulnerabilities password. For use when known exploited vulnerabilities are mirrored locally on a site requiring HTTP-Basic-authentication      | `null`                                                                                |
+| `bearerToken`   | the known exploited vulnerabilities bearer token. For use when known exploited vulnerabilities are mirrored locally on a site requiring HTTP-Bearer-authentication | `null`                                                                                |
+| `validForHours` | controls the skipping of the check for Known Exploited Vulnerabilities updates.                                                                                    | `24`                                                                                  |
 
 ##### Maven Central Settings
 
