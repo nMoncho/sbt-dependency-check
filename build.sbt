@@ -27,6 +27,14 @@ lazy val root = (project in file("."))
     headerLicense := Some(HeaderLicense.MIT("2025", "the original author or authors")),
     sonatypeCredentialHost := "s01.oss.sonatype.org",
     sonatypeRepository := "https://s01.oss.sonatype.org/service/local",
+    developers := List(
+      Developer(
+        "nMoncho",
+        "Gustavo De Micheli",
+        "gustavo.demicheli@gmail.com",
+        url("https://github.com/nMoncho")
+      )
+    ),
     semanticdbEnabled := true,
     semanticdbVersion := scalafixSemanticdb.revision,
     scalacOptions := (Opts.compile.encoding("UTF-8") :+
