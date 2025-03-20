@@ -52,7 +52,7 @@ object DependencyCheckPlugin extends AutoPlugin {
     dependencyCheckFormats := List(Format.HTML),
     dependencyCheckAnalysisTimeout := None,
     dependencyCheckDataDirectory := None,
-    dependencyCheckAnalyzer := AnalyzerSettings.Default,
+    dependencyCheckAnalyzers := AnalyzerSettings.Default,
     dependencyCheckSuppressionFiles := SuppressionFilesSettings.Default,
     dependencyCheckScopes := ScopesSettings.Default,
     dependencyCheckDatabase := DatabaseSettings.Default,

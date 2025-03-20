@@ -77,7 +77,7 @@ object LoadSettings {
       baseSettings.setStringIfNotEmpty(DATA_DIRECTORY, folder.getAbsolutePath)
     )
 
-    dependencyCheckAnalyzer.value(baseSettings)
+    dependencyCheckAnalyzers.value(baseSettings)
     dependencyCheckDatabase.value(baseSettings)
     dependencyCheckNvdApi.value(baseSettings)
     dependencyCheckSuppressionFiles.value(baseSettings)

@@ -27,92 +27,92 @@ To migrate your project from Alexander v. Buchholtz's "sbt-dependency-check"` pl
 | `dependencyCheckSkipOptionalScope`    | Moved to `dependencyCheckScopes` using the `optional` field.                                               |
 | `dependencyCheckSuppressionFiles`     | Same value, but accepts both `java.io.File`s and `java.net.URL`s.                                          |
 | `dependencyCheckCpeStartsWith`        | The starting String to identify the CPEs that are qualified to be imported.                                |
-| `dependencyCheckHintsFile`            | Moved to `dependencyCheckAnalyzer` under the `hints` field, for the Hints Analyzer Settings.               |
+| `dependencyCheckHintsFile`            | Moved to `dependencyCheckAnalyzers` under the `hints` field, for the Hints Analyzer Settings.              |
 | `dependencyCheckUseSbtModuleIdAsGav`  | Removed. This is enabled by default.                                                                       |
 | `dependencyCheckAnalysisTimeout`      | Same value, but accepts `java.time.Duration` instead of `Int`.                                             |
-| `dependencyCheckEnableExperimental`   | Moved to `dependencyCheckAnalyzer` under the `experimentalEnabled` field.                                  |
-| `dependencyCheckEnableRetired`        | Moved to `dependencyCheckAnalyzer` under the `retiredEnabled` field.                                       |
+| `dependencyCheckEnableExperimental`   | Moved to `dependencyCheckAnalyzers` under the `experimentalEnabled` field.                                 |
+| `dependencyCheckEnableRetired`        | Moved to `dependencyCheckAnalyzers` under the `retiredEnabled` field.                                      |
 
 
 ### Analyzer Configuration
 
-| Previous Setting                                     | New Setting                                                                 |
-|:-----------------------------------------------------|:----------------------------------------------------------------------------|
-| `dependencyCheckArchiveAnalyzerEnabled`              | Moved to `dependencyCheckAnalyzer` under the `archiveEnabled` field.        |
-| `dependencyCheckArtifactoryAnalyzerApiToken`         | Moved to `dependencyCheckAnalyzer` under the `artifactory` field.           |
-| `dependencyCheckArtifactoryAnalyzerBearerToken`      | Moved to `dependencyCheckAnalyzer` under the `artifactory` field.           |
-| `dependencyCheckArtifactoryAnalyzerEnabled`          | Moved to `dependencyCheckAnalyzer` under the `artifactory` field.           |
-| `dependencyCheckArtifactoryAnalyzerParallelAnalysis` | Moved to `dependencyCheckAnalyzer` under the `artifactory` field.           |
-| `dependencyCheckArtifactoryAnalyzerUrl`              | Moved to `dependencyCheckAnalyzer` under the `artifactory` field.           |
-| `dependencyCheckArtifactoryAnalyzerUseProxy`         | Moved to `dependencyCheckAnalyzer` under the `artifactory` field.           |
-| `dependencyCheckArtifactoryAnalyzerUsername`         | Moved to `dependencyCheckAnalyzer` under the `artifactory` field.           |
-| `dependencyCheckAssemblyAnalyzerEnabled`             | Moved to `dependencyCheckAnalyzer` under the `dotNet` field.                |
-| `dependencyCheckAutoconfAnalyzerEnabled`             | Moved to `dependencyCheckAnalyzer` under the `autoconfEnabled` field.       |
-| `dependencyCheckBundleAuditEnabled`                  | Moved to `dependencyCheckAnalyzer` under the `ruby` field.                  |
-| `dependencyCheckBundleAuditWorkingDirectory`         | Moved to `dependencyCheckAnalyzer` under the `ruby` field.                  |
-| `dependencyCheckCentralAnalyzerEnabled`              | Moved to `dependencyCheckAnalyzer` under the `mavenCentral` field.          |
-| `dependencyCheckCentralAnalyzerUseCache`             | Moved to `dependencyCheckAnalyzer` under the `mavenCentral` field.          |
-| `dependencyCheckCmakeAnalyzerEnabled`                | Moved to `dependencyCheckAnalyzer` under the `cmakeEnabled` field.          |
-| `dependencyCheckCocoapodsEnabled`                    | Moved to `dependencyCheckAnalyzer` under the `swift` field.                 |
-| `dependencyCheckComposerAnalyzerEnabled`             | Moved to `dependencyCheckAnalyzer` under the `php` field.                   |
-| `dependencyCheckCpanFileAnalyzerEnabled`             | Moved to `dependencyCheckAnalyzer` under the `cpanFileEnabled` field.       |
-| `dependencyCheckDartAnalyzerEnabled`                 | Moved to `dependencyCheckAnalyzer` under the `dartEnabled` field.           |
-| `dependencyCheckGolangDepEnabled`                    | Moved to `dependencyCheckAnalyzer` under the `golang` field.                |
-| `dependencyCheckGolangModEnabled`                    | Moved to `dependencyCheckAnalyzer` under the `golang` field.                |
-| `dependencyCheckJarAnalyzerEnabled`                  | Moved to `dependencyCheckAnalyzer` under the `jarEnabled` field.            |
-| `dependencyCheckKnownExploitedEnabled`               | Moved to `dependencyCheckAnalyzer` under the `knownExploitedEnabled` field. |
-| `dependencyCheckKnownExploitedUrl`                   | `TODO`                                                                      |
-| `dependencyCheckKnownExploitedValidForHours`         | `TODO`                                                                      |
-| `dependencyCheckMavenInstallAnalyzerEnabled`         | Moved to `dependencyCheckAnalyzer` under the `mavenInstallEnabled` field.   |
-| `dependencyCheckMixAuditAnalyzerEnabled`             | Moved to `dependencyCheckAnalyzer` under the `elixir` field.                |
-| `dependencyCheckMixAuditPath`                        | Moved to `dependencyCheckAnalyzer` under the `elixir` field.                |
-| `dependencyCheckMSBuildAnalyzerEnabled`              | Moved to `dependencyCheckAnalyzer` under the `dotNet` field.                |
-| `dependencyCheckNexusAnalyzerEnabled`                | Moved to `dependencyCheckAnalyzer` under the `nexus` field.                 |
-| `dependencyCheckNexusPassword`                       | Moved to `dependencyCheckAnalyzer` under the `nexus` field.                 |
-| `dependencyCheckNexusUrl`                            | Moved to `dependencyCheckAnalyzer` under the `nexus` field.                 |
-| `dependencyCheckNexusUser`                           | Moved to `dependencyCheckAnalyzer` under the `nexus` field.                 |
-| `dependencyCheckNexusUsesProxy`                      | Moved to `dependencyCheckAnalyzer` under the `nexus` field.                 |
-| `dependencyCheckNodeAnalyzerEnabled`                 | Moved to `dependencyCheckAnalyzer` under the `node` field.                  |
-| `dependencyCheckNodeAuditAnalyzerEnabled`            | Moved to `dependencyCheckAnalyzer` under the `node` field.                  |
-| `dependencyCheckNodeAuditAnalyzerUrl`                | Moved to `dependencyCheckAnalyzer` under the `node` field.                  |
-| `dependencyCheckNodeAuditAnalyzerUseCache`           | Moved to `dependencyCheckAnalyzer` under the `node` field.                  |
-| `dependencyCheckNodeAuditSkipDevDependencies`        | Moved to `dependencyCheckAnalyzer` under the `node` field.                  |
-| `dependencyCheckNodePackageSkipDevDependencies`      | Moved to `dependencyCheckAnalyzer` under the `node` field.                  |
-| `dependencyCheckNPMCPEAnalyzerEnabled`               | Moved to `dependencyCheckAnalyzer` under the `dotNet` field.                |
-| `dependencyCheckNugetConfAnalyzerEnabled`            | Moved to `dependencyCheckAnalyzer` under the `dotNet` field.                |
-| `dependencyCheckNuspecAnalyzerEnabled`               | Moved to `dependencyCheckAnalyzer` under the `dotNet` field.                |
-| `dependencyCheckOpensslAnalyzerEnabled`              | Moved to `dependencyCheckAnalyzer` under the `openSslEnabled` field.        |
-| `dependencyCheckOSSIndexAnalyzerEnabled`             | Moved to `dependencyCheckAnalyzer` under the `ossIndex` field.              |
-| `dependencyCheckOSSIndexAnalyzerPassword`            | Moved to `dependencyCheckAnalyzer` under the `ossIndex` field.              |
-| `dependencyCheckOSSIndexAnalyzerUrl`                 | Moved to `dependencyCheckAnalyzer` under the `ossIndex` field.              |
-| `dependencyCheckOSSIndexAnalyzerUseCache`            | Moved to `dependencyCheckAnalyzer` under the `ossIndex` field.              |
-| `dependencyCheckOSSIndexAnalyzerUsername`            | Moved to `dependencyCheckAnalyzer` under the `ossIndex` field.              |
-| `dependencyCheckOSSIndexWarnOnlyOnRemoteErrors`      | Moved to `dependencyCheckAnalyzer` under the `ossIndex` field.              |
-| `dependencyCheckPathToBundleAudit`                   | Moved to `dependencyCheckAnalyzer` under the `ruby` field.                  |
-| `dependencyCheckPathToDotNETCore`                    | Moved to `dependencyCheckAnalyzer` under the `dotNet` field.                |
-| `dependencyCheckPathToGo`                            | Moved to `dependencyCheckAnalyzer` under the `golang` field.                |
-| `dependencyCheckPathToPNPM`                          | Moved to `dependencyCheckAnalyzer` under the `pnpm` field.                  |
-| `dependencyCheckPathToYarn`                          | Moved to `dependencyCheckAnalyzer` under the `yarn` field.                  |
-| `dependencyCheckPEAnalyzerEnabled`                   | Moved to `dependencyCheckAnalyzer` under the `fileVersionEnabled` field.    |
-| `dependencyCheckPipAnalyzerEnabled`                  | Moved to `dependencyCheckAnalyzer` under the `python` field.                |
-| `dependencyCheckPipfileAnalyzerEnabled`              | Moved to `dependencyCheckAnalyzer` under the `python` field.                |
-| `dependencyCheckPNPMAuditAnalyzerEnabled`            | Moved to `dependencyCheckAnalyzer` under the `python` field.                |
-| `dependencyCheckPoetryAnalyzerEnabled`               | Moved to `dependencyCheckAnalyzer` under the `python` field.                |
-| `dependencyCheckPyDistributionAnalyzerEnabled`       | Moved to `dependencyCheckAnalyzer` under the `python` field.                |
-| `dependencyCheckPyPackageAnalyzerEnabled`            | Moved to `dependencyCheckAnalyzer` under the `python` field.                |
-| `dependencyCheckRetireJSAnalyzerEnabled`             | Moved to `dependencyCheckAnalyzer` under the `retireJS` field.              |
-| `dependencyCheckRetireJsAnalyzerFilterNonVulnerable` | Moved to `dependencyCheckAnalyzer` under the `retireJS` field.              |
-| `dependencyCheckRetireJsAnalyzerFilters`             | Moved to `dependencyCheckAnalyzer` under the `retireJS` field.              |
-| `dependencyCheckRetireJSAnalyzerRepoJSUrl`           | Moved to `dependencyCheckAnalyzer` under the `retireJS` field.              |
-| `dependencyCheckRetireJsAnalyzerRepoPassword`        | Moved to `dependencyCheckAnalyzer` under the `retireJS` field.              |
-| `dependencyCheckRetireJsAnalyzerRepoUser`            | Moved to `dependencyCheckAnalyzer` under the `retireJS` field.              |
-| `dependencyCheckRetireJsAnalyzerRepoValidFor`        | Moved to `dependencyCheckAnalyzer` under the `retireJS` field.              |
-| `dependencyCheckRetireJSForceUpdate`                 | Moved to `dependencyCheckAnalyzer` under the `retireJS` field.              |
-| `dependencyCheckRubygemsAnalyzerEnabled`             | Moved to `dependencyCheckAnalyzer` under the `ruby` field.                  |
-| `dependencyCheckSwiftEnabled`                        | Moved to `dependencyCheckAnalyzer` under the `swift` field.                 |
-| `dependencyCheckSwiftPackageResolvedAnalyzerEnabled` | Moved to `dependencyCheckAnalyzer` under the `swift` field.                 |
-| `dependencyCheckYarnAuditAnalyzerEnabled`            | Moved to `dependencyCheckAnalyzer` under the `yarn` field.                  |
-| `dependencyCheckZipExtensions`                       | `TODO`                                                                      |
+| Previous Setting                                     | New Setting                                                                  |
+|:-----------------------------------------------------|:-----------------------------------------------------------------------------|
+| `dependencyCheckArchiveAnalyzerEnabled`              | Moved to `dependencyCheckAnalyzers` under the `archiveEnabled` field.        |
+| `dependencyCheckArtifactoryAnalyzerApiToken`         | Moved to `dependencyCheckAnalyzers` under the `artifactory` field.           |
+| `dependencyCheckArtifactoryAnalyzerBearerToken`      | Moved to `dependencyCheckAnalyzers` under the `artifactory` field.           |
+| `dependencyCheckArtifactoryAnalyzerEnabled`          | Moved to `dependencyCheckAnalyzers` under the `artifactory` field.           |
+| `dependencyCheckArtifactoryAnalyzerParallelAnalysis` | Moved to `dependencyCheckAnalyzers` under the `artifactory` field.           |
+| `dependencyCheckArtifactoryAnalyzerUrl`              | Moved to `dependencyCheckAnalyzers` under the `artifactory` field.           |
+| `dependencyCheckArtifactoryAnalyzerUseProxy`         | Moved to `dependencyCheckAnalyzers` under the `artifactory` field.           |
+| `dependencyCheckArtifactoryAnalyzerUsername`         | Moved to `dependencyCheckAnalyzers` under the `artifactory` field.           |
+| `dependencyCheckAssemblyAnalyzerEnabled`             | Moved to `dependencyCheckAnalyzers` under the `dotNet` field.                |
+| `dependencyCheckAutoconfAnalyzerEnabled`             | Moved to `dependencyCheckAnalyzers` under the `autoconfEnabled` field.       |
+| `dependencyCheckBundleAuditEnabled`                  | Moved to `dependencyCheckAnalyzers` under the `ruby` field.                  |
+| `dependencyCheckBundleAuditWorkingDirectory`         | Moved to `dependencyCheckAnalyzers` under the `ruby` field.                  |
+| `dependencyCheckCentralAnalyzerEnabled`              | Moved to `dependencyCheckAnalyzers` under the `mavenCentral` field.          |
+| `dependencyCheckCentralAnalyzerUseCache`             | Moved to `dependencyCheckAnalyzers` under the `mavenCentral` field.          |
+| `dependencyCheckCmakeAnalyzerEnabled`                | Moved to `dependencyCheckAnalyzers` under the `cmakeEnabled` field.          |
+| `dependencyCheckCocoapodsEnabled`                    | Moved to `dependencyCheckAnalyzers` under the `swift` field.                 |
+| `dependencyCheckComposerAnalyzerEnabled`             | Moved to `dependencyCheckAnalyzers` under the `php` field.                   |
+| `dependencyCheckCpanFileAnalyzerEnabled`             | Moved to `dependencyCheckAnalyzers` under the `cpanFileEnabled` field.       |
+| `dependencyCheckDartAnalyzerEnabled`                 | Moved to `dependencyCheckAnalyzers` under the `dartEnabled` field.           |
+| `dependencyCheckGolangDepEnabled`                    | Moved to `dependencyCheckAnalyzers` under the `golang` field.                |
+| `dependencyCheckGolangModEnabled`                    | Moved to `dependencyCheckAnalyzers` under the `golang` field.                |
+| `dependencyCheckJarAnalyzerEnabled`                  | Moved to `dependencyCheckAnalyzers` under the `jarEnabled` field.            |
+| `dependencyCheckKnownExploitedEnabled`               | Moved to `dependencyCheckAnalyzers` under the `knownExploitedEnabled` field. |
+| `dependencyCheckKnownExploitedUrl`                   | `TODO`                                                                       |
+| `dependencyCheckKnownExploitedValidForHours`         | `TODO`                                                                       |
+| `dependencyCheckMavenInstallAnalyzerEnabled`         | Moved to `dependencyCheckAnalyzers` under the `mavenInstallEnabled` field.   |
+| `dependencyCheckMixAuditAnalyzerEnabled`             | Moved to `dependencyCheckAnalyzers` under the `elixir` field.                |
+| `dependencyCheckMixAuditPath`                        | Moved to `dependencyCheckAnalyzers` under the `elixir` field.                |
+| `dependencyCheckMSBuildAnalyzerEnabled`              | Moved to `dependencyCheckAnalyzers` under the `dotNet` field.                |
+| `dependencyCheckNexusAnalyzerEnabled`                | Moved to `dependencyCheckAnalyzers` under the `nexus` field.                 |
+| `dependencyCheckNexusPassword`                       | Moved to `dependencyCheckAnalyzers` under the `nexus` field.                 |
+| `dependencyCheckNexusUrl`                            | Moved to `dependencyCheckAnalyzers` under the `nexus` field.                 |
+| `dependencyCheckNexusUser`                           | Moved to `dependencyCheckAnalyzers` under the `nexus` field.                 |
+| `dependencyCheckNexusUsesProxy`                      | Moved to `dependencyCheckAnalyzers` under the `nexus` field.                 |
+| `dependencyCheckNodeAnalyzerEnabled`                 | Moved to `dependencyCheckAnalyzers` under the `node` field.                  |
+| `dependencyCheckNodeAuditAnalyzerEnabled`            | Moved to `dependencyCheckAnalyzers` under the `node` field.                  |
+| `dependencyCheckNodeAuditAnalyzerUrl`                | Moved to `dependencyCheckAnalyzers` under the `node` field.                  |
+| `dependencyCheckNodeAuditAnalyzerUseCache`           | Moved to `dependencyCheckAnalyzers` under the `node` field.                  |
+| `dependencyCheckNodeAuditSkipDevDependencies`        | Moved to `dependencyCheckAnalyzers` under the `node` field.                  |
+| `dependencyCheckNodePackageSkipDevDependencies`      | Moved to `dependencyCheckAnalyzers` under the `node` field.                  |
+| `dependencyCheckNPMCPEAnalyzerEnabled`               | Moved to `dependencyCheckAnalyzers` under the `dotNet` field.                |
+| `dependencyCheckNugetConfAnalyzerEnabled`            | Moved to `dependencyCheckAnalyzers` under the `dotNet` field.                |
+| `dependencyCheckNuspecAnalyzerEnabled`               | Moved to `dependencyCheckAnalyzers` under the `dotNet` field.                |
+| `dependencyCheckOpensslAnalyzerEnabled`              | Moved to `dependencyCheckAnalyzers` under the `openSslEnabled` field.        |
+| `dependencyCheckOSSIndexAnalyzerEnabled`             | Moved to `dependencyCheckAnalyzers` under the `ossIndex` field.              |
+| `dependencyCheckOSSIndexAnalyzerPassword`            | Moved to `dependencyCheckAnalyzers` under the `ossIndex` field.              |
+| `dependencyCheckOSSIndexAnalyzerUrl`                 | Moved to `dependencyCheckAnalyzers` under the `ossIndex` field.              |
+| `dependencyCheckOSSIndexAnalyzerUseCache`            | Moved to `dependencyCheckAnalyzers` under the `ossIndex` field.              |
+| `dependencyCheckOSSIndexAnalyzerUsername`            | Moved to `dependencyCheckAnalyzers` under the `ossIndex` field.              |
+| `dependencyCheckOSSIndexWarnOnlyOnRemoteErrors`      | Moved to `dependencyCheckAnalyzers` under the `ossIndex` field.              |
+| `dependencyCheckPathToBundleAudit`                   | Moved to `dependencyCheckAnalyzers` under the `ruby` field.                  |
+| `dependencyCheckPathToDotNETCore`                    | Moved to `dependencyCheckAnalyzers` under the `dotNet` field.                |
+| `dependencyCheckPathToGo`                            | Moved to `dependencyCheckAnalyzers` under the `golang` field.                |
+| `dependencyCheckPathToPNPM`                          | Moved to `dependencyCheckAnalyzers` under the `pnpm` field.                  |
+| `dependencyCheckPathToYarn`                          | Moved to `dependencyCheckAnalyzers` under the `yarn` field.                  |
+| `dependencyCheckPEAnalyzerEnabled`                   | Moved to `dependencyCheckAnalyzers` under the `fileVersionEnabled` field.    |
+| `dependencyCheckPipAnalyzerEnabled`                  | Moved to `dependencyCheckAnalyzers` under the `python` field.                |
+| `dependencyCheckPipfileAnalyzerEnabled`              | Moved to `dependencyCheckAnalyzers` under the `python` field.                |
+| `dependencyCheckPNPMAuditAnalyzerEnabled`            | Moved to `dependencyCheckAnalyzers` under the `python` field.                |
+| `dependencyCheckPoetryAnalyzerEnabled`               | Moved to `dependencyCheckAnalyzers` under the `python` field.                |
+| `dependencyCheckPyDistributionAnalyzerEnabled`       | Moved to `dependencyCheckAnalyzers` under the `python` field.                |
+| `dependencyCheckPyPackageAnalyzerEnabled`            | Moved to `dependencyCheckAnalyzers` under the `python` field.                |
+| `dependencyCheckRetireJSAnalyzerEnabled`             | Moved to `dependencyCheckAnalyzers` under the `retireJS` field.              |
+| `dependencyCheckRetireJsAnalyzerFilterNonVulnerable` | Moved to `dependencyCheckAnalyzers` under the `retireJS` field.              |
+| `dependencyCheckRetireJsAnalyzerFilters`             | Moved to `dependencyCheckAnalyzers` under the `retireJS` field.              |
+| `dependencyCheckRetireJSAnalyzerRepoJSUrl`           | Moved to `dependencyCheckAnalyzers` under the `retireJS` field.              |
+| `dependencyCheckRetireJsAnalyzerRepoPassword`        | Moved to `dependencyCheckAnalyzers` under the `retireJS` field.              |
+| `dependencyCheckRetireJsAnalyzerRepoUser`            | Moved to `dependencyCheckAnalyzers` under the `retireJS` field.              |
+| `dependencyCheckRetireJsAnalyzerRepoValidFor`        | Moved to `dependencyCheckAnalyzers` under the `retireJS` field.              |
+| `dependencyCheckRetireJSForceUpdate`                 | Moved to `dependencyCheckAnalyzers` under the `retireJS` field.              |
+| `dependencyCheckRubygemsAnalyzerEnabled`             | Moved to `dependencyCheckAnalyzers` under the `ruby` field.                  |
+| `dependencyCheckSwiftEnabled`                        | Moved to `dependencyCheckAnalyzers` under the `swift` field.                 |
+| `dependencyCheckSwiftPackageResolvedAnalyzerEnabled` | Moved to `dependencyCheckAnalyzers` under the `swift` field.                 |
+| `dependencyCheckYarnAuditAnalyzerEnabled`            | Moved to `dependencyCheckAnalyzers` under the `yarn` field.                  |
+| `dependencyCheckZipExtensions`                       | `TODO`                                                                       |
 
 
 ### Advanced Configuration
