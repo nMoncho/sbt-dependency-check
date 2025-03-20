@@ -71,6 +71,7 @@ object DependencyCheckPlugin extends AutoPlugin {
     dependencyCheckUpdate := dependencyCheckUpdateTask.value,
     dependencyCheckPurge := dependencyCheckPurgeTask.value,
     dependencyCheckListSettings := dependencyCheckListTask.value,
+    dependencyCheckListUnusedSuppressions := dependencyCheckListUnusedTask.value,
     dependencyCheckOutputDirectory := crossTarget.value,
     dependencyCheckAggregate / aggregate := false,
     dependencyCheckAllProjects / aggregate := false,
@@ -90,6 +91,8 @@ object DependencyCheckPlugin extends AutoPlugin {
   private def dependencyCheckPurgeTask: Def.Initialize[Task[Unit]] = Purge()
 
   private def dependencyCheckListTask: Def.Initialize[Task[Unit]] = ListSettings()
+
+  private def dependencyCheckListUnusedTask: Def.Initialize[Task[Unit]] = ListUnusedSuppressions()
 
   lazy val engineSettings: Def.Initialize[Task[Settings]] = LoadSettings()
 

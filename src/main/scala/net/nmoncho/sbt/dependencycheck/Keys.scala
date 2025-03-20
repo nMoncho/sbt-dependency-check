@@ -114,5 +114,9 @@ object Keys {
     taskKey("Deletes the local copy of the NVD. This is used to force a refresh of the data.")
   lazy val dependencyCheckListSettings: TaskKey[Unit] =
     taskKey("List the settings used during the analysis.")
+  lazy val dependencyCheckListUnusedSuppressions: TaskKey[Unit] =
+    taskKey(
+      "List unused suppressions, only considering suppression files, not hosted suppressions nor packed suppressions."
+    )
 
 }

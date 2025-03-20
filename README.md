@@ -29,14 +29,15 @@ The minimum SBT version supported is `1.9.0`.
 
 The following tasks are available:
 
-| Task                          | Description                                                                                     |
-|:------------------------------|:------------------------------------------------------------------------------------------------|
-| `dependencyCheck`             | Runs dependency-check against the project and generates a report per sub project.               |
-| `dependencyCheckAggregate`    | Runs dependency-check against project aggregates and combines the results into a single report. |
-| `dependencyCheckAllProjects`  | Runs dependency-check against all projects and combines the results into a single report.       |
-| `dependencyCheckUpdate`       | Updates the local cache of the NVD data from NIST.                                              |
-| `dependencyCheckPurge`        | Deletes the local copy of the NVD. This is used to force a refresh of the data.                 |
-| `dependencyCheckListSettings` | List the settings used during the analysis.                                                     |
+| Task                                    | Description                                                                                                    |
+|:----------------------------------------|:---------------------------------------------------------------------------------------------------------------|
+| `dependencyCheck`                       | Runs dependency-check against the project and generates a report per sub project.                              |
+| `dependencyCheckAggregate`              | Runs dependency-check against project aggregates and combines the results into a single report.                |
+| `dependencyCheckAllProjects`            | Runs dependency-check against all projects and combines the results into a single report.                      |
+| `dependencyCheckUpdate`                 | Updates the local cache of the NVD data from NIST.                                                             |
+| `dependencyCheckPurge`                  | Deletes the local copy of the NVD. This is used to force a refresh of the data.                                |
+| `dependencyCheckListSettings`           | List the settings used during the analysis.                                                                    |
+| `dependencyCheckListUnusedSuppressions` | List unused suppressions, only considering suppression files, not hosted suppressions nor packed suppressions. |
 
 The reports will be written to `crossTarget.value` by default. This can be overwritten by
 setting `dependencyCheckOutputDirectory`.
