@@ -27,11 +27,10 @@ import scala.collection.Seq
 
 import net.nmoncho.sbt.dependencycheck.settings.AnalyzerSettings
 import net.nmoncho.sbt.dependencycheck.settings.DatabaseSettings
-import net.nmoncho.sbt.dependencycheck.settings.HostedSuppressionsSettings
 import net.nmoncho.sbt.dependencycheck.settings.NvdApiSettings
 import net.nmoncho.sbt.dependencycheck.settings.ProxySettings
 import net.nmoncho.sbt.dependencycheck.settings.ScopesSettings
-import net.nmoncho.sbt.dependencycheck.settings.SuppressionFilesSettings
+import net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings
 import org.owasp.dependencycheck.reporting.ReportGenerator
 import sbt.File
 import sbt.SettingKey
@@ -77,17 +76,14 @@ object Keys {
   lazy val dependencyCheckAnalyzers: SettingKey[AnalyzerSettings] = settingKey(
     "Settings for the different analyzers used during the analysis."
   )
-  lazy val dependencyCheckSuppressionFiles: SettingKey[SuppressionFilesSettings] = settingKey(
-    "The sequence of file paths or URLs to the XML suppression files - used to suppress false positives."
+  lazy val dependencyCheckSuppressions: SettingKey[SuppressionSettings] = settingKey(
+    "Combines a sequence of file paths, or URLs to the XML suppression files, with any hosted suppressions the analysis should be using. Suppressions are used to ignore false positives."
   )
   lazy val dependencyCheckDataDirectory: SettingKey[Option[File]] = settingKey(
     "Base path to use for the data directory (for embedded db and other cached resources from the Internet)"
   )
   lazy val dependencyCheckDatabase: SettingKey[DatabaseSettings] = settingKey(
     "Settings for the database used to hold the CVEs during the analysis."
-  )
-  lazy val dependencyCheckHostedSuppressions: SettingKey[HostedSuppressionsSettings] = settingKey(
-    "Settings for any hosted suppressions the analysis should be using."
   )
   lazy val dependencyCheckNvdApi: SettingKey[NvdApiSettings] = settingKey(
     "Settings to contact the NVD API, such as API Key, Request Delay, Max Retries, etc."

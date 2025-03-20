@@ -53,12 +53,11 @@ object DependencyCheckPlugin extends AutoPlugin {
     dependencyCheckAnalysisTimeout := None,
     dependencyCheckDataDirectory := None,
     dependencyCheckAnalyzers := AnalyzerSettings.Default,
-    dependencyCheckSuppressionFiles := SuppressionFilesSettings.Default,
+    dependencyCheckSuppressions := SuppressionSettings.Default,
     dependencyCheckScopes := ScopesSettings.Default,
     dependencyCheckDatabase := DatabaseSettings.Default,
     dependencyCheckNvdApi := NvdApiSettings.Default,
     dependencyCheckProxy := ProxySettings.Default,
-    dependencyCheckHostedSuppressions := HostedSuppressionsSettings.Default,
     dependencyCheckConnectionTimeout := None,
     dependencyCheckConnectionReadTimeout := None
   )

@@ -10,28 +10,28 @@ To migrate your project from Alexander v. Buchholtz's "sbt-dependency-check"` pl
 
 ## Settings Mapping
 
-| Previous Setting                      | New Setting                                                                                                |
-|:--------------------------------------|:-----------------------------------------------------------------------------------------------------------|
-| `dependencyCheckAutoUpdate`           | Same value                                                                                                 |
-| `dependencyCheckCveValidForHours`     | Sets the number of hours to wait before checking for new updates from the NVD.                             |
-| `dependencyCheckFailBuildOnCVSS`      | Same value.                                                                                                |
-| `dependencyCheckJUnitFailBuildOnCVSS` | Same value.                                                                                                |
-| `dependencyCheckFormat`               | Combined with `dependencyCheckFormats`.                                                                    |
-| `dependencyCheckFormats`              | Same value, but accepts `org.owasp.dependencycheck.reporting.ReportGenerator.Format` instead of `String`s. |
-| `dependencyCheckOutputDirectory`      | Same value                                                                                                 |
-| `dependencyCheckScanSet`              | Same value                                                                                                 |
-| `dependencyCheckSkip`                 | Same value                                                                                                 |
-| `dependencyCheckSkipTestScope`        | Moved to `dependencyCheckScopes` using the `test` field.                                                   |
-| `dependencyCheckSkipRuntimeScope`     | Moved to `dependencyCheckScopes` using the `runtime` field.                                                |
-| `dependencyCheckSkipProvidedScope`    | Moved to `dependencyCheckScopes` using the `provided` field.                                               |
-| `dependencyCheckSkipOptionalScope`    | Moved to `dependencyCheckScopes` using the `optional` field.                                               |
-| `dependencyCheckSuppressionFiles`     | Same value, but accepts both `java.io.File`s and `java.net.URL`s.                                          |
-| `dependencyCheckCpeStartsWith`        | The starting String to identify the CPEs that are qualified to be imported.                                |
-| `dependencyCheckHintsFile`            | Moved to `dependencyCheckAnalyzers` under the `hints` field, for the Hints Analyzer Settings.              |
-| `dependencyCheckUseSbtModuleIdAsGav`  | Removed. This is enabled by default.                                                                       |
-| `dependencyCheckAnalysisTimeout`      | Same value, but accepts `java.time.Duration` instead of `Int`.                                             |
-| `dependencyCheckEnableExperimental`   | Moved to `dependencyCheckAnalyzers` under the `experimentalEnabled` field.                                 |
-| `dependencyCheckEnableRetired`        | Moved to `dependencyCheckAnalyzers` under the `retiredEnabled` field.                                      |
+| Previous Setting                      | New Setting                                                                                                       |
+|:--------------------------------------|:------------------------------------------------------------------------------------------------------------------|
+| `dependencyCheckAutoUpdate`           | Same value                                                                                                        |
+| `dependencyCheckCveValidForHours`     | Sets the number of hours to wait before checking for new updates from the NVD.                                    |
+| `dependencyCheckFailBuildOnCVSS`      | Same value.                                                                                                       |
+| `dependencyCheckJUnitFailBuildOnCVSS` | Same value.                                                                                                       |
+| `dependencyCheckFormat`               | Combined with `dependencyCheckFormats`.                                                                           |
+| `dependencyCheckFormats`              | Same value, but accepts `org.owasp.dependencycheck.reporting.ReportGenerator.Format` instead of `String`s.        |
+| `dependencyCheckOutputDirectory`      | Same value                                                                                                        |
+| `dependencyCheckScanSet`              | Same value                                                                                                        |
+| `dependencyCheckSkip`                 | Same value                                                                                                        |
+| `dependencyCheckSkipTestScope`        | Moved to `dependencyCheckScopes` using the `test` field.                                                          |
+| `dependencyCheckSkipRuntimeScope`     | Moved to `dependencyCheckScopes` using the `runtime` field.                                                       |
+| `dependencyCheckSkipProvidedScope`    | Moved to `dependencyCheckScopes` using the `provided` field.                                                      |
+| `dependencyCheckSkipOptionalScope`    | Moved to `dependencyCheckScopes` using the `optional` field.                                                      |
+| `dependencyCheckSuppressionFiles`     | Moved to `dependencyCheckSuppressions` under the `files` field. Accepts both `java.io.File`s and `java.net.URL`s. |
+| `dependencyCheckCpeStartsWith`        | The starting String to identify the CPEs that are qualified to be imported.                                       |
+| `dependencyCheckHintsFile`            | Moved to `dependencyCheckAnalyzers` under the `hints` field, for the Hints Analyzer Settings.                     |
+| `dependencyCheckUseSbtModuleIdAsGav`  | Removed. This is enabled by default.                                                                              |
+| `dependencyCheckAnalysisTimeout`      | Same value, but accepts `java.time.Duration` instead of `Int`.                                                    |
+| `dependencyCheckEnableExperimental`   | Moved to `dependencyCheckAnalyzers` under the `experimentalEnabled` field.                                        |
+| `dependencyCheckEnableRetired`        | Moved to `dependencyCheckAnalyzers` under the `retiredEnabled` field.                                             |
 
 
 ### Analyzer Configuration
@@ -129,11 +129,11 @@ To migrate your project from Alexander v. Buchholtz's "sbt-dependency-check"` pl
 | `dependencyCheckCveUser`                         | Moved to `dependencyCheckNvdApi` under the `dataFeed` field (consider using to NVD API Key)  |
 | `dependencyCheckCveWaitTime`                     | N/A                                                                                          |
 | `dependencyCheckDatabaseDriverName`              | Moved to `dependencyCheckDatabase`.                                                          |
-| `dependencyCheckDatabaseDriverPath`              | Moved to `dependencyCheckDatabase`.                                                          |
+| `dependencyCheckDatabaseDriverPath`         §    | Moved to `dependencyCheckDatabase`.                                                          |
 | `dependencyCheckDatabasePassword`                | Moved to `dependencyCheckDatabase`.                                                          |
 | `dependencyCheckDatabaseUser`                    | Moved to `dependencyCheckDatabase`.                                                          |
 | `dependencyCheckDataDirectory`                   | Same value.                                                                                  |
-| `dependencyCheckHostedSuppressionsEnabled`       | Moved to `dependencyCheckHostedSuppressions`.                                                |
-| `dependencyCheckHostedSuppressionsForceUpdate`   | Moved to `dependencyCheckHostedSuppressions`.                                                |
-| `dependencyCheckHostedSuppressionsUrl`           | Moved to `dependencyCheckHostedSuppressions`.                                                |
-| `dependencyCheckHostedSuppressionsValidForHours` | Moved to `dependencyCheckHostedSuppressions`.                                                |
+| `dependencyCheckHostedSuppressionsEnabled`       | Moved to `dependencyCheckSuppressions` under the `hosted` field.                             |
+| `dependencyCheckHostedSuppressionsForceUpdate`   | Moved to `dependencyCheckSuppressions` under the `hosted` field.                             |
+| `dependencyCheckHostedSuppressionsUrl`           | Moved to `dependencyCheckSuppressions` under the `hosted` field.                             |
+| `dependencyCheckHostedSuppressionsValidForHours` | Moved to `dependencyCheckSuppressions` under the `hosted` field.                             |

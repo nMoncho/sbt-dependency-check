@@ -29,7 +29,7 @@ import sbt.URL
 /** Suppression Files used to ignore false positives.
   *
   * @param files files or urls to consider
-  * @param user he username used when connecting to the suppressionFiles. For use when your suppressionFiles are hosted on a site requiring HTTP-Basic-authentication.
+  * @param user the username used when connecting to the suppressionFiles. For use when your suppressionFiles are hosted on a site requiring HTTP-Basic-authentication.
   * @param password the password used when connecting to the suppressionFiles. For use when your suppressionFiles are hosted on a site requiring HTTP-Basic-authentication.
   * @param bearerToken the token used when connecting to the suppressionFiles. For use when your suppressionFiles are hosted on a site requiring HTTP-Bearer-authentication.
   */

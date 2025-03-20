@@ -80,8 +80,7 @@ object LoadSettings {
     dependencyCheckAnalyzers.value(baseSettings)
     dependencyCheckDatabase.value(baseSettings)
     dependencyCheckNvdApi.value(baseSettings)
-    dependencyCheckSuppressionFiles.value(baseSettings)
-    dependencyCheckHostedSuppressions.value(baseSettings)
+    dependencyCheckSuppressions.value(baseSettings)
 
     baseSettings
   }

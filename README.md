@@ -56,27 +56,26 @@ to know what's the final value of each setting, and an example of this propertie
 SBT Setting Keys are usually wrapped with an `Option`. This is meant to allow keeping the default value, at the cost of
 some configuration convenience.
 
-| Setting                                | Description                                                                                                           | Default                                                                        |
-|:---------------------------------------|:----------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------|
-| `dependencyCheckFailBuildOnCVSS`       | Specifies if the build should be failed if a CVSS score above a specified level is identified                         | 11.0 (never fails a build)                                                     |
-| `dependencyCheckJUnitFailBuildOnCVSS`  | If using the jUnit, specifies the CVSS score that is considered a `test` failure when generating a jUnit style report | 0.0                                                                            |
-| `dependencyCheckSkip`                  | Skips this project on the dependency-check analysis                                                                   | `false`                                                                        |
-| `dependencyCheckScopes`                | What library dependency scopes are considered during the analysis                                                     | Compile = true, Test = false, Runtime = true, Provided = true, Optional = true |
-| `dependencyCheckScanSet`               | An optional sequence of files that specify additional files and/or directories to analyze as part of the scan         | Standard Scala conventions                                                     |
-| `dependencyCheckFormats`               | The report formats to be generated                                                                                    | `HTML`                                                                         |
-| `dependencyCheckAnalysisTimeout`       | Set the analysis timeout.                                                                                             | 180 minutes (by DependencyCheck)                                               |
-| `dependencyCheckOutputDirectory`       | The location to write the report(s).                                                                                  | `cross.target`                                                                 |
-| `dependencyCheckAutoUpdate`            | Sets whether auto-updating of the NVD CVE/CPE, retireJS and hosted suppressions data is enabled.                      | `true`                                                                         |
-| `dependencyCheckDataDirectory`         | Base path to use for the data directory (for embedded db and other cached resources from the Internet)                | `[JAR]/data/11.0`                                                              |
-| `dependencyCheckSettingsFile`          | Where to look for the 'dependencycheck.properties' file                                                               | Resource `dependencycheck.properties`                                          |
-| `dependencyCheckAnalyzers`             | Settings for the different analyzers used during the analysis                                                         | See [Analyzer Settings](#analyzer-settings)                                    |
-| `dependencyCheckSuppressionFiles`      | The sequence of file paths or URLs to the XML suppression files - used to suppress false positives.                   | empty                                                                          |
-| `dependencyCheckDatabase`              | Settings for the database used to hold the CVEs during the analysis.                                                  | See [Database Settings](#database-settings)                                    |
-| `dependencyCheckHostedSuppressions`    | Settings for any hosted suppressions the analysis should be using.                                                    |                                                                                |
-| `dependencyCheckNvdApi`                | Settings to contact the NVD API, such as API Key, Request Delay, Max Retries, etc.                                    | See [NVD API](#nvd-api)                                                        |
-| `dependencyCheckProxy`                 | Settings to use a Proxy. Honors System Properties like `https.proxyHost`, `https.proxyPort`, etc.                     | See [Running behind a proxy](#running-behind-a-proxy)                          |
-| `dependencyCheckConnectionTimeout`     | Sets the URL Connection Timeout (in milliseconds) used when downloading external data.                                | `10 seconds`                                                                   |
-| `dependencyCheckConnectionReadTimeout` | Sets the URL Connection Read Timeout (in milliseconds) used when downloading external data.                           | `60 seconds`                                                                   |
+| Setting                                | Description                                                                                                                                                                          | Default                                                                        |
+|:---------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------|
+| `dependencyCheckFailBuildOnCVSS`       | Specifies if the build should be failed if a CVSS score above a specified level is identified                                                                                        | 11.0 (never fails a build)                                                     |
+| `dependencyCheckJUnitFailBuildOnCVSS`  | If using the jUnit, specifies the CVSS score that is considered a `test` failure when generating a jUnit style report                                                                | 0.0                                                                            |
+| `dependencyCheckSkip`                  | Skips this project on the dependency-check analysis                                                                                                                                  | `false`                                                                        |
+| `dependencyCheckScopes`                | What library dependency scopes are considered during the analysis                                                                                                                    | Compile = true, Test = false, Runtime = true, Provided = true, Optional = true |
+| `dependencyCheckScanSet`               | An optional sequence of files that specify additional files and/or directories to analyze as part of the scan                                                                        | Standard Scala conventions                                                     |
+| `dependencyCheckFormats`               | The report formats to be generated                                                                                                                                                   | `HTML`                                                                         |
+| `dependencyCheckAnalysisTimeout`       | Set the analysis timeout.                                                                                                                                                            | 180 minutes (by DependencyCheck)                                               |
+| `dependencyCheckOutputDirectory`       | The location to write the report(s).                                                                                                                                                 | `cross.target`                                                                 |
+| `dependencyCheckAutoUpdate`            | Sets whether auto-updating of the NVD CVE/CPE, retireJS and hosted suppressions data is enabled.                                                                                     | `true`                                                                         |
+| `dependencyCheckDataDirectory`         | Base path to use for the data directory (for embedded db and other cached resources from the Internet)                                                                               | `[JAR]/data/11.0`                                                              |
+| `dependencyCheckSettingsFile`          | Where to look for the 'dependencycheck.properties' file                                                                                                                              | Resource `dependencycheck.properties`                                          |
+| `dependencyCheckAnalyzers`             | Settings for the different analyzers used during the analysis                                                                                                                        | See [Analyzer Settings](#analyzer-settings)                                    |
+| `dependencyCheckSuppressions`          | Combines a sequence of file paths, or URLs to the XML suppression files, with any hosted suppressions the analysis should be using. Suppressions are used to ignore false positives. | empty                                                                          |
+| `dependencyCheckDatabase`              | Settings for the database used to hold the CVEs during the analysis.                                                                                                                 | See [Database Settings](#database-settings)                                    |
+| `dependencyCheckNvdApi`                | Settings to contact the NVD API, such as API Key, Request Delay, Max Retries, etc.                                                                                                   | See [NVD API](#nvd-api)                                                        |
+| `dependencyCheckProxy`                 | Settings to use a Proxy. Honors System Properties like `https.proxyHost`, `https.proxyPort`, etc.                                                                                    | See [Running behind a proxy](#running-behind-a-proxy)                          |
+| `dependencyCheckConnectionTimeout`     | Sets the URL Connection Timeout (in milliseconds) used when downloading external data.                                                                                               | `10 seconds`                                                                   |
+| `dependencyCheckConnectionReadTimeout` | Sets the URL Connection Read Timeout (in milliseconds) used when downloading external data.                                                                                          | `60 seconds`                                                                   |
 
 #### Sensitive Configuration
 
@@ -130,7 +129,27 @@ limit and receive 403 errors. In a CI environment one must use a caching strateg
 | `batchInsertEnabled` | adds capabilities to batch insert. Tested on PostgreSQL and H2          | `true`                                                                                       |
 | `batchInsertSize`    | Size of database batch inserts                                          | `1000`                                                                                       |
 
-#### Hosted Suppression Settings
+#### Suppression Settings
+
+Suppressions can be specified either as suppression files, or as hosted suppressions. A suppression file can be either an
+actual file or a URL. Hosted suppression are specified with a URL. The different between the two is that suppression files
+are meant to be project specific, whereas hosted suppression are meant, or can be, more general. Hosted Suppressions are
+considered "base" suppressions, whereas suppression files are not.
+
+Whether this suppression is taken into account or not is governed by the Analyzer Setting `vulnerabilitySuppressionEnabled`.
+Another useful setting is `failOnUnusedSuppressionRule` which will fail the build if there is any non-base suppression not
+applied.
+
+**Suppression Files**
+
+| Setting       | Description                                                                                                                                             | Default |
+|:--------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------|:--------|
+| `files`       | files or urls to consider                                                                                                                               | <empty> |
+| `user`        | the username used when connecting to the suppressionFiles. For use when your suppressionFiles are hosted on a site requiring HTTP-Basic-authentication. | `null`  |
+| `password`    | the password used when connecting to the suppressionFiles. For use when your suppressionFiles are hosted on a site requiring HTTP-Basic-authentication. | `null`  |
+| `bearerToken` | the token used when connecting to the suppressionFiles. For use when your suppressionFiles are hosted on a site requiring HTTP-Bearer-authentication.   | `null`  |
+
+**Hosted Suppressions**
 
 | Setting         | Description                                                                                                                                | Default                                                                               |
 |:----------------|:-------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------|
