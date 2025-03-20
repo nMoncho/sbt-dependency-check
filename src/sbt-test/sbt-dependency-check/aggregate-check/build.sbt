@@ -1,3 +1,5 @@
+import net.nmoncho.sbt.dependencycheck.settings._
+
 lazy val commonSettings = Seq(
   organization := "net.nmoncho",
   version := "0.1.0",
@@ -10,7 +12,8 @@ lazy val root = (project in file("."))
   .settings(
     libraryDependencies += "org.eclipse.jetty" % "jetty-runner" % "9.2.4.v20141103" % "provided",
     libraryDependencies += "commons-collections" % "commons-collections" % "3.2.1" % "optional",
-    dependencyCheckScopes := net.nmoncho.sbt.dependencycheck.settings.ScopesSettings(
+    dependencyCheckNvdApi := sys.env.get("NVD_API_KEY").map(key => NvdApiSettings(key)).getOrElse(NvdApiSettings.Default),
+    dependencyCheckScopes := ScopesSettings(
       test = false,
       provided = false,
       optional = false

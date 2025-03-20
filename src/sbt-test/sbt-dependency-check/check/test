@@ -1,2 +1,14 @@
 > dependencyCheck
 $ exists target/scala-2.13/dependency-check-report.html
+
+> set dependencyCheckScopes := net.nmoncho.sbt.dependencycheck.settings.ScopesSettings(test = true, provided = true, runtime = true)
+> set dependencyCheckFailBuildOnCVSS := 0.0
+-> dependencyCheck
+
+> set dependencyCheckSuppressionFiles := net.nmoncho.sbt.dependencycheck.settings.SuppressionFilesSettings.files()(new File("suppressions.xml"))
+> dependencyCheck
+
+# Cleanup settings
+> set dependencyCheckScopes := net.nmoncho.sbt.dependencycheck.settings.ScopesSettings.Default
+> set dependencyCheckFailBuildOnCVSS := 11.0
+> set dependencyCheckSuppressionFiles := net.nmoncho.sbt.dependencycheck.settings.SuppressionFilesSettings.Default
