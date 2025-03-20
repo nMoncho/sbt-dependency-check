@@ -25,6 +25,19 @@ import org.owasp.dependencycheck.utils.Settings
 import org.owasp.dependencycheck.utils.Settings.KEYS._
 import sbt.File
 
+/** Database Settings
+  *
+  * Database where vulnerabilities are stored for the analysis.
+  *
+  * @param driverName the database driver class name. An embedded database is used by default
+  * @param driverPath the database driver class path
+  * @param connectionString the database connection string
+  * @param username username to use when connecting to the database
+  * @param password password to use when connecting to the database
+  * @param dataDirectory base path to use for the data directory (for embedded db and other cached resources from the Internet)
+  * @param batchInsertEnabled adds capabilities to batch insert. Tested on PostgreSQL and H2
+  * @param batchInsertSize Size of database batch inserts
+  */
 case class DatabaseSettings(
     driverName: Option[String],
     driverPath: Option[String],
@@ -42,7 +55,6 @@ case class DatabaseSettings(
     settings.set(DB_CONNECTION_STRING, connectionString)
     settings.set(DB_USER, username)
     settings.set(DB_PASSWORD, password)
-    settings.set(DATA_DIRECTORY, dataDirectory)
 
     settings.set(ENABLE_BATCH_UPDATES, batchInsertEnabled)
     settings.set(MAX_BATCH_SIZE, batchInsertSize)

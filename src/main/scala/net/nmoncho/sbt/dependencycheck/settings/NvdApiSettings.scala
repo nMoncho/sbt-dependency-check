@@ -22,15 +22,27 @@
 package net.nmoncho.sbt.dependencycheck
 package settings
 
+import java.time.Duration
+
 import net.nmoncho.sbt.dependencycheck.settings.NvdApiSettings.DataFeed
 import org.owasp.dependencycheck.utils.Settings
 import org.owasp.dependencycheck.utils.Settings.KEYS._
 import sbt.URL
 
+/** NVD API Settings
+  *
+  * @param endpoint NVD API Endpoint
+  * @param apiKey API Key for the NVD API
+  * @param requestDelay delay between requests for the NVD API
+  * @param maxRetryCount the maximum number of retry requests for a single call to the NVD API
+  * @param validForHours control the skipping of the check for NVD updates
+  * @param resultsPerPage control the results per page lower than NVD's default of 2000.
+  * @param dataFeed NVD Data Feed Configuration
+  */
 case class NvdApiSettings(
     endpoint: Option[String],
     apiKey: String,
-    requestDelay: Option[Int],
+    requestDelay: Option[Duration],
     maxRetryCount: Option[Int],
     validForHours: Option[Int],
     resultsPerPage: Option[Int],
@@ -40,9 +52,10 @@ case class NvdApiSettings(
   def apply(settings: Settings): Unit = {
     settings.set(NVD_API_ENDPOINT, endpoint)
     settings.setStringIfNotEmpty(NVD_API_KEY, apiKey)
-    settings.set(NVD_API_DELAY, requestDelay)
+    settings.set(NVD_API_DELAY, requestDelay.map(_.toMillis))
     settings.set(NVD_API_MAX_RETRY_COUNT, maxRetryCount)
     settings.set(NVD_API_VALID_FOR_HOURS, validForHours)
+    settings.set(NVD_API_RESULTS_PER_PAGE, resultsPerPage)
     dataFeed(settings)
   }
 
@@ -53,13 +66,13 @@ object NvdApiSettings {
     new NvdApiSettings(None, "", None, None, None, None, DataFeed.Default)
 
   def apply(
-      endpoint: Option[String]    = None,
-      apiKey: String              = "",
-      requestDelay: Option[Int]   = None,
-      maxRetryCount: Option[Int]  = None,
-      validForHours: Option[Int]  = None,
-      resultsPerPage: Option[Int] = None,
-      dataFeed: DataFeed          = DataFeed.Default
+      endpoint: Option[String]       = None,
+      apiKey: String                 = "",
+      requestDelay: Option[Duration] = None,
+      maxRetryCount: Option[Int]     = None,
+      validForHours: Option[Int]     = None,
+      resultsPerPage: Option[Int]    = None,
+      dataFeed: DataFeed             = DataFeed.Default
   ): NvdApiSettings =
     new NvdApiSettings(
       endpoint,
@@ -71,6 +84,15 @@ object NvdApiSettings {
       dataFeed
     )
 
+  /** Data Feed Settings
+    *
+    * @param url URL for the NVD API Data Feed
+    * @param startYear starting year for the NVD CVE Data feed cache.
+    * @param validForDays indicates how often the NVD API data feed needs to be updated before a full refresh is evaluated
+    * @param username username to use when connecting to the NVD Data feed. For use when NVD API Data is hosted as datafeeds locally on a site requiring HTTP-Basic-authentication.
+    * @param password password to authenticate to the NVD Data feed. For use when NVD API Data is hosted as datafeeds locally on a site requiring HTTP-Basic-authentication.
+    * @param bearerToken token to authenticate to the NVD Data feed. For use when NVD API Data is hosted as datafeeds locally on a site requiring HTTP-Bearer-authentication.
+    */
   case class DataFeed(
       url: Option[URL],
       startYear: Option[Int],

@@ -27,6 +27,16 @@ import java.net.URL
 import org.owasp.dependencycheck.utils.Settings
 import org.owasp.dependencycheck.utils.Settings.KEYS._
 
+/** Hosted Suppressions Settings
+  *
+  * @param enabled whether the hosted suppressions file datasource is enabled
+  * @param url hosted suppressions file URL
+  * @param forceUpdate whether the hosted suppressions file will be updated regardless of the autoupdate settings.
+  * @param validForHours controls the skipping of the check for hosted suppressions file updates.
+  * @param username the hosted suppressions username. For use when hosted suppressions are mirrored locally on a site requiring HTTP-Basic-authentication
+  * @param password the hosted suppressions password. For use when hosted suppressions are mirrored locally on a site requiring HTTP-Basic-authentication
+  * @param bearerToken the hosted suppressions bearer token. For use when hosted suppressions are mirrored locally on a site requiring HTTP-Bearer-authentication
+  */
 case class HostedSuppressionsSettings(
     enabled: Option[Boolean],
     url: Option[URL],

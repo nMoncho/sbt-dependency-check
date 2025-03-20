@@ -50,16 +50,16 @@ object Keys {
       "If using the jUnit, specifies the CVSS score that is considered a \"test\" failure when generating a jUnit style report. The default value is 0 - all vulnerabilities are considered a failure."
     )
   lazy val dependencyCheckSkip: SettingKey[Boolean] = settingKey(
-    "Skips the dependency-check analysis"
+    "Skips this project on the dependency-check analysis."
   )
   lazy val dependencyCheckScopes: SettingKey[ScopesSettings] = settingKey(
-    "What library dependency scopes are considered during the analysis"
+    "What library dependency scopes are considered during the analysis."
   )
   lazy val dependencyCheckScanSet: SettingKey[Seq[File]] = settingKey(
     "An optional sequence of files that specify additional files and/or directories to analyze as part of the scan. If not specified, defaults to standard scala conventions."
   )
   lazy val dependencyCheckFormats: SettingKey[Seq[ReportGenerator.Format]] = settingKey(
-    "The report formats to be generated (HTML, XML, JUNIT, CSV, JSON, SARIF, JENKINS, ALL)"
+    "The report formats to be generated (HTML, XML, JUNIT, CSV, JSON, SARIF, JENKINS, ALL)."
   )
 
   lazy val dependencyCheckAnalysisTimeout: SettingKey[Option[Duration]] =
@@ -75,28 +75,31 @@ object Keys {
     "Where to look for the 'dependencycheck.properties' file. If this file exists, it will act as default, which values can be overridden by other SBT SettingKeys. Can be an external file, or a resource."
   )
   lazy val dependencyCheckAnalyzer: SettingKey[AnalyzerSettings] = settingKey(
-    "Settings for the different analyzers used during the analysis"
+    "Settings for the different analyzers used during the analysis."
   )
   lazy val dependencyCheckSuppressionFiles: SettingKey[SuppressionFilesSettings] = settingKey(
-    "The sequence of file paths or URLs to the XML suppression files - used to suppress false positives"
+    "The sequence of file paths or URLs to the XML suppression files - used to suppress false positives."
+  )
+  lazy val dependencyCheckDataDirectory: SettingKey[Option[File]] = settingKey(
+    "Base path to use for the data directory (for embedded db and other cached resources from the Internet)"
   )
   lazy val dependencyCheckDatabase: SettingKey[DatabaseSettings] = settingKey(
-    "Settings for the database used to hold the CVEs during the analysis"
+    "Settings for the database used to hold the CVEs during the analysis."
   )
   lazy val dependencyCheckHostedSuppressions: SettingKey[HostedSuppressionsSettings] = settingKey(
-    "Settings for any hosted suppressions the analysis should be using"
+    "Settings for any hosted suppressions the analysis should be using."
   )
   lazy val dependencyCheckNvdApi: SettingKey[NvdApiSettings] = settingKey(
     "Settings to contact the NVD API, such as API Key, Request Delay, Max Retries, etc."
   )
   lazy val dependencyCheckProxy: SettingKey[ProxySettings] = settingKey(
-    "Settings to contact the NVD API, such as API Key, Request Delay, Max Retries, etc."
+    "Settings to use a Proxy. Honors System Properties like `https.proxyHost`, `https.proxyPort`, etc."
   )
-  lazy val dependencyCheckConnectionTimeout: SettingKey[Option[Int]] = settingKey(
-    "Sets the URL Connection Timeout (in milliseconds) used when downloading external data. "
+  lazy val dependencyCheckConnectionTimeout: SettingKey[Option[Duration]] = settingKey(
+    "Sets the URL Connection Timeout (in milliseconds) used when downloading external data."
   )
-  lazy val dependencyCheckConnectionReadTimeout: SettingKey[Option[Int]] = settingKey(
-    "Sets the URL Connection Read Timeout (in milliseconds) used when downloading external data. "
+  lazy val dependencyCheckConnectionReadTimeout: SettingKey[Option[Duration]] = settingKey(
+    "Sets the URL Connection Read Timeout (in milliseconds) used when downloading external data."
   )
 
   // Tasks
@@ -114,6 +117,6 @@ object Keys {
   lazy val dependencyCheckPurge: TaskKey[Unit] =
     taskKey("Deletes the local copy of the NVD. This is used to force a refresh of the data.")
   lazy val dependencyCheckListSettings: TaskKey[Unit] =
-    taskKey("List the settings used during the analysis'")
+    taskKey("List the settings used during the analysis.")
 
 }

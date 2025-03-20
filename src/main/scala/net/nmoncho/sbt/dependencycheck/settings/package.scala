@@ -33,6 +33,8 @@ package object settings {
     (setting: Settings, key: String, value: String) => setting.setString(key, value)
   implicit val IntSetter: SettingSetter[Int] =
     (setting: Settings, key: String, value: Int) => setting.setInt(key, value)
+  implicit val LongSetter: SettingSetter[Long] =
+    (setting: Settings, key: String, value: Long) => setting.setString(key, value.toString)
   implicit val BooleanSetter: SettingSetter[Boolean] =
     (setting: Settings, key: String, value: Boolean) => setting.setBoolean(key, value)
   implicit val FileSetter: SettingSetter[File] =
