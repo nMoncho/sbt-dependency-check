@@ -8,15 +8,14 @@ which already offers several integrations with other build and continuous integr
 For more information on how OWASP DependencyCheck works and how to read the reports check
 the [project's documentation](https://jeremylong.github.io/DependencyCheck/index.html).
 
-This plugin is inspired by the great work of Alexander v. Buchholtz et
-al. [sbt-dependency-check](https://github.com/albuch/sbt-dependency-check).
+This plugin is inspired by the great work of Alexander v. Buchholtz et  al. [sbt-dependency-check](https://github.com/albuch/sbt-dependency-check).
 This plugin seeks to build on top of the previous plugin, keeping some settings and tasks the same, while offering some
 functionalities on top. The work on this plugin started when we noticed NVD deprecating data-feed, which the previous
-plugin still relied on.
+plugin still relied on. If you're looking to migrate from Buchholtz's plugin, please read the [Migration Guide](MIGRATION.md)
 
 ## Installation
 
-This is an AutoPlugin. Simply add the plugin to your project configuration:
+Add the plugin to your project configuration:
 
 ```scala
 addSbtPlugin("net.nmoncho" % "sbt-dependency-check" % "1.0.0")
@@ -79,6 +78,16 @@ some configuration convenience.
 | `dependencyCheckConnectionTimeout`     | Sets the URL Connection Timeout (in milliseconds) used when downloading external data.                                | `10 seconds`                                                                   |
 | `dependencyCheckConnectionReadTimeout` | Sets the URL Connection Read Timeout (in milliseconds) used when downloading external data.                           | `60 seconds`                                                                   |
 
+#### Sensitive Configuration
+
+`DependencyCheck` may use sensitive information like usernames, passwords, and Bearer Tokens. Although these could be
+added as SBT Setting Keys this is discouraged in order to avoid committing sensitive information to your VCS. Here are
+some options to that:
+
+- Install this plugin globally under `~/.sbt/<version>/plugins.sbt`, then define these values on that file.
+- Set the setting `dependencyCheckSettingsFile` using an external `dependencycheck.properties`.
+- Use System Properties when running an SBT Task: `sbt -Danalyzer.central.password=12348765 dependencyCheck` 
+
 #### NVD API
 
 Dependency-check has moved from using the NVD data-feed to the NVD API. It is **highly** encouraged to obtain an NVD API Key;
@@ -138,51 +147,51 @@ limit and receive 403 errors. In a CI environment one must use a caching strateg
 Analyzer settings are grouped together where they make sense. This is an attempt to make the Setting Keys offered by the
 plugin a bit more readable and comprehensible.
 
-To learn more see the
-available [File Type Analyzers](https://jeremylong.github.io/DependencyCheck/analyzers/index.html).
+To learn more see the available [File Type Analyzers](https://jeremylong.github.io/DependencyCheck/analyzers/index.html).
+Some analyzers may be enabled but marked as experimental, which may not run if `experimentalEnabled` is disabled.
 If you don't care about a particular Analyzer, feel free to ignore it, leaving the default values as they are.
 
 Settings are grouped by either analyzer, tool, or language:
 
-| Setting                           | Description                                                                         | Default |
-|:----------------------------------|:------------------------------------------------------------------------------------|:--------|
-| `archiveEnabled`                  | whether or not the Archive analyzer is enabled.                                     | `true`  |
-| `artifactory`                     | Artifactory Settings.                                                               |         |
-| `autoconfEnabled`                 | whether or not the autoconf analyzer should be used.                                | `true`  |
-| `cmakeEnabled`                    | whether or not the CMake analyzer is enabled.                                       | `true`  |
-| `cpanFileEnabled`                 | whether or not the Perl CPAN File analyzer is enabled.                              | `true`  |
-| `cpeEnabled`                      | whether or not the CPE analyzer is enabled.                                         | `true`  |
-| `cpeSuppressionEnabled`           | whether or not the CPE Suppression analyzer is enabled.                             | `true`  |
-| `dartEnabled`                     | whether or not the Dart analyzer is enabled.                                        | `true`  |
-| `dependencyBundlingEnabled`       | whether or not the Dependency Bundling analyzer is enabled.                         | `true`  |
-| `dependencyMergingEnabled`        | whether or not the Dependency Merging analyzer is enabled.                          | `true`  |
-| `dotNet`                          | .NET Settings.                                                                      |         |
-| `elixir`                          | Elixir Settings                                                                     |         |
-| `experimentalEnabled`             | whether or not experimental analyzers are enabled.                                  | `false` |
-| `failOnUnusedSuppressionRule`     | whether the Unused Suppression Rule analyzer should fail if there are unused rules. | `false` |
-| `falsePositiveEnabled`            | whether or not the False Positive analyzer is enabled.                              | `true`  |
-| `filenameEnabled`                 | whether or not the Filename analyzer is enabled.                                    | `true`  |
-| `fileVersionEnabled`              | whether or not the File Version analyzer is enabled.                                | `true`  |
-| `golang`                          | Golang Settings.                                                                    |         |
-| `hints`                           | Hints Settings.                                                                     |         |
-| `jarEnabled`                      | whether or not the JAR analyzer is enabled.                                         | `true`  |
-| `knownExploitedEnabled`           | whether or not the Known Exploited Vulnerabilities analyzer is enabled.             | `true`  |
-| `mavenCentral`                    | Maven Central Settings                                                              |         |
-| `mavenInstallEnabled`             | whether or not the Maven Install analyzer is enabled.                               | `true`  |
-| `nexus`                           | Nexus Settings.                                                                     |         |
-| `node`                            | Node Settings                                                                       |         |
-| `nvdCveEnabled`                   | whether or not the NVD CVE analyzer is enabled.                                     | `true`  |
-| `openSslEnabled`                  | whether or not the OpenSSL analyzer is enabled.                                     | `true`  |
-| `php`                             | PHP Settings.                                                                       |         |
-| `pnmp`                            | PNPM Settings.                                                                      |         |
-| `python`                          | Python Settings.                                                                    |         |
-| `retiredEnabled`                  | whether or not the retired analyzers are enabled.                                   | `false` |
-| `retireJS`                        | RetireJS Settings.                                                                  |         |
-| `ruby`                            | Ruby Settings.                                                                      |         |
-| `swift`                           | Swift Settings.                                                                     |         |
-| `versionFilterEnabled`            | whether or not the Version Filter analyzer is enabled.                              | `true`  |
-| `vulnerabilitySuppressionEnabled` | whether or not the Vulnerability Suppression analyzer is enabled.                   | `true`  |
-| `yarn`                            | Yarn Settings.                                                                      |         |
+| Setting                           | Description                                                                                      | Default |
+|:----------------------------------|:-------------------------------------------------------------------------------------------------|:--------|
+| `archiveEnabled`                  | whether or not the Archive analyzer is enabled.                                                  | `true`  |
+| `artifactory`                     | Artifactory Settings.                                                                            |         |
+| `autoconfEnabled`                 | whether or not the autoconf analyzer should be used.                                             | `true`  |
+| `cmakeEnabled`                    | whether or not the CMake analyzer is enabled.                                                    | `true`  |
+| `cpanFileEnabled`                 | whether or not the Perl CPAN File analyzer is enabled.                                           | `true`  |
+| `cpeEnabled`                      | whether or not the CPE analyzer is enabled.                                                      | `true`  |
+| `cpeSuppressionEnabled`           | whether or not the CPE Suppression analyzer is enabled.                                          | `true`  |
+| `dartEnabled`                     | whether or not the Dart analyzer is enabled.                                                     | `true`  |
+| `dependencyBundlingEnabled`       | whether or not the Dependency Bundling analyzer is enabled.                                      | `true`  |
+| `dependencyMergingEnabled`        | whether or not the Dependency Merging analyzer is enabled.                                       | `true`  |
+| `dotNet`                          | .NET Settings.                                                                                   |         |
+| `elixir`                          | Elixir Settings                                                                                  |         |
+| `experimentalEnabled`             | whether or not experimental analyzers are enabled.                                               | `false` |
+| `failOnUnusedSuppressionRule`     | whether the Unused Suppression Rule analyzer should fail if there are unused rules.              | `false` |
+| `falsePositiveEnabled`            | whether or not the False Positive analyzer is enabled.                                           | `true`  |
+| `filenameEnabled`                 | whether or not the Filename analyzer is enabled.                                                 | `true`  |
+| `fileVersionEnabled`              | whether or not the File Version analyzer is enabled (reads the PE headers of DLL and EXE files). | `true`  |
+| `golang`                          | Golang Settings.                                                                                 |         |
+| `hints`                           | Hints Settings.                                                                                  |         |
+| `jarEnabled`                      | whether or not the JAR analyzer is enabled.                                                      | `true`  |
+| `knownExploitedEnabled`           | whether or not the Known Exploited Vulnerabilities analyzer is enabled.                          | `true`  |
+| `mavenCentral`                    | Maven Central Settings                                                                           |         |
+| `mavenInstallEnabled`             | whether or not the Maven Install analyzer is enabled.                                            | `true`  |
+| `nexus`                           | Nexus Settings.                                                                                  |         |
+| `node`                            | Node Settings                                                                                    |         |
+| `nvdCveEnabled`                   | whether or not the NVD CVE analyzer is enabled.                                                  | `true`  |
+| `openSslEnabled`                  | whether or not the OpenSSL analyzer is enabled.                                                  | `true`  |
+| `php`                             | PHP Settings.                                                                                    |         |
+| `pnmp`                            | PNPM Settings.                                                                                   |         |
+| `python`                          | Python Settings.                                                                                 |         |
+| `retiredEnabled`                  | whether or not the retired analyzers are enabled.                                                | `false` |
+| `retireJS`                        | RetireJS Settings.                                                                               |         |
+| `ruby`                            | Ruby Settings.                                                                                   |         |
+| `swift`                           | Swift Settings.                                                                                  |         |
+| `versionFilterEnabled`            | whether or not the Version Filter analyzer is enabled.                                           | `true`  |
+| `vulnerabilitySuppressionEnabled` | whether or not the Vulnerability Suppression analyzer is enabled.                                | `true`  |
+| `yarn`                            | Yarn Settings.                                                                                   |         |
 
 Most of the settings here are picked up from either the default `dependencycheck.properties`, or from source, thus these
 tables try to gather them as best effort.
@@ -356,3 +365,11 @@ sbt -Dhttp.proxyHost=proxy.example.com \
     -Dproxy.nonproxyhosts="localhost|http://www.google.com" \
     dependencyCheck
 ```
+
+### Changing Log Level
+Add `-Dlog4j2.level=<level>` when running a task, for example:
+```bash
+sbt -Dlog4j2.level=debug dependencyCheck
+```
+
+Replace `dependencyCheck` with the right [task name](#tasks) that you use for your project.
