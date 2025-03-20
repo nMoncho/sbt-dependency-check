@@ -24,6 +24,7 @@ package net.nmoncho.sbt.dependencycheck.tasks
 import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.engineSettings
 import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.scanSet
 import net.nmoncho.sbt.dependencycheck.Keys._
+import net.nmoncho.sbt.dependencycheck.tasks.Dependencies._
 import sbt.Keys._
 import sbt._
 

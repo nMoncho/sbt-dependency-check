@@ -30,9 +30,6 @@ import scala.util.Try
 import scala.util.Using
 import scala.util.control.NonFatal
 
-import net.nmoncho.sbt.dependencycheck.Keys.dependencyCheckScopes
-import net.nmoncho.sbt.dependencycheck.Keys.dependencyCheckSkip
-import net.nmoncho.sbt.dependencycheck.settings.ScopesSettings
 import org.owasp.dependencycheck.Engine
 import org.owasp.dependencycheck.agent.DependencyCheckScanAgent
 import org.owasp.dependencycheck.data.nexus.MavenArtifact
@@ -47,8 +44,6 @@ import org.owasp.dependencycheck.reporting.ReportGenerator.Format
 import org.owasp.dependencycheck.utils.Settings
 import org.owasp.dependencycheck.utils.Settings.KEYS.APPLICATION_NAME
 import org.owasp.dependencycheck.utils.SeverityUtil
-import sbt.Keys._
-import sbt.plugins.JvmPlugin
 import sbt.{ Keys => SbtKeys, _ }
 
 package object tasks {
@@ -93,8 +88,8 @@ package object tasks {
       configuration: Configuration,
       action: String
   )(implicit log: Logger): Seq[Attributed[File]] = {
-    log.info(s"$action ${configuration.name} dependencies to check.")
-    classpath.foreach(f => log.info("\t" + f.data.getName))
+    log.debug(s"$action ${configuration.name} dependencies to check.")
+    classpath.foreach(f => log.debug("\t" + f.data.getName))
     classpath
   }
 
@@ -251,73 +246,4 @@ package object tasks {
     }
   }
 
-  lazy val compileDependenciesTask: Def.Initialize[Task[Seq[Attributed[File]]]] =
-    Def.taskDyn {
-      if (
-        !thisProject.value.autoPlugins.contains(JvmPlugin) ||
-        (dependencyCheckSkip ?? false).value ||
-        !(dependencyCheckScopes ?? ScopesSettings.Default).value.compile
-      )
-        Def.task(Seq.empty)
-      else
-        Def.task {
-          (configuration / externalDependencyClasspath).value
-        }
-    }
-
-  lazy val runtimeDependenciesTask: Def.Initialize[Task[Seq[Attributed[File]]]] =
-    Def.taskDyn {
-      if (
-        !thisProject.value.autoPlugins.contains(JvmPlugin) ||
-        (dependencyCheckSkip ?? false).value ||
-        !(dependencyCheckScopes ?? ScopesSettings.Default).value.runtime
-      )
-        Def.task(Seq.empty)
-      else
-        Def.task {
-          (configuration / externalDependencyClasspath).value
-        }
-    }
-
-  lazy val testDependenciesTask: Def.Initialize[Task[Seq[Attributed[File]]]] =
-    Def.taskDyn {
-      if (
-        !thisProject.value.autoPlugins.contains(JvmPlugin) ||
-        (dependencyCheckSkip ?? false).value ||
-        !(dependencyCheckScopes ?? ScopesSettings.Default).value.test
-      )
-        Def.task(Seq.empty)
-      else
-        Def.task {
-          (configuration / externalDependencyClasspath).value
-        }
-    }
-
-  lazy val providedDependenciesTask: Def.Initialize[Task[Seq[Attributed[File]]]] =
-    Def.taskDyn {
-      if (
-        !thisProject.value.autoPlugins.contains(JvmPlugin) ||
-        (dependencyCheckSkip ?? false).value ||
-        (dependencyCheckScopes ?? ScopesSettings.Default).value.provided
-      )
-        Def.task(Seq.empty)
-      else
-        Def.task {
-          Classpaths.managedJars(configuration.value, classpathTypes.value, update.value)
-        }
-    }
-
-  lazy val optionalDependenciesTask: Def.Initialize[Task[Seq[Attributed[File]]]] =
-    Def.taskDyn {
-      if (
-        !thisProject.value.autoPlugins.contains(JvmPlugin) ||
-        (dependencyCheckSkip ?? false).value ||
-        (dependencyCheckScopes ?? ScopesSettings.Default).value.optional
-      )
-        Def.task(Seq.empty)
-      else
-        Def.task {
-          Classpaths.managedJars(configuration.value, classpathTypes.value, update.value)
-        }
-    }
 }
