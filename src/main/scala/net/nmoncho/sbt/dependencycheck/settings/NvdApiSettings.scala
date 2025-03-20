@@ -31,8 +31,8 @@ import sbt.URL
 
 /** NVD API Settings
   *
-  * @param endpoint NVD API Endpoint
   * @param apiKey API Key for the NVD API
+  * @param endpoint NVD API Endpoint
   * @param requestDelay delay between requests for the NVD API
   * @param maxRetryCount the maximum number of retry requests for a single call to the NVD API
   * @param validForHours control the skipping of the check for NVD updates
@@ -40,8 +40,8 @@ import sbt.URL
   * @param dataFeed NVD Data Feed Configuration
   */
 case class NvdApiSettings(
-    endpoint: Option[String],
     apiKey: String,
+    endpoint: Option[String],
     requestDelay: Option[Duration],
     maxRetryCount: Option[Int],
     validForHours: Option[Int],
@@ -50,8 +50,8 @@ case class NvdApiSettings(
 ) {
 
   def apply(settings: Settings): Unit = {
-    settings.set(NVD_API_ENDPOINT, endpoint)
     settings.setStringIfNotEmpty(NVD_API_KEY, apiKey)
+    settings.set(NVD_API_ENDPOINT, endpoint)
     settings.set(NVD_API_DELAY, requestDelay.map(_.toMillis))
     settings.set(NVD_API_MAX_RETRY_COUNT, maxRetryCount)
     settings.set(NVD_API_VALID_FOR_HOURS, validForHours)
@@ -63,11 +63,11 @@ case class NvdApiSettings(
 
 object NvdApiSettings {
   val Default: NvdApiSettings =
-    new NvdApiSettings(None, "", None, None, None, None, DataFeed.Default)
+    new NvdApiSettings("", None, None, None, None, None, DataFeed.Default)
 
   def apply(
-      endpoint: Option[String]       = None,
       apiKey: String                 = "",
+      endpoint: Option[String]       = None,
       requestDelay: Option[Duration] = None,
       maxRetryCount: Option[Int]     = None,
       validForHours: Option[Int]     = None,
@@ -75,8 +75,8 @@ object NvdApiSettings {
       dataFeed: DataFeed             = DataFeed.Default
   ): NvdApiSettings =
     new NvdApiSettings(
-      endpoint,
       apiKey,
+      endpoint,
       requestDelay,
       maxRetryCount,
       validForHours,
