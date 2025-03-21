@@ -11,7 +11,10 @@ lazy val root = (project in file("."))
   .settings(commonSettings: _*)
   .settings(
     dependencyCheckFailBuildOnCVSS := 0,
-    dependencyCheckNvdApi := sys.env.get("NVD_API_KEY").map(key => NvdApiSettings(key)).getOrElse(NvdApiSettings.Default),
+    dependencyCheckNvdApi := sys.env
+      .get("NVD_API_KEY")
+      .map(key => NvdApiSettings(key))
+      .getOrElse(NvdApiSettings.Default)
   )
 
 lazy val core = (project in file("core"))
@@ -23,5 +26,5 @@ lazy val core = (project in file("core"))
 lazy val inScope = (project in file("inScope"))
   .settings(commonSettings: _*)
   .settings(
-    libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind"  % "2.9.9"
+    libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.9"
   )
