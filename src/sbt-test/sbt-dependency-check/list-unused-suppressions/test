@@ -1,7 +1,0 @@
-> set dependencyCheckSuppressions := net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings(files = net.nmoncho.sbt.dependencycheck.settings.SuppressionFilesSettings.files()(new File("suppressions.xml")))
-> dependencyCheckListUnusedSuppressions
-
-# Cleanup settings
-> set dependencyCheckSuppressions := net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings.Default
-
-

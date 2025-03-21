@@ -6,13 +6,15 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.13.15"
 )
 
+ThisBuild / dependencyCheckDataDirectory := scala.util.Properties.envOrNone("DATA_DIRECTORY").map(new File(_))
+ThisBuild / dependencyCheckNvdApi := sys.env.get("NVD_API_KEY").map(key => NvdApiSettings(key)).getOrElse(NvdApiSettings.Default)
+
 lazy val root = (project in file("."))
   .aggregate(core)
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies += "org.eclipse.jetty" % "jetty-runner" % "9.2.4.v20141103" % "provided",
     libraryDependencies += "commons-collections" % "commons-collections" % "3.2.1" % "optional",
-    dependencyCheckNvdApi := sys.env.get("NVD_API_KEY").map(key => NvdApiSettings(key)).getOrElse(NvdApiSettings.Default),
     dependencyCheckScopes := ScopesSettings(
       test = false,
       provided = false,

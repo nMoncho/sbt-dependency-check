@@ -44,7 +44,9 @@ lazy val root = (project in file("."))
       "-Ywarn-unused"),
     libraryDependencies ++= Seq(
       dependencyCheck,
-      munit % Test
+      munit           % Test,
+      munitScalaCheck % Test,
+      log4jSf4jImpl   % Test
     ),
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
@@ -56,5 +58,6 @@ lazy val root = (project in file("."))
       scriptedLaunchOpts.value ++
       Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
     },
-    scriptedBufferLog := false
+    scriptedBufferLog := false,
+    Test / testOptions += Tests.Argument("-F") // Show full stack trace
   )

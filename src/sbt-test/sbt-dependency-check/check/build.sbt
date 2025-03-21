@@ -1,4 +1,4 @@
-import net.nmoncho.sbt.dependencycheck.settings._
+import net.nmoncho.sbt.dependencycheck.settings.*
 
 version := "0.1"
 lazy val root = project in file(".")
@@ -12,9 +12,11 @@ libraryDependencies ++= Seq(
   "com.google.oauth-client" % "google-oauth-client" % "1.22.0" % "optional"
 )
 
-dependencyCheckNvdApi := sys.env.get("NVD_API_KEY").map(key => NvdApiSettings(key)).getOrElse(NvdApiSettings.Default)
 dependencyCheckScopes := ScopesSettings(
   test = true,
   provided = false,
   runtime = true
 )
+
+ThisBuild / dependencyCheckDataDirectory := scala.util.Properties.envOrNone("DATA_DIRECTORY").map(new File(_))
+ThisBuild / dependencyCheckNvdApi := sys.env.get("NVD_API_KEY").map(key => NvdApiSettings(key)).getOrElse(NvdApiSettings.Default)
