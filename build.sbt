@@ -44,7 +44,8 @@ lazy val root = (project in file("."))
       "-Ywarn-unused"),
     libraryDependencies ++= Seq(
       dependencyCheck,
-      munit % Test
+      munit           % Test,
+      munitScalaCheck % Test
     ),
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
