@@ -1,5 +1,8 @@
 import net.nmoncho.sbt.dependencycheck.settings._
 
+ThisBuild / dependencyCheckDataDirectory := scala.util.Properties.envOrNone("DATA_DIRECTORY").map(new File(_))
+ThisBuild / dependencyCheckNvdApi := sys.env.get("NVD_API_KEY").map(key => NvdApiSettings(key)).getOrElse(NvdApiSettings.Default)
+
 lazy val commonSettings = Seq(
   organization := "net.vonbuchholtz",
   version := "0.1.0",
@@ -10,8 +13,7 @@ lazy val root = (project in file("."))
   .aggregate(core)
   .settings(commonSettings: _*)
   .settings(
-    dependencyCheckFailBuildOnCVSS := 0,
-    dependencyCheckNvdApi := sys.env.get("NVD_API_KEY").map(key => NvdApiSettings(key)).getOrElse(NvdApiSettings.Default),
+    dependencyCheckFailBuildOnCVSS := 0
   )
 
 lazy val core = (project in file("core"))

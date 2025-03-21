@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" xmlns:xi="http://www.w3.org/2001/XInclude">
+
+    <Appenders>
+        <Console name="Stdout" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d %p %c{1.} [%t] %m%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="${env:LOG_LEVEL:-info}" includeLocation="true">
+            <AppenderRef ref="Stdout"/>
+        </Root>
+
+        <Logger name="org.owasp.dependencycheck.xml.suppression.SuppressionHandler" level="WARN" additivity="false">
+            <AppenderRef ref="Stdout"/>
+        </Logger>
+    </Loggers>
+
+</Configuration>
