@@ -94,7 +94,8 @@ object DependencyCheckPlugin extends AutoPlugin {
 
   private def dependencyCheckListUnusedTask: Def.Initialize[Task[Unit]] = ListUnusedSuppressions()
 
-  lazy val engineSettings: Def.Initialize[Task[Settings]] = LoadSettings()
+  lazy val engineSettings: Def.Initialize[Task[Settings]] =
+    LoadSettings() dependsOn GenerateSuppressions()
 
   lazy val scanSet: Def.Initialize[Task[Seq[File]]] = ScanSet()
 

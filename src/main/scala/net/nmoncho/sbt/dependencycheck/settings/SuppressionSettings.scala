@@ -22,6 +22,7 @@
 package net.nmoncho.sbt.dependencycheck.settings
 
 import org.owasp.dependencycheck.utils.Settings
+import sbt.File
 
 /** Suppression Settings
   *
@@ -34,22 +35,38 @@ import org.owasp.dependencycheck.utils.Settings
   */
 case class SuppressionSettings(
     files: SuppressionFilesSettings,
-    hosted: HostedSuppressionsSettings
+    hosted: HostedSuppressionsSettings,
+    generatedSuppressions: File,
+    suppressions: Seq[SuppressionRule]
 ) {
   def apply(settings: Settings): Unit = {
-    files(settings)
+    val filesUpdated = if (generatedSuppressions.exists()) {
+      files.copy(files = files.files :+ generatedSuppressions.getAbsolutePath)
+    } else {
+      files
+    }
+
+    filesUpdated(settings)
     hosted(settings)
   }
 }
 
 object SuppressionSettings {
+
+  val GeneratedSuppressionsFilename: String = "generated-suppressions-file.xml"
+
   val Default: SuppressionSettings = new SuppressionSettings(
-    files  = SuppressionFilesSettings.Default,
-    hosted = HostedSuppressionsSettings.Default
+    files                 = SuppressionFilesSettings.Default,
+    hosted                = HostedSuppressionsSettings.Default,
+    generatedSuppressions = new File(GeneratedSuppressionsFilename),
+    suppressions          = Seq.empty
   )
 
   def apply(
       files: SuppressionFilesSettings    = SuppressionFilesSettings.Default,
-      hosted: HostedSuppressionsSettings = HostedSuppressionsSettings.Default
-  ): SuppressionSettings = new SuppressionSettings(files, hosted)
+      hosted: HostedSuppressionsSettings = HostedSuppressionsSettings.Default,
+      generatedSuppressions: File        = new File(GeneratedSuppressionsFilename),
+      suppressions: Seq[SuppressionRule] = Seq.empty
+  ): SuppressionSettings =
+    new SuppressionSettings(files, hosted, generatedSuppressions, suppressions)
 }
