@@ -19,7 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package net.nmoncho.sbt.dependencycheck.tasks
+package net.nmoncho.sbt.dependencycheck
+package tasks
 
 import net.nmoncho.sbt.dependencycheck.Keys.dependencyCheckSuppressions
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule

@@ -19,7 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package net.nmoncho.sbt.dependencycheck.settings
+package net.nmoncho.sbt.dependencycheck
+package settings
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -32,7 +33,6 @@ import scala.xml.Elem
 import scala.xml.PCData
 
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule._
-import net.nmoncho.sbt.dependencycheck.tasks.logThrowable
 import org.owasp.dependencycheck.xml.suppression.{ PropertyType => OwaspPropertyType }
 import org.owasp.dependencycheck.xml.suppression.{ SuppressionRule => OwaspSuppressionRule }
 import sbt.Logger
