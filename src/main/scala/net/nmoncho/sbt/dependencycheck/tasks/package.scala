@@ -26,8 +26,11 @@ import scala.util.Success
 import scala.util.Try
 import scala.util.control.NonFatal
 
+import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
 import org.owasp.dependencycheck.Engine
 import org.owasp.dependencycheck.agent.DependencyCheckScanAgent
+import org.owasp.dependencycheck.analyzer.AbstractSuppressionAnalyzer.SUPPRESSION_OBJECT_KEY
+import org.owasp.dependencycheck.analyzer.VulnerabilitySuppressionAnalyzer
 import org.owasp.dependencycheck.data.nexus.MavenArtifact
 import org.owasp.dependencycheck.dependency.Confidence
 import org.owasp.dependencycheck.dependency.Dependency
@@ -39,6 +42,7 @@ import org.owasp.dependencycheck.reporting.ReportGenerator.Format
 import org.owasp.dependencycheck.utils.Settings
 import org.owasp.dependencycheck.utils.Settings.KEYS.APPLICATION_NAME
 import org.owasp.dependencycheck.utils.SeverityUtil
+import org.owasp.dependencycheck.xml.suppression.{ SuppressionRule => OwaspSuppressionRule }
 import sbt.{ Keys => SbtKeys, _ }
 
 package object tasks {
@@ -92,11 +96,13 @@ package object tasks {
       projectName: String,
       engine: Engine,
       dependencies: Set[Attributed[File]],
+      suppressionRules: Seq[SuppressionRule],
       scanSet: Seq[File],
       failCvssScore: Double,
       outputDir: File,
       reportFormats: Seq[Format]
   )(implicit log: Logger): Unit = {
+    addSuppressionRules(suppressionRules, engine)
     addDependencies(dependencies, engine)
     scanSet.foreach(file => engine.scan(file))
 
@@ -116,6 +122,28 @@ package object tasks {
     )
 
     failOnFoundVulnerabilities(failCvssScore, engine, projectName)
+  }
+
+  private def addSuppressionRules(rules: Seq[SuppressionRule], engine: Engine): Unit = {
+    import scala.jdk.CollectionConverters.*
+
+    engine.getAnalyzers().asScala.foreach {
+      case analyzer: VulnerabilitySuppressionAnalyzer =>
+        // We have to prepare the analyzer first before adding any other suppression rules
+        // This way the XML and Hosted Suppressions are loaded first, then the ones defined
+        // in the project being analyzed (i.e. in the `build.sbt` or imported as packaged suppressions)
+        analyzer.prepare(engine)
+        if (analyzer.isEnabled) {
+          val engineRules = Option(engine.getObject(SUPPRESSION_OBJECT_KEY))
+            .map(_.asInstanceOf[java.util.List[OwaspSuppressionRule]])
+            .getOrElse(new java.util.ArrayList[OwaspSuppressionRule]())
+
+          engineRules.addAll(rules.map(_.toOwasp).asJavaCollection)
+          engine.putObject(SUPPRESSION_OBJECT_KEY, engineRules)
+        }
+
+      case _ =>
+    }
   }
 
   private def addDependencies(

@@ -41,9 +41,10 @@ object ListUnusedSuppressions {
       Def.task {
         log.info(s"Running check for [${name.value}]")
 
-        val failCvssScore = dependencyCheckFailBuildOnCVSS.value
-        val scanSetFiles  = scanSet.value
-        val dependencies  = Dependencies.projectDependencies.value
+        val failCvssScore    = dependencyCheckFailBuildOnCVSS.value
+        val scanSetFiles     = scanSet.value
+        val dependencies     = Dependencies.projectDependencies.value
+        val suppressionRules = GenerateSuppressions.apply().value
 
         log.info("Scanning following dependencies: ")
         dependencies.foreach(f => log.info("\t" + f.data.getName))
@@ -54,6 +55,7 @@ object ListUnusedSuppressions {
               name.value,
               engine,
               dependencies,
+              suppressionRules,
               scanSetFiles,
               failCvssScore,
               dependencyCheckOutputDirectory.value,

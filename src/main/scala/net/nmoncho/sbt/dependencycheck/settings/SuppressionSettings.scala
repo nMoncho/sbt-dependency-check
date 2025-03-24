@@ -48,14 +48,8 @@ case class SuppressionSettings(
     packagedFilter: SuppressionSettings.PackagedFilter
 ) {
 
-  def apply(settings: Settings, combinedSuppressionsFile: File): Unit = {
-    val filesUpdated = if (combinedSuppressionsFile.exists()) {
-      files.copy(files = files.files :+ combinedSuppressionsFile.getAbsolutePath)
-    } else {
-      files
-    }
-
-    filesUpdated(settings)
+  def apply(settings: Settings): Unit = {
+    files(settings)
     hosted(settings)
   }
 }
@@ -63,8 +57,6 @@ case class SuppressionSettings(
 object SuppressionSettings {
 
   final val DefaultPackagedFilter: PackagedFilter = PackagedFilter.BlacklistAll
-
-  final val CombinedSuppressionsFilename: String = "combined-suppressions-file.xml"
 
   final val PackagedSuppressionsFilename: String = "packaged-suppressions-file.xml"
 

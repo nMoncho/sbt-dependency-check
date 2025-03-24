@@ -34,32 +34,13 @@ import sbt._
   */
 object GenerateSuppressions {
 
-  def apply(): Def.Initialize[Task[File]] = Def.taskDyn {
-    implicit val log: Logger = streams.value.log
-    val settings             = dependencyCheckSuppressions.value
-    val combinedSuppressions = crossTarget.value / CombinedSuppressionsFilename
+  def apply(): Def.Initialize[Task[Seq[SuppressionRule]]] = Def.task {
+    val settings = dependencyCheckSuppressions.value
 
     val buildSuppressions            = settings.suppressions
     val importedPackagedSuppressions = collectImportedPackagedSuppressions().value
-    val suppressions                 = buildSuppressions ++ importedPackagedSuppressions
 
-    if (suppressions.nonEmpty) {
-      log.info(
-        s"Generating suppression file to [${combinedSuppressions.getAbsolutePath}]"
-      )
-
-      Def.task {
-        IO.write(
-          combinedSuppressions,
-          SuppressionRule.toSuppressionsXML(suppressions)
-        )
-
-        combinedSuppressions
-      }
-    } else {
-      log.debug("No suppressions defined, skipping suppression file generation...")
-      Def.task(combinedSuppressions)
-    }
+    buildSuppressions ++ importedPackagedSuppressions
   }
 
   /** Collects all [[SuppressionRule]]s packaged on the libraries included in this project.

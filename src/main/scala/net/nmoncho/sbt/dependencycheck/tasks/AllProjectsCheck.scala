@@ -34,8 +34,9 @@ object AllProjectsCheck {
     implicit val log: Logger = streams.value.log
     log.info(s"Running AllProjects check for [${name.value}]")
 
-    val failCvssScore           = dependencyCheckFailBuildOnCVSS.value
-    val scanSetFiles: Seq[File] = scanSet.value
+    val failCvssScore    = dependencyCheckFailBuildOnCVSS.value
+    val suppressionRules = GenerateSuppressions.apply().value
+    val scanSetFiles     = scanSet.value
 
     val dependencies = scala.collection.mutable.Set[Attributed[File]]()
     dependencies ++= logAddDependencies(anyCompileFilter.value.flatten, Compile)
@@ -52,6 +53,7 @@ object AllProjectsCheck {
         name.value,
         engine,
         dependencies.toSet,
+        suppressionRules,
         scanSetFiles,
         failCvssScore,
         dependencyCheckOutputDirectory.value,

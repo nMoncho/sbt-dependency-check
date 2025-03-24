@@ -44,8 +44,7 @@ object LoadSettings {
   def apply(): Def.Initialize[Task[Settings]] = Def.task {
     implicit val log: Logger = streams.value.log
 
-    val propertiesFile           = dependencyCheckSettingsFile.value
-    val combinedSuppressionsFile = GenerateSuppressions().value
+    val propertiesFile = dependencyCheckSettingsFile.value
 
     val baseSettings = Using {
       if (propertiesFile.exists()) new FileInputStream(propertiesFile)
@@ -81,7 +80,7 @@ object LoadSettings {
     dependencyCheckAnalyzers.value(baseSettings)
     dependencyCheckDatabase.value(baseSettings)
     dependencyCheckNvdApi.value(baseSettings)
-    dependencyCheckSuppressions.value(baseSettings, combinedSuppressionsFile)
+    dependencyCheckSuppressions.value(baseSettings)
 
     baseSettings
   }

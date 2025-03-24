@@ -37,9 +37,10 @@ object Check {
       Def.task {
         log.info(s"Running check for [${name.value}]")
 
-        val failCvssScore = dependencyCheckFailBuildOnCVSS.value
-        val dependencies  = Dependencies.projectDependencies.value
-        val scanSetFiles  = scanSet.value
+        val failCvssScore    = dependencyCheckFailBuildOnCVSS.value
+        val dependencies     = Dependencies.projectDependencies.value
+        val suppressionRules = GenerateSuppressions.apply().value
+        val scanSetFiles     = scanSet.value
 
         log.info("Scanning following dependencies: ")
         dependencies.foreach(f => log.info("\t" + f.data.getName))
@@ -49,6 +50,7 @@ object Check {
             name.value,
             engine,
             dependencies,
+            suppressionRules,
             scanSetFiles,
             failCvssScore,
             dependencyCheckOutputDirectory.value,
