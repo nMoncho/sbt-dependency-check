@@ -25,6 +25,27 @@ The minimum SBT version supported is `1.9.0`.
 
 ## Usage
 
+### Getting Started
+
+Don't feel deterred by all the configuration settings defined in this plugin. All of them have sensible defaults.
+
+The best way to get started is to install the plugin, set your [NVD API Key](#nvd-api):
+
+```sbt
+dependencyCheckNvdApi := NvdApiSettings("YOUR_NVD_API_KEY")
+```
+
+And then just run:
+
+```bash
+sbt -Dlog4j2.level=info dependencyCheck
+```
+
+The first time you run these tasks it will take some time, even a couple of minutes. The analysis will write a report
+to `target/{scala-version}/dependency-check-report.html`.
+
+After this feel free to take a look at the available tasks and settings.
+
 ### Tasks
 
 The following tasks are available:
