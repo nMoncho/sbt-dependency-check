@@ -23,13 +23,19 @@ package net.nmoncho.sbt.dependencycheck.settings
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import java.util.regex.Pattern
 
+import scala.util.Try
 import scala.util.matching.Regex
 import scala.xml.Elem
 import scala.xml.PCData
 
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule._
+import net.nmoncho.sbt.dependencycheck.tasks.logThrowable
+import org.owasp.dependencycheck.xml.suppression.{ PropertyType => OwaspPropertyType }
+import org.owasp.dependencycheck.xml.suppression.{ SuppressionRule => OwaspSuppressionRule }
+import sbt.Logger
 
 /** Scala counterpart of [[org.owasp.dependencycheck.xml.suppression.SuppressionRule]]
   *
@@ -57,11 +63,37 @@ case class SuppressionRule private (
     notes: String
 ) {
 
+  def toOwasp: OwaspSuppressionRule = {
+    import scala.jdk.CollectionConverters.*
+
+    val rule     = new OwaspSuppressionRule()
+    val untilCal = Calendar.getInstance()
+    untilCal.set(until.getYear, until.getMonthValue - 1, until.getDayOfMonth, 0, 0, 0)
+
+    rule.setBase(base)
+    rule.setUntil(untilCal)
+    identifier match {
+      case Some(Identifier(id, FilePath)) => rule.setFilePath(id.toOwasp)
+      case Some(Identifier(id, Gav)) => rule.setGav(id.toOwasp)
+      case Some(Identifier(id, PackageUrl)) => rule.setPackageUrl(id.toOwasp)
+      case Some(Identifier(id, Sha1)) => rule.setSha1(id.value)
+      case None =>
+    }
+    rule.setCpe(cpe.map(_.toOwasp).asJava)
+    rule.setCvssBelow(cvssBelow.map(x => x: java.lang.Double).asJava)
+    rule.setCwe(cwe.asJava)
+    rule.setCve(cve.asJava)
+    vulnerabilityNames.foreach(vn => rule.addVulnerabilityName(vn.toOwasp))
+    rule.setNotes(notes)
+
+    rule
+  }
+
   /** Converts this rule to a `suppress` XML element
     *
     * @return xml element
     */
-  def toOwasp: Elem = {
+  def toOwaspXml: Elem = {
     // format: off
     val id = identifier.flatMap {
       case Identifier(PropertyType.Empty, _) => None
@@ -113,7 +145,7 @@ object SuppressionRule {
   object Identifier {
 
     // format: off
-    private def apply(id: PropertyType, `type`: IdentifierType): Identifier = new Identifier(id, `type`)
+    private[settings] def apply(id: PropertyType, `type`: IdentifierType): Identifier = new Identifier(id, `type`)
 
     private def ofString(value: String, caseSensitive: Boolean, `type`: IdentifierType): Identifier =
       new Identifier(PropertyType.string(value, caseSensitive), `type`)
@@ -143,7 +175,19 @@ object SuppressionRule {
     * @param regex whether is a regex or not
     * @param caseSensitive whether is case sensitive or not
     */
-  case class PropertyType(value: String, regex: Boolean, caseSensitive: Boolean)
+  case class PropertyType(value: String, regex: Boolean, caseSensitive: Boolean) {
+
+    def toOwasp: OwaspPropertyType = {
+      val prop = new OwaspPropertyType()
+
+      prop.setValue(value)
+      prop.setRegex(regex)
+      prop.setCaseSensitive(caseSensitive)
+
+      prop
+    }
+
+  }
 
   object PropertyType {
     val Empty: PropertyType = PropertyType("", regex = false, caseSensitive = false)
@@ -161,6 +205,79 @@ object SuppressionRule {
         regex         = false,
         caseSensitive = caseSensitive
       )
+
+    def fromOwasp(prop: org.owasp.dependencycheck.xml.suppression.PropertyType): PropertyType =
+      new PropertyType(prop.getValue, prop.isRegex, prop.isCaseSensitive)
+  }
+
+  /** Converts [[org.owasp.dependencycheck.xml.suppression.SuppressionRule]] into a [[SuppressionRule]]
+    */
+  def fromOwasp(rule: OwaspSuppressionRule)(implicit log: Logger): SuppressionRule = {
+    import scala.jdk.CollectionConverters.*
+
+    def getPackageUrl(): Option[PropertyType] = Try {
+      classOf[OwaspSuppressionRule].getDeclaredFields
+        .find(_.getName == "packageUrl")
+        .map { field =>
+          field.setAccessible(true)
+          PropertyType.fromOwasp(field.get(rule).asInstanceOf[OwaspPropertyType])
+        }
+    }.recover { case t: Throwable =>
+      log.warn("Failed to get 'packageUrl' using reflection")
+      logThrowable(t)
+      None
+    }.toOption
+      .flatten
+
+    def getVulnerabilityNames(): Seq[PropertyType] = Try {
+      classOf[OwaspSuppressionRule].getDeclaredFields
+        .find(_.getName == "vulnerabilityNames")
+        .map { field =>
+          field.setAccessible(true)
+          field
+            .get(rule)
+            .asInstanceOf[java.util.List[OwaspPropertyType]]
+            .asScala
+            .map(PropertyType.fromOwasp)
+        }
+    }.recover { case t: Throwable =>
+      log.warn("Failed to get 'vulnerabilityNames' using reflection")
+      logThrowable(t)
+      t.printStackTrace()
+      None
+    }.toOption
+      .flatten
+      .getOrElse(Seq.empty[PropertyType])
+
+    val identifier = if (rule.hasGav) {
+      Some(Identifier(PropertyType.fromOwasp(rule.getGav), Gav))
+    } else if (rule.getFilePath != null) {
+      Some(Identifier(PropertyType.fromOwasp(rule.getFilePath), FilePath))
+    } else if (rule.getSha1 != null && rule.getSha1.nonEmpty) {
+      Some(Identifier.ofSha1(rule.getSha1))
+    } else if (rule.hasPackageUrl) {
+      getPackageUrl().map(Identifier(_, PackageUrl))
+    } else {
+      None
+    }
+
+    val until = Option(rule.getUntil)
+      .map { c =>
+        LocalDate.of(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DATE))
+      }
+      .getOrElse(LocalDate.EPOCH)
+
+    new SuppressionRule(
+      base               = rule.isBase,
+      until              = until,
+      identifier         = identifier,
+      cpe                = rule.getCpe.asScala.map(PropertyType.fromOwasp).toList,
+      cvssBelow          = rule.getCvssBelow.asScala.map(_.toDouble).toList,
+      cwe                = rule.getCwe.asScala.toList,
+      cve                = rule.getCve.asScala.toList,
+      vulnerabilityNames = getVulnerabilityNames().toList,
+      notes              = Option(rule.getNotes).getOrElse("")
+    )
   }
 
   // format: off
@@ -313,7 +430,7 @@ object SuppressionRule {
   def toSuppressionsXML(rules: Seq[SuppressionRule]): String = {
     val xml =
       <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-      {rules.map(_.toOwasp)}
+      {rules.map(_.toOwaspXml)}
       </suppressions>
 
     new scala.xml.PrettyPrinter(120, 4).format(xml)

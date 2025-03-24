@@ -21,8 +21,12 @@
 
 package net.nmoncho.sbt.dependencycheck.settings
 
+import scala.util.matching.Regex
+
 import org.owasp.dependencycheck.utils.Settings
 import sbt.File
+import sbt.Keys
+import sbt.internal.util.Attributed
 
 /** Suppression Settings
   *
@@ -32,16 +36,21 @@ import sbt.File
   *
   * @param files suppression files
   * @param hosted hosted suppressions
+  * @param suppressions suppressions defined in the project definition (e.g. a `build.sbt`)
+  * @param packagedEnabled whether the packaged suppressions rules are enabled
+  * @param packagedFilter which dependencies should be considered when importing packaged suppression rules
   */
 case class SuppressionSettings(
     files: SuppressionFilesSettings,
     hosted: HostedSuppressionsSettings,
-    generatedSuppressions: File,
-    suppressions: Seq[SuppressionRule]
+    suppressions: Seq[SuppressionRule],
+    packagedEnabled: Boolean,
+    packagedFilter: SuppressionSettings.PackagedFilter
 ) {
-  def apply(settings: Settings): Unit = {
-    val filesUpdated = if (generatedSuppressions.exists()) {
-      files.copy(files = files.files :+ generatedSuppressions.getAbsolutePath)
+
+  def apply(settings: Settings, combinedSuppressionsFile: File): Unit = {
+    val filesUpdated = if (combinedSuppressionsFile.exists()) {
+      files.copy(files = files.files :+ combinedSuppressionsFile.getAbsolutePath)
     } else {
       files
     }
@@ -53,20 +62,65 @@ case class SuppressionSettings(
 
 object SuppressionSettings {
 
-  val GeneratedSuppressionsFilename: String = "generated-suppressions-file.xml"
+  final val DefaultPackagedFilter: PackagedFilter = PackagedFilter.BlacklistAll
 
-  val Default: SuppressionSettings = new SuppressionSettings(
-    files                 = SuppressionFilesSettings.Default,
-    hosted                = HostedSuppressionsSettings.Default,
-    generatedSuppressions = new File(GeneratedSuppressionsFilename),
-    suppressions          = Seq.empty
+  final val CombinedSuppressionsFilename: String = "combined-suppressions-file.xml"
+
+  final val PackagedSuppressionsFilename: String = "packaged-suppressions-file.xml"
+
+  final val Default: SuppressionSettings = new SuppressionSettings(
+    files           = SuppressionFilesSettings.Default,
+    hosted          = HostedSuppressionsSettings.Default,
+    suppressions    = Seq.empty,
+    packagedEnabled = false,
+    packagedFilter  = DefaultPackagedFilter
   )
 
   def apply(
-      files: SuppressionFilesSettings    = SuppressionFilesSettings.Default,
-      hosted: HostedSuppressionsSettings = HostedSuppressionsSettings.Default,
-      generatedSuppressions: File        = new File(GeneratedSuppressionsFilename),
-      suppressions: Seq[SuppressionRule] = Seq.empty
+      files: SuppressionFilesSettings    = Default.files,
+      hosted: HostedSuppressionsSettings = Default.hosted,
+      suppressions: Seq[SuppressionRule] = Default.suppressions,
+      packagedEnabled: Boolean           = Default.packagedEnabled,
+      packagedFilter: PackagedFilter     = Default.packagedFilter
   ): SuppressionSettings =
-    new SuppressionSettings(files, hosted, generatedSuppressions, suppressions)
+    new SuppressionSettings(
+      files,
+      hosted,
+      suppressions,
+      packagedEnabled,
+      packagedFilter
+    )
+
+  type PackagedFilter = Attributed[File] => Boolean
+
+  object PackagedFilter {
+
+    final val BlacklistAll: PackagedFilter = _ => false
+
+    final val WhitelistAll: PackagedFilter = _ => true
+
+    /** Filter dependencies based on their GAV identifiers
+      *
+      * @param pred a function that takes a GAV (GroudId, ArtifactId, Version) return true if it should consider that artifact.
+      */
+    def ofGav(pred: (String, String, String) => Boolean): PackagedFilter =
+      (dependency: Attributed[File]) => {
+        dependency.get(Keys.moduleID.key).exists(m => pred(m.organization, m.name, m.revision))
+      }
+
+    /** Filter dependencies based on a file check
+      */
+    def ofFile(pred: File => Boolean): PackagedFilter =
+      (dependency: Attributed[File]) => pred(dependency.data)
+
+    /** Filter dependencies based on a filename check
+      */
+    def ofFilename(pred: String => Boolean): PackagedFilter =
+      (dependency: Attributed[File]) => pred(dependency.data.getName)
+
+    /** Filter dependencies based on a filename check against a Regex
+      */
+    def ofFilenameRegex(regex: Regex): PackagedFilter =
+      (dependency: Attributed[File]) => regex.findFirstMatchIn(dependency.data.getName).nonEmpty
+  }
 }

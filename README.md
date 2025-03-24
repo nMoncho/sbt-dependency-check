@@ -132,10 +132,13 @@ limit and receive 403 errors. In a CI environment one must use a caching strateg
 
 #### Suppression Settings
 
-Suppressions can be specified either as suppression files, or as hosted suppressions. A suppression file can be either an
-actual file or a URL. Hosted suppression are specified with a URL. The different between the two is that suppression files
-are meant to be project specific, whereas hosted suppression are meant, or can be, more general. Hosted Suppressions are
-considered "base" suppressions, whereas suppression files are not.
+Suppressions can be specified either as suppression files, as hosted suppressions, or as a SBT Setting Key.
+A suppression file can be either an  actual file or a URL. Hosted suppression are specified with a URL. The different
+between the two is that suppression files  are meant to be project specific, whereas hosted suppression are meant,
+or can be, more general. Hosted Suppressions are considered "base" suppressions, whereas suppression files are not.
+
+Suppressions defined with the `suppressions` field on the `dependencyCheckSuppressions` key are created using the
+`net.nmoncho.sbt.dependencycheck.settings.SuppressionRule` class, providing an alternative to defining suppressions with XML files.
 
 Whether this suppression is taken into account or not is governed by the Analyzer Setting `vulnerabilitySuppressionEnabled`.
 Another useful setting is `failOnUnusedSuppressionRule` which will fail the build if there is any non-base suppression not
@@ -161,6 +164,49 @@ applied.
 | `username`      | the hosted suppressions username. For use when hosted suppressions are mirrored locally on a site requiring HTTP-Basic-authentication      | `null`                                                                                |
 | `password`      | the hosted suppressions password. For use when hosted suppressions are mirrored locally on a site requiring HTTP-Basic-authentication      | `null`                                                                                |
 | `bearerToken`   | the hosted suppressions bearer token. For use when hosted suppressions are mirrored locally on a site requiring HTTP-Bearer-authentication | `null`                                                                                |
+
+##### Packaged Suppressions
+
+In order to avoid duplicating suppression rules between related projects, we can export suppressions rules defined in a
+project, and then reuse those suppressions on downstream projects. For example, say you have a "commons" project that
+includes a library with a CVE. And then another project including that "commons" project. If we run CI on both projects
+with a dependency check, we'd have to define the same suppression rule in both projects, as "commons" would have this
+dependency in its classpath, and the other project would also have it as a transitive dependency. If we could define the
+suppression only in "commons", and then reuse it on downstream projects, we would save us a lot of copy/paste and headaches.
+
+We can use and export package suppressions by enabling with the `packagedEnabled` field in the `dependencyCheckSuppressions` key.
+By default, packaged suppressions rules are disabled.
+
+**Using Packaged Suppressions**
+To use exported packaged suppressions rules by other projects we need to whitelist what dependencies we'll accept
+suppressions rules from. By default, all dependencies are blacklisted.
+
+For example, imagine we only want to accept packaged suppressions from libraries published by Typesafe or Lightbend, we
+would configure our builds like:
+
+```scala
+dependencyCheckSuppressions := SuppressionSettings(
+  packagedEnabled = true,
+  packagedFilter = PackageFilter.ofGav {
+    case ("com.typesafe" | "com.lightbend", _ ,_) => true
+    case _ => false
+  }
+)
+```
+
+There are other ways to define `PackageFilter`s that can filter each dependency available in the classpath.
+
+
+**Exporting Packaged Suppressions**
+We can export the suppression rules we define in a project by just enabling the packaged suppression rules. An XML suppression
+rules file will be created and treated as a managed resource (i.e. will be included in the packaged JAR).
+
+Only the suppression rules defined in the `files` (non-URLs, just files) and the `suppressions` fields on the
+`dependencyCheckSuppressions` key will be included in the packaged suppressions rules. The rationale is that `URLs` defined
+in the `files` field, or the hosted suppressions can be easily shared already.
+
+Every packaged suppression rule will be marked as "base", meaning it won't show in the dependency check report, nor on the
+unused suppressions rules list. This is to avoid duplicating information on multiple projects.
 
 #### Analyzer Settings
 

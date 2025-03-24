@@ -34,6 +34,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Prop._
 import org.scalacheck.Test
+import sbt.Logger
 
 class SuppressionRuleSuite extends munit.ScalaCheckSuite {
 
@@ -63,6 +64,13 @@ class SuppressionRuleSuite extends munit.ScalaCheckSuite {
       } else {
         true
       }
+    }
+  }
+
+  property("Suppression rules can round-trip between Owasp and Plugin representations") {
+    implicit val log: Logger = Logger.Null
+    forAll(genRule) { rule =>
+      assertEquals(SuppressionRule.fromOwasp(rule.toOwasp), rule)
     }
   }
 

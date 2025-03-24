@@ -26,6 +26,7 @@ import net.nmoncho.sbt.dependencycheck.tasks._
 import org.owasp.dependencycheck.reporting.ReportGenerator.Format
 import org.owasp.dependencycheck.utils.Settings
 import sbt.AutoPlugin
+import sbt.Compile
 import sbt.Def
 import sbt.File
 import sbt.Keys._
@@ -72,6 +73,7 @@ object DependencyCheckPlugin extends AutoPlugin {
     dependencyCheckPurge := dependencyCheckPurgeTask.value,
     dependencyCheckListSettings := dependencyCheckListTask.value,
     dependencyCheckListUnusedSuppressions := dependencyCheckListUnusedTask.value,
+    Compile / resourceGenerators += GenerateSuppressions.exportPackagedSuppressions(),
     dependencyCheckOutputDirectory := crossTarget.value,
     dependencyCheckAggregate / aggregate := false,
     dependencyCheckAllProjects / aggregate := false,
@@ -94,8 +96,7 @@ object DependencyCheckPlugin extends AutoPlugin {
 
   private def dependencyCheckListUnusedTask: Def.Initialize[Task[Unit]] = ListUnusedSuppressions()
 
-  lazy val engineSettings: Def.Initialize[Task[Settings]] =
-    LoadSettings() dependsOn GenerateSuppressions()
+  lazy val engineSettings: Def.Initialize[Task[Settings]] = LoadSettings()
 
   lazy val scanSet: Def.Initialize[Task[Seq[File]]] = ScanSet()
 

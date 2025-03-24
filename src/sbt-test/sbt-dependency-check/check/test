@@ -8,6 +8,11 @@ $ exists target/scala-2.13/dependency-check-report.html
 > set dependencyCheckSuppressions := net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings(files = net.nmoncho.sbt.dependencycheck.settings.SuppressionFilesSettings.files()(new File("suppressions.xml")), suppressions = Seq(net.nmoncho.sbt.dependencycheck.settings.SuppressionRule(cvssBelow = Seq(10.0))))
 > dependencyCheck
 
+-$ exists target/scala-2.13/resource_managed/main/packaged-suppressions-file.xml
+> set dependencyCheckSuppressions := net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings(files = net.nmoncho.sbt.dependencycheck.settings.SuppressionFilesSettings.files()(new File("suppressions.xml")), suppressions = Seq(net.nmoncho.sbt.dependencycheck.settings.SuppressionRule(cvssBelow = Seq(10.0))), packagedEnabled = true)
+> managedResources
+$ exists target/scala-2.13/resource_managed/main/packaged-suppressions-file.xml
+
 > set dependencyCheckSuppressions := net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings(files = net.nmoncho.sbt.dependencycheck.settings.SuppressionFilesSettings.files()(new File("unused-suppressions.xml")), suppressions = Seq(net.nmoncho.sbt.dependencycheck.settings.SuppressionRule(cvssBelow = Seq(1.0))))
 > dependencyCheckListUnusedSuppressions
 
