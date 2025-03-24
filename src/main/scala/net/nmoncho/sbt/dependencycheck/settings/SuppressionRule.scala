@@ -66,12 +66,15 @@ case class SuppressionRule private (
   def toOwasp: OwaspSuppressionRule = {
     import scala.jdk.CollectionConverters.*
 
-    val rule     = new OwaspSuppressionRule()
-    val untilCal = Calendar.getInstance()
-    untilCal.set(until.getYear, until.getMonthValue - 1, until.getDayOfMonth, 0, 0, 0)
+    val rule = new OwaspSuppressionRule()
+
+    if (until != LocalDate.EPOCH) {
+      val untilCal = Calendar.getInstance()
+      untilCal.set(until.getYear, until.getMonthValue - 1, until.getDayOfMonth, 0, 0, 0)
+      rule.setUntil(untilCal)
+    }
 
     rule.setBase(base)
-    rule.setUntil(untilCal)
     identifier match {
       case Some(Identifier(id, FilePath)) => rule.setFilePath(id.toOwasp)
       case Some(Identifier(id, Gav)) => rule.setGav(id.toOwasp)
@@ -84,7 +87,10 @@ case class SuppressionRule private (
     rule.setCwe(cwe.asJava)
     rule.setCve(cve.asJava)
     vulnerabilityNames.foreach(vn => rule.addVulnerabilityName(vn.toOwasp))
-    rule.setNotes(notes)
+
+    if (!notes.isBlank) {
+      rule.setNotes(notes)
+    }
 
     rule
   }
