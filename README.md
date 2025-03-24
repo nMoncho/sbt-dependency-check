@@ -18,7 +18,7 @@ plugin still relied on. If you're looking to migrate from Buchholtz's plugin, pl
 Add the plugin to your project configuration:
 
 ```scala
-addSbtPlugin("net.nmoncho" % "sbt-dependency-check" % "1.0.0")
+addSbtPlugin("net.nmoncho" % "sbt-dependency-check" % "1.1.0")
 ```
 
 The minimum SBT version supported is `1.9.0`.
