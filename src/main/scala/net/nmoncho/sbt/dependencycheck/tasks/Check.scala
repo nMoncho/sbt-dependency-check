@@ -57,12 +57,12 @@ object Check {
             dependencyCheckFormats.value
           )
         }
-      }
+      } tag NonParallel
     } else {
       Def.task {
         log.info(s"Skipping dependency check for [${name.value}]")
       }
     }
-  }
+  } tag NonParallel
 
 }

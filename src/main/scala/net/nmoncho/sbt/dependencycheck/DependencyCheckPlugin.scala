@@ -29,8 +29,10 @@ import sbt.AutoPlugin
 import sbt.Compile
 import sbt.Def
 import sbt.File
+import sbt.Global
 import sbt.Keys._
 import sbt.PluginTrigger
+import sbt.Tags
 import sbt.Task
 import sbt.io.syntax._
 import sbt.plugins.JvmPlugin
@@ -79,7 +81,8 @@ object DependencyCheckPlugin extends AutoPlugin {
     dependencyCheckAllProjects / aggregate := false,
     dependencyCheckUpdate / aggregate := false,
     dependencyCheckPurge / aggregate := false,
-    dependencyCheckListSettings / aggregate := false
+    dependencyCheckListSettings / aggregate := false,
+    Global / concurrentRestrictions += Tags.exclusive(NonParallel)
   )
 
   private def dependencyCheckTask: Def.Initialize[Task[Unit]] = Check()
