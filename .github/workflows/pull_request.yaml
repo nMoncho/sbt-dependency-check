@@ -9,7 +9,7 @@ permissions:
 
 env:
   LOG_LEVEL: INFO
-  DATA_DIRECTORY: cve-data/
+  DATA_DIRECTORY: ~/cve-data/
   CI: true
   NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
 
@@ -36,7 +36,7 @@ jobs:
         id: restore-cve-db
         uses: actions/cache@v4
         with:
-          path: cve-data/
+          path: ~/cve-data/
           key: cve-data
 
       - name: Test Coverage
@@ -44,11 +44,3 @@ jobs:
 
       - name: Test SBT
         run: sbt scripted
-
-      - name: Save CVE Database
-        id: save-cve-db
-        uses: actions/cache/save@v4
-        if: always()
-        with:
-          path: cve-data/
-          key: cve-data
