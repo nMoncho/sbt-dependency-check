@@ -42,7 +42,7 @@ import org.owasp.dependencycheck.reporting.ReportGenerator.Format
 import org.owasp.dependencycheck.utils.Settings
 import org.owasp.dependencycheck.utils.Settings.KEYS.APPLICATION_NAME
 import org.owasp.dependencycheck.utils.SeverityUtil
-import org.owasp.dependencycheck.xml.suppression.{SuppressionRule => OwaspSuppressionRule}
+import org.owasp.dependencycheck.xml.suppression.{ SuppressionRule => OwaspSuppressionRule }
 import sbt.Tags.Tag
 import sbt.{ Keys => SbtKeys, _ }
 
