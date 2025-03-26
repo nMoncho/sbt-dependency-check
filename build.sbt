@@ -46,7 +46,8 @@ lazy val root = (project in file("."))
       dependencyCheck,
       munit           % Test,
       munitScalaCheck % Test,
-      log4jSf4jImpl   % Test
+      // log4jSf4jImpl   % Test,
+      mockito % Test
     ),
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
