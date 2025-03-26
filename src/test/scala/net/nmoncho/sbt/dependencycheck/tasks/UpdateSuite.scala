@@ -19,36 +19,35 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package net.nmoncho.sbt.dependencycheck
-package tasks
+package net.nmoncho.sbt.dependencycheck.tasks
 
-import scala.util.control.NonFatal
-
-import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.engineSettings
+import org.mockito.Mockito._
 import org.owasp.dependencycheck.Engine
-import sbt.Def
-import sbt.Keys.streams
 import sbt.Logger
-import sbt.Task
 
-object Update {
+class UpdateSuite extends munit.FunSuite {
 
-  def apply(): Def.Initialize[Task[Unit]] = Def.task {
-    implicit val log: Logger = streams.value.log
+  test("The Update task should delegate update to the Owasp Engine") {
+    implicit val log: Logger = Logger.Null
 
-    withEngine(engineSettings.value) { engine =>
-      Update(engine)
-    }
+    val engine = mock(classOf[Engine])
+
+    Update(engine)
+
+    verify(engine, atLeastOnce()).doUpdates()
   }
 
-  def apply(engine: Engine)(implicit log: Logger): Unit =
-    try {
-      engine.doUpdates()
-    } catch {
-      case t: Throwable if NonFatal(t) =>
-        log.error("An exception occurred connecting to the local database:")
-        logFailure(t)
-        throw t
+  test("The Update task should report failures when delegating update to the Owasp Engine") {
+    implicit val log: Logger = Logger.Null
+
+    val engine = mock(classOf[Engine])
+    when(engine.doUpdates()).thenThrow(new IllegalStateException("Some expected error"))
+
+    intercept[IllegalStateException] {
+      Update(engine)
     }
+
+    verify(engine, atLeastOnce()).doUpdates()
+  }
 
 }
