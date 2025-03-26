@@ -39,6 +39,7 @@ import org.owasp.dependencycheck.dependency.naming.GenericIdentifier
 import org.owasp.dependencycheck.dependency.naming.Identifier
 import org.owasp.dependencycheck.dependency.naming.PurlIdentifier
 import org.owasp.dependencycheck.reporting.ReportGenerator.Format
+import org.owasp.dependencycheck.utils.Downloader
 import org.owasp.dependencycheck.utils.Settings
 import org.owasp.dependencycheck.utils.Settings.KEYS.APPLICATION_NAME
 import org.owasp.dependencycheck.utils.SeverityUtil
@@ -59,6 +60,7 @@ package object tasks {
       Thread.currentThread().setContextClassLoader(newClassLoader)
 
       try {
+        Downloader.getInstance().configure(settings)
         fn(engine)
       } catch {
         case NonFatal(e) =>
