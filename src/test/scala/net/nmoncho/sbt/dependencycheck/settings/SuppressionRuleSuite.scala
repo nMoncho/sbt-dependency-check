@@ -70,7 +70,16 @@ class SuppressionRuleSuite extends munit.ScalaCheckSuite {
   property("Suppression rules can round-trip between Owasp and Plugin representations") {
     implicit val log: Logger = Logger.Null
     forAll(genRule) { rule =>
-      assertEquals(SuppressionRule.fromOwasp(rule.toOwasp), rule)
+      val other = SuppressionRule.fromOwasp(rule.toOwasp)
+      assertEquals(other.base, rule.base)
+      assertEquals(other.until, rule.until)
+      assertEquals(other.identifier, rule.identifier)
+      assertEquals(other.cpe, rule.cpe)
+      assertEquals(other.cvssBelow, rule.cvssBelow)
+      assertEquals(other.cwe, rule.cwe)
+      assertEquals(other.cve, rule.cve)
+      assertEquals(other.vulnerabilityNames, rule.vulnerabilityNames)
+      assertEquals(other.notes, rule.notes)
     }
   }
 
@@ -166,7 +175,7 @@ class SuppressionRuleSuite extends munit.ScalaCheckSuite {
     cve <- Gen.listOf(genCVE)
     vulnerabilityNames <- Gen.listOf(genCVE.map(PropertyType.string(_, caseSensitive = false)))
     cpe <- Gen.listOf(genCpe)
-    notes <- Gen.asciiPrintableStr
+    notes <- Gen.nonEmptyStringOf(Gen.asciiPrintableChar)
     until <- Gen.oneOf(
       Gen.const(LocalDate.EPOCH),
       Gen.choose(-365, 365).map(LocalDate.now().plusDays(_))

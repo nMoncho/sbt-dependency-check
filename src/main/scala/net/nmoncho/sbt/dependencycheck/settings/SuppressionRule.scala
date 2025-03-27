@@ -111,7 +111,7 @@ case class SuppressionRule private (
 
     // Just like any XML, the order of the elements is important. This is taken from the XSD
     val body =
-        Option(notes).filter(_.nonEmpty).map(_ => <notes>{PCData(notes)}</notes>).toSeq ++
+        Option(notes).filterNot(_.isBlank).map(_ => <notes>{PCData(notes)}</notes>).toSeq ++
         id.toSeq ++
         cpe.map(c => <cpe regex={c.regex.toString} caseSensitive={c.caseSensitive.toString}>{c.value}</cpe>) ++
         cvssBelow.map(cvss => <cvssBelow>{cvss}</cvssBelow>) ++
@@ -282,7 +282,7 @@ object SuppressionRule {
       cwe                = rule.getCwe.asScala.toList,
       cve                = rule.getCve.asScala.toList,
       vulnerabilityNames = getVulnerabilityNames().toList,
-      notes              = Option(rule.getNotes).getOrElse("")
+      notes              = Option(rule.getNotes).filterNot(_.isBlank).getOrElse("")
     )
   }
 
