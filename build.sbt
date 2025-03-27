@@ -4,7 +4,7 @@ ThisBuild / organization := "net.nmoncho"
 
 addCommandAlias(
   "testCoverage",
-  "; clean ; coverage; test; coverageAggregate; coverageReport; coverageOff"
+  "; clean ; coverage; test; scripted; coverageAggregate; coverageReport; coverageOff"
 )
 
 addCommandAlias(

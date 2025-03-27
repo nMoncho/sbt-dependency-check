@@ -40,7 +40,4 @@ jobs:
           key: cve-data
 
       - name: Test Coverage
-        run: sbt test
-
-      - name: Test SBT
-        run: sbt scripted
+        run: sbt testCoverage
