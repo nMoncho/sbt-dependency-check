@@ -37,7 +37,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/cve-data/
-          key: cve-data
+          key: ${{ runner.os }}-cve-cache-${{ hashFiles('**/build.sbt') }}
 
       - name: Test Coverage
         run: sbt testCoverage
