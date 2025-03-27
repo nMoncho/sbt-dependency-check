@@ -18,7 +18,7 @@ plugin still relied on. If you're looking to migrate from Buchholtz's plugin, pl
 Add the plugin to your project configuration:
 
 ```scala
-addSbtPlugin("net.nmoncho" % "sbt-dependency-check" % "1.2.0")
+addSbtPlugin("net.nmoncho" % "sbt-dependency-check" % "1.3.0")
 ```
 
 The minimum SBT version supported is `1.9.0`.
@@ -44,7 +44,7 @@ sbt -Dlog4j2.level=info dependencyCheck
 The first time you run these tasks it will take some time, even a couple of minutes. The analysis will write a report
 to `target/{scala-version}/dependency-check-report.html`.
 
-After this feel free to take a look at the available tasks and settings.
+After this, feel free to take a look at the available tasks and settings.
 
 ### Tasks
 
