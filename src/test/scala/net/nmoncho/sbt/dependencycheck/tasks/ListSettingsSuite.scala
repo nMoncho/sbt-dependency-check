@@ -21,10 +21,9 @@
 
 package net.nmoncho.sbt.dependencycheck.tasks
 
+import net.nmoncho.sbt.dependencycheck.Utils.StringLogger
 import net.nmoncho.sbt.dependencycheck.settings.ScopesSettings
 import org.owasp.dependencycheck.utils.Settings
-import sbt.util.Level
-import sbt.util.Logger
 
 class ListSettingsSuite extends munit.FunSuite {
 
@@ -34,17 +33,6 @@ class ListSettingsSuite extends munit.FunSuite {
     ListSettings(new Settings(), ScopesSettings.Default)
 
     assertEquals(log.sb.result(), expected)
-  }
-
-  class StringLogger extends Logger {
-
-    val sb: StringBuilder = new StringBuilder()
-
-    override def trace(t: => Throwable): Unit = ()
-
-    override def success(message: => String): Unit = sb.append(message).append('\n')
-
-    override def log(level: Level.Value, message: => String): Unit = sb.append(message).append('\n')
   }
 
   private lazy val expected =

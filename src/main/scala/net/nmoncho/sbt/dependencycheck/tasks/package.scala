@@ -111,6 +111,7 @@ package object tasks {
     addDependencies(dependencies, engine)
     scanSet.foreach(file => engine.scan(file))
 
+    println(engine.getSettings.getDataDirectory)
     engine.analyzeDependencies()
 
     if (reportFormats.isEmpty) {
