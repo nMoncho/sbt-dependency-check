@@ -32,7 +32,10 @@ class ListSettingsSuite extends munit.FunSuite {
 
     ListSettings(new Settings(), ScopesSettings.Default)
 
-    assertEquals(log.sb.result(), expected)
+    val result = log.sb.result()
+    assertEquals(result, expected)
+
+    assert(result.contains("data.password: ********"), "sensitive settings are masked properly")
   }
 
   private lazy val expected =
