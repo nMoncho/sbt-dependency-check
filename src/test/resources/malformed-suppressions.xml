@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions>
+    <suppress base="true">
+        <notes><![CDATA[
+        obvious fp - currently not returning any CVEs
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-cli/commons\-cli@.*$</packageUrl>
+        <cpe>cpe:/a:spirit-project:spirit</cpe>
+    </suppress>
+    <suppress base="true">
+        <notes><![CDATA[
+        obvious fp - currently not returning any CVEs
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/javax\.xml\.bind/jaxb\-api@.*$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/javax\.xml\.bind/jaxb\-api@.*$</packageUrl>
+        <cpe>cpe:/a:oracle:java_se</cpe>
+    </suppress>
+</suppressions>

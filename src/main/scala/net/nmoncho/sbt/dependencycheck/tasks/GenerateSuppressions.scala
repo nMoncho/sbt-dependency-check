@@ -24,6 +24,7 @@ package tasks
 
 import net.nmoncho.sbt.dependencycheck.Keys.dependencyCheckSuppressions
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
+import net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings._
 import org.owasp.dependencycheck.xml.suppression.SuppressionParser
 import sbt.Keys._
@@ -35,10 +36,15 @@ import sbt._
 object GenerateSuppressions {
 
   def apply(): Def.Initialize[Task[Seq[SuppressionRule]]] = Def.task {
-    val settings = dependencyCheckSuppressions.value
+    implicit val log: Logger = streams.value.log
+    val settings             = dependencyCheckSuppressions.value
+    val dependencies         = (Compile / externalDependencyClasspath).value
 
-    val buildSuppressions            = settings.suppressions
-    val importedPackagedSuppressions = collectImportedPackagedSuppressions().value
+    val buildSuppressions = settings.suppressions
+    val importedPackagedSuppressions = collectImportedPackagedSuppressions(
+      settings,
+      dependencies
+    )
 
     buildSuppressions ++ importedPackagedSuppressions
   }
@@ -47,37 +53,32 @@ object GenerateSuppressions {
     *
     * @return list of all packaged [[SuppressionRule]]s
     */
-  def collectImportedPackagedSuppressions(): Def.Initialize[Task[Seq[SuppressionRule]]] =
-    Def.taskDyn {
-      implicit val log: Logger = streams.value.log
-      val settings             = dependencyCheckSuppressions.value
+  def collectImportedPackagedSuppressions(
+      settings: SuppressionSettings,
+      dependencies: Seq[Attributed[File]]
+  )(implicit log: Logger): Seq[SuppressionRule] =
+    if (settings.packagedEnabled) {
+      val allowedDependencies = dependencies.filter(settings.packagedFilter)
 
-      if (settings.packagedEnabled) {
-        Def.task {
-          val dependencies =
-            (Compile / externalDependencyClasspath).value.filter(settings.packagedFilter)
+      IO.withTemporaryDirectory { tempDir =>
+        val parser = new SuppressionParser
+        allowedDependencies.flatMap { dependency =>
+          IO.unzip(
+            dependency.data,
+            tempDir,
+            (filename: String) => filename == PackagedSuppressionsFilename
+          ).flatMap { file =>
+            log.debug(s"Extracting packaged suppressions file from JAR [${file.name}]")
 
-          IO.withTemporaryDirectory { tempDir =>
-            val parser = new SuppressionParser
-            dependencies.flatMap { dependency =>
-              IO.unzip(
-                dependency.data,
-                tempDir,
-                (filename: String) => filename == PackagedSuppressionsFilename
-              ).flatMap { file =>
-                log.debug(s"Extracting packaged suppressions file from JAR [${file.name}]")
-
-                parseSuppressionFile(parser, file)
-                  // Make all imported packaged suppressions "base", so they don't show on this project's reports.
-                  .map(_.copy(base = true))
-              }
-            }
+            parseSuppressionFile(parser, file)
+              // Make all imported packaged suppressions "base", so they don't show on this project's reports.
+              .map(_.copy(base = true))
           }
         }
-      } else {
-        log.debug("Packaged suppressions rules disabled, skipping...")
-        Def.task(Seq.empty[SuppressionRule])
       }
+    } else {
+      log.debug("Packaged suppressions rules disabled, skipping...")
+      Seq.empty[SuppressionRule]
     }
 
   /** Creates a file containing [[SuppressionRule]]s defined in the [[net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings.files]] field
@@ -89,52 +90,72 @@ object GenerateSuppressions {
     implicit val log: Logger     = streams.value.log
     val settings                 = dependencyCheckSuppressions.value
     val packagedSuppressionsFile = (Compile / resourceManaged).value / PackagedSuppressionsFilename
-    val parser                   = new SuppressionParser
 
-    // Suppression files are parsed lazily in case `packagedEnabled` is disabled
-    val suppressionsFiles = if (settings.packagedEnabled) {
-      settings.files.files.flatMap { filePath =>
-        val file = new File(filePath)
-        if (file.exists()) {
-          log.debug(s"Including suppressions rules from [${file.name}]")
-          parseSuppressionFile(parser, file)
+    if (settings.packagedEnabled) {
+      Def.task {
+        val generated = writeExportSuppressions(packagedSuppressionsFile, settings)
+
+        if (generated) {
+          Seq(packagedSuppressionsFile)
         } else {
-          log.debug(s"Ignoring [$filePath] on packaged suppressions rules export process")
-          None
+          Seq.empty
         }
       }
     } else {
-      Seq.empty
-    }
-
-    val buildSuppressions = settings.suppressions
-    val suppressions      = buildSuppressions ++ suppressionsFiles
-
-    if (settings.packagedEnabled && suppressions.nonEmpty) {
       log.info(
-        s"Generating packaged suppression file to [${packagedSuppressionsFile.getAbsolutePath}]"
-      )
-
-      Def.task {
-        IO.write(
-          packagedSuppressionsFile,
-          SuppressionRule.toSuppressionsXML(
-            // Make all packaged suppressions "base", so they don't show on downstream projects' reports.
-            suppressions.map(_.copy(base = true))
-          )
-        )
-
-        Seq(packagedSuppressionsFile)
-      }
-    } else {
-      log.info(
-        "Either packaged suppressions is disabled, or there are no suppressions defined, skipping packaged suppression file generation..."
+        "Packaged suppressions is disabled, skipping packaged suppression file generation..."
       )
       Def.task(Seq.empty)
     }
   }
 
-  private def parseSuppressionFile(parser: SuppressionParser, file: File)(
+  /** Writes the exported packaged suppression rules
+    *
+    * Packaged suppressions rules will only consider the rules defined in the
+    * [[net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings.files]] field
+    * and the [[net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings.suppressions]] field.
+    *
+    * @param file file to write to
+    * @param settings rules settings, including files and
+    * @return true if a file was generated, false if there was not suppression rule to write to the file
+    */
+  private[tasks] def writeExportSuppressions(file: File, settings: SuppressionSettings)(
+      implicit log: Logger
+  ): Boolean = {
+    val parser = new SuppressionParser
+
+    val buildSuppressions = settings.suppressions
+    val suppressionsFiles = settings.files.files.flatMap { filePath =>
+      val file = new File(filePath)
+      if (file.exists()) {
+        log.debug(s"Including suppressions rules from [${file.name}]")
+        parseSuppressionFile(parser, file)
+      } else {
+        log.debug(s"Ignoring [$filePath] on packaged suppressions rules export process")
+        None
+      }
+    }
+
+    val rules = (buildSuppressions ++ suppressionsFiles).map(
+      // Make all packaged suppressions "base", so they don't show on downstream projects' reports.
+      _.copy(base = true)
+    )
+
+    if (rules.nonEmpty) {
+      log.info(
+        s"Generating packaged suppression file to [${file.getAbsolutePath}]"
+      )
+
+      IO.write(file, SuppressionRule.toSuppressionsXML(rules))
+
+      true
+    } else {
+      log.info("No suppressions defined, skipping packaged suppression file generation...")
+      false
+    }
+  }
+
+  private[tasks] def parseSuppressionFile(parser: SuppressionParser, file: File)(
       implicit log: Logger
   ): Seq[SuppressionRule] =
     try {
