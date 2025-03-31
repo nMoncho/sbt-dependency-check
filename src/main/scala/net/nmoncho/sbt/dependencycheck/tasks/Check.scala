@@ -39,7 +39,7 @@ object Check {
 
         val failCvssScore    = dependencyCheckFailBuildOnCVSS.value
         val dependencies     = Dependencies.projectDependencies.value
-        val suppressionRules = GenerateSuppressions.apply().value
+        val suppressionRules = GenerateSuppressions().value
         val scanSetFiles     = scanSet.value
 
         log.info("Scanning following dependencies: ")

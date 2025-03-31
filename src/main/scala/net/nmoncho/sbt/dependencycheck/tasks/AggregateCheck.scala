@@ -35,7 +35,7 @@ object AggregateCheck {
     log.info(s"Running aggregate check for [${name.value}]")
 
     val failCvssScore    = dependencyCheckFailBuildOnCVSS.value
-    val suppressionRules = GenerateSuppressions.apply().value
+    val suppressionRules = GenerateSuppressions().value
     val scanSetFiles     = scanSet.value
 
     val dependencies = scala.collection.mutable.Set[Attributed[File]]()

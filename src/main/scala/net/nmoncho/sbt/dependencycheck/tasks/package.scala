@@ -129,9 +129,12 @@ package object tasks {
     failOnFoundVulnerabilities(failCvssScore, engine, projectName)
   }
 
-  private def addSuppressionRules(rules: Seq[SuppressionRule], engine: Engine): Unit = {
+  private def addSuppressionRules(rules: Seq[SuppressionRule], engine: Engine)(
+      implicit log: Logger
+  ): Unit = {
     import scala.jdk.CollectionConverters.*
 
+    log.info(s"Adding [${rules.size}] suppression rules to Owasp Engine")
     engine.getAnalyzers().asScala.foreach {
       case analyzer: VulnerabilitySuppressionAnalyzer =>
         // We have to prepare the analyzer first before adding any other suppression rules
