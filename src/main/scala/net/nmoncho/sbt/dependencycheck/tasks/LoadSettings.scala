@@ -31,6 +31,7 @@ import net.nmoncho.sbt.dependencycheck.Keys
 import org.owasp.dependencycheck.utils.Settings
 import org.owasp.dependencycheck.utils.Settings.KEYS._
 import sbt.Def
+import sbt.Keys.name
 import sbt.Keys.streams
 import sbt.Logger
 import sbt.Task
@@ -60,6 +61,7 @@ object LoadSettings {
       new Settings()
     }.get
 
+    baseSettings.setStringIfNotEmpty(APPLICATION_NAME, name.value)
     baseSettings.setBoolean(AUTO_UPDATE, dependencyCheckAutoUpdate.value)
     dependencyCheckConnectionTimeout.value.foreach(value =>
       baseSettings.setInt(CONNECTION_TIMEOUT, value.toMillis.toInt)

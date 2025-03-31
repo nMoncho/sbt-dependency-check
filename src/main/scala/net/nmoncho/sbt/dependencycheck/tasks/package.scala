@@ -41,7 +41,6 @@ import org.owasp.dependencycheck.dependency.naming.PurlIdentifier
 import org.owasp.dependencycheck.reporting.ReportGenerator.Format
 import org.owasp.dependencycheck.utils.Downloader
 import org.owasp.dependencycheck.utils.Settings
-import org.owasp.dependencycheck.utils.Settings.KEYS.APPLICATION_NAME
 import org.owasp.dependencycheck.utils.SeverityUtil
 import org.owasp.dependencycheck.xml.suppression.{ SuppressionRule => OwaspSuppressionRule }
 import sbt.Tags.Tag
@@ -119,7 +118,7 @@ package object tasks {
 
     reportFormats.foreach(reportFormat =>
       engine.writeReports(
-        engine.getSettings.getString(APPLICATION_NAME),
+        projectName,
         outputDir,
         reportFormat.name(),
         null
