@@ -25,6 +25,7 @@ import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.engineSettings
 import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.scanSet
 import net.nmoncho.sbt.dependencycheck.Keys._
 import net.nmoncho.sbt.dependencycheck.tasks.Dependencies._
+import sbt.Def
 import sbt.Keys._
 import sbt._
 
@@ -35,8 +36,29 @@ object AllProjectsCheck {
     log.info(s"Running AllProjects check for [${name.value}]")
 
     val failCvssScore    = dependencyCheckFailBuildOnCVSS.value
-    val suppressionRules = GenerateSuppressions().value
+    val allDependencies  = dependencies().value
+    val suppressionRules = GenerateSuppressions.forAllProjects().value
     val scanSetFiles     = scanSet.value
+
+    log.info("Scanning following dependencies: ")
+    allDependencies.foreach(f => log.info("\t" + f.data.getName))
+
+    withEngine(engineSettings.value) { engine =>
+      analyzeProject(
+        name.value,
+        engine,
+        allDependencies,
+        suppressionRules,
+        scanSetFiles,
+        failCvssScore,
+        dependencyCheckOutputDirectory.value,
+        dependencyCheckFormats.value
+      )
+    }
+  }
+
+  def dependencies(): Def.Initialize[Task[Set[Attributed[File]]]] = Def.task {
+    implicit val log: Logger = streams.value.log
 
     val dependencies = scala.collection.mutable.Set[Attributed[File]]()
     dependencies ++= logAddDependencies(anyCompileFilter.value.flatten, Compile)
@@ -45,21 +67,7 @@ object AllProjectsCheck {
     dependencies ++= logAddDependencies(anyTestFilter.value.flatten, Test)
     dependencies --= logRemoveDependencies(anyOptionalFilter.value.flatten, Optional)
 
-    log.info("Scanning following dependencies: ")
-    dependencies.foreach(f => log.info("\t" + f.data.getName))
-
-    withEngine(engineSettings.value) { engine =>
-      analyzeProject(
-        name.value,
-        engine,
-        dependencies.toSet,
-        suppressionRules,
-        scanSetFiles,
-        failCvssScore,
-        dependencyCheckOutputDirectory.value,
-        dependencyCheckFormats.value
-      )
-    }
+    dependencies.toSet
   }
 
   private lazy val anyCompileFilter = Def.settingDyn {

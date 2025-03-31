@@ -35,19 +35,50 @@ import sbt._
   */
 object GenerateSuppressions {
 
-  def apply(): Def.Initialize[Task[Seq[SuppressionRule]]] = Def.task {
-    implicit val log: Logger = streams.value.log
-    val settings             = dependencyCheckSuppressions.value
-    val dependencies         = (Compile / externalDependencyClasspath).value
+  def forProject(): Def.Initialize[Task[Seq[SuppressionRule]]] =
+    Def.task {
+      implicit val log: Logger = streams.value.log
+      val settings             = dependencyCheckSuppressions.value
+      val dependencies         = Dependencies.projectDependencies.value
 
-    val buildSuppressions = settings.suppressions
-    val importedPackagedSuppressions = collectImportedPackagedSuppressions(
-      settings,
-      dependencies
-    )
+      val buildSuppressions = settings.suppressions
+      val importedPackagedSuppressions = collectImportedPackagedSuppressions(
+        settings,
+        dependencies
+      )
 
-    buildSuppressions ++ importedPackagedSuppressions
-  }
+      buildSuppressions ++ importedPackagedSuppressions
+    }
+
+  def forAggregate(): Def.Initialize[Task[Seq[SuppressionRule]]] =
+    Def.task {
+      implicit val log: Logger = streams.value.log
+      val settings             = dependencyCheckSuppressions.value
+      val dependencies         = AggregateCheck.dependencies().value
+
+      val buildSuppressions = settings.suppressions
+      val importedPackagedSuppressions = collectImportedPackagedSuppressions(
+        settings,
+        dependencies
+      )
+
+      buildSuppressions ++ importedPackagedSuppressions
+    }
+
+  def forAllProjects(): Def.Initialize[Task[Seq[SuppressionRule]]] =
+    Def.task {
+      implicit val log: Logger = streams.value.log
+      val settings             = dependencyCheckSuppressions.value
+      val dependencies         = AllProjectsCheck.dependencies().value
+
+      val buildSuppressions = settings.suppressions
+      val importedPackagedSuppressions = collectImportedPackagedSuppressions(
+        settings,
+        dependencies
+      )
+
+      buildSuppressions ++ importedPackagedSuppressions
+    }
 
   /** Collects all [[SuppressionRule]]s packaged on the libraries included in this project.
     *
@@ -55,10 +86,10 @@ object GenerateSuppressions {
     */
   def collectImportedPackagedSuppressions(
       settings: SuppressionSettings,
-      dependencies: Seq[Attributed[File]]
+      dependencies: Set[Attributed[File]]
   )(implicit log: Logger): Seq[SuppressionRule] =
     if (settings.packagedEnabled) {
-      val allowedDependencies = dependencies.filter(settings.packagedFilter)
+      val allowedDependencies = dependencies.filter(settings.packagedFilter).toSeq
 
       IO.withTemporaryDirectory { tempDir =>
         val parser = new SuppressionParser

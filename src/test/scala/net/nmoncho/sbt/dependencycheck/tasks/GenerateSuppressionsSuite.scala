@@ -47,7 +47,7 @@ class GenerateSuppressionsSuite extends munit.FunSuite {
     val settings = SuppressionSettings.Default
     val suppressions = GenerateSuppressions.collectImportedPackagedSuppressions(
       settings,
-      Seq(
+      Set(
         attributedFile("net.nmoncho-foobar-1.23.jar", ("net.nmoncho", "foobar", "1.23")),
         attributedFile("nmoncho.net-barfoo-4.56.jar", ("moncho.net", "barfoo", "4.56"))
       )
@@ -57,7 +57,7 @@ class GenerateSuppressionsSuite extends munit.FunSuite {
 
     val otherSuppressions = GenerateSuppressions.collectImportedPackagedSuppressions(
       settings.copy(packagedEnabled = true),
-      Seq(
+      Set(
         attributedFile("net.nmoncho-foobar-1.23.jar", ("net.nmoncho", "foobar", "1.23")),
         attributedFile("nmoncho.net-barfoo-4.56.jar", ("moncho.net", "barfoo", "4.56"))
       )
@@ -76,7 +76,7 @@ class GenerateSuppressionsSuite extends munit.FunSuite {
 
     val suppressions = GenerateSuppressions.collectImportedPackagedSuppressions(
       settings,
-      Seq(
+      Set(
         attributedFile("net.nmoncho-foobar-1.23.jar", ("net.nmoncho", "foobar", "1.23")),
         attributedFile("nmoncho.net-barfoo-4.56.jar", ("moncho.net", "barfoo", "4.56"))
       )

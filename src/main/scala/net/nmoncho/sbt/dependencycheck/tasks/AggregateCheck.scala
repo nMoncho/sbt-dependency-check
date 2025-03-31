@@ -25,6 +25,7 @@ import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.engineSettings
 import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.scanSet
 import net.nmoncho.sbt.dependencycheck.Keys._
 import net.nmoncho.sbt.dependencycheck.tasks.Dependencies._
+import sbt.Def
 import sbt.Keys._
 import sbt._
 
@@ -34,9 +35,29 @@ object AggregateCheck {
     implicit val log: Logger = streams.value.log
     log.info(s"Running aggregate check for [${name.value}]")
 
-    val failCvssScore    = dependencyCheckFailBuildOnCVSS.value
-    val suppressionRules = GenerateSuppressions().value
-    val scanSetFiles     = scanSet.value
+    val failCvssScore         = dependencyCheckFailBuildOnCVSS.value
+    val aggregateDependencies = dependencies().value
+    val suppressionRules      = GenerateSuppressions.forAggregate().value
+    val scanSetFiles          = scanSet.value
+
+    log.info("Scanning following dependencies: ")
+
+    withEngine(engineSettings.value) { engine =>
+      analyzeProject(
+        name.value,
+        engine,
+        aggregateDependencies,
+        suppressionRules,
+        scanSetFiles,
+        failCvssScore,
+        dependencyCheckOutputDirectory.value,
+        dependencyCheckFormats.value
+      )
+    }
+  }
+
+  def dependencies(): Def.Initialize[Task[Set[Attributed[File]]]] = Def.task {
+    implicit val log: Logger = streams.value.log
 
     val dependencies = scala.collection.mutable.Set[Attributed[File]]()
     dependencies ++= logAddDependencies(aggregateCompileFilter.value.flatten, Compile)
@@ -45,21 +66,7 @@ object AggregateCheck {
     dependencies --= logRemoveDependencies(aggregateProvidedFilter.value.flatten, Provided)
     dependencies --= logRemoveDependencies(aggregateOptionalFilter.value.flatten, Optional)
 
-    log.info("Scanning following dependencies: ")
-    dependencies.foreach(f => log.info("\t" + f.data.getName))
-
-    withEngine(engineSettings.value) { engine =>
-      analyzeProject(
-        name.value,
-        engine,
-        dependencies.toSet,
-        suppressionRules,
-        scanSetFiles,
-        failCvssScore,
-        dependencyCheckOutputDirectory.value,
-        dependencyCheckFormats.value
-      )
-    }
+    dependencies.toSet
   }
 
   private lazy val aggregateCompileFilter = Def.settingDyn {
