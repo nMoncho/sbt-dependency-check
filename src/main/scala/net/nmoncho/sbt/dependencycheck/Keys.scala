@@ -25,18 +25,9 @@ import java.time.Duration
 
 import scala.collection.Seq
 
-import net.nmoncho.sbt.dependencycheck.settings.AnalyzerSettings
-import net.nmoncho.sbt.dependencycheck.settings.DatabaseSettings
-import net.nmoncho.sbt.dependencycheck.settings.NvdApiSettings
-import net.nmoncho.sbt.dependencycheck.settings.ProxySettings
-import net.nmoncho.sbt.dependencycheck.settings.ScopesSettings
-import net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings
+import net.nmoncho.sbt.dependencycheck.settings._
 import org.owasp.dependencycheck.reporting.ReportGenerator
-import sbt.File
-import sbt.SettingKey
-import sbt.TaskKey
-import sbt.settingKey
-import sbt.taskKey
+import sbt._
 
 object Keys {
 
@@ -118,5 +109,7 @@ object Keys {
     taskKey(
       "List unused suppressions, only considering suppression files, not hosted suppressions nor packed suppressions."
     )
-
+  lazy val dependencyCheckListSuppressions: InputKey[Unit] = inputKey(
+    "List suppression rules added to the Owasp Engine which are defined in the project definition (ie. build.sbt), or are imported packaged suppressions."
+  )
 }

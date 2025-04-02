@@ -75,6 +75,7 @@ object DependencyCheckPlugin extends AutoPlugin {
     dependencyCheckPurge := dependencyCheckPurgeTask.value,
     dependencyCheckListSettings := dependencyCheckListTask.value,
     dependencyCheckListUnusedSuppressions := dependencyCheckListUnusedTask.value,
+    dependencyCheckListSuppressions := ListSuppressions().evaluated,
     Compile / resourceGenerators += GenerateSuppressions.exportPackagedSuppressions(),
     dependencyCheckOutputDirectory := crossTarget.value,
     dependencyCheckAggregate / aggregate := false,

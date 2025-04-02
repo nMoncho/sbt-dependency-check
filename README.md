@@ -8,10 +8,12 @@ which already offers several integrations with other build and continuous integr
 For more information on how OWASP DependencyCheck works and how to read the reports check
 the [project's documentation](https://jeremylong.github.io/DependencyCheck/index.html).
 
-This plugin is inspired by the great work of Alexander v. Buchholtz et  al. [sbt-dependency-check](https://github.com/albuch/sbt-dependency-check).
+This plugin is inspired by the great work of Alexander v. Buchholtz et
+al. [sbt-dependency-check](https://github.com/albuch/sbt-dependency-check).
 This plugin seeks to build on top of the previous plugin, keeping some settings and tasks the same, while offering some
 functionalities on top. The work on this plugin started when we noticed NVD deprecating data-feed, which the previous
-plugin still relied on. If you're looking to migrate from Buchholtz's plugin, please read the [Migration Guide](MIGRATION.md)
+plugin still relied on. If you're looking to migrate from Buchholtz's plugin, please read
+the [Migration Guide](MIGRATION.md)
 
 ## Installation
 
@@ -50,15 +52,16 @@ After this, feel free to take a look at the available tasks and settings.
 
 The following tasks are available:
 
-| Task                                    | Description                                                                                                    |
-|:----------------------------------------|:---------------------------------------------------------------------------------------------------------------|
-| `dependencyCheck`                       | Runs dependency-check against the project and generates a report per sub project.                              |
-| `dependencyCheckAggregate`              | Runs dependency-check against project aggregates and combines the results into a single report.                |
-| `dependencyCheckAllProjects`            | Runs dependency-check against all projects and combines the results into a single report.                      |
-| `dependencyCheckUpdate`                 | Updates the local cache of the NVD data from NIST.                                                             |
-| `dependencyCheckPurge`                  | Deletes the local copy of the NVD. This is used to force a refresh of the data.                                |
-| `dependencyCheckListSettings`           | List the settings used during the analysis.                                                                    |
-| `dependencyCheckListUnusedSuppressions` | List unused suppressions, only considering suppression files, not hosted suppressions nor packed suppressions. |
+| Task                                    | Description                                                                                                                                                               |
+|:----------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `dependencyCheck`                       | Runs dependency-check against the project and generates a report per sub project.                                                                                         |
+| `dependencyCheckAggregate`              | Runs dependency-check against project aggregates and combines the results into a single report.                                                                           |
+| `dependencyCheckAllProjects`            | Runs dependency-check against all projects and combines the results into a single report.                                                                                 |
+| `dependencyCheckUpdate`                 | Updates the local cache of the NVD data from NIST.                                                                                                                        |
+| `dependencyCheckPurge`                  | Deletes the local copy of the NVD. This is used to force a refresh of the data.                                                                                           |
+| `dependencyCheckListSettings`           | List the settings used during the analysis.                                                                                                                               |
+| `dependencyCheckListUnusedSuppressions` | List unused suppressions, only considering suppression files or rules defined in the project definition (ie. build.sbt), not hosted suppressions nor packed suppressions. |
+| `dependencyCheckListSuppressions`       | List suppression rules added to the Owasp Engine which are defined in the project definition (ie. build.sbt), or are imported packaged suppressions.                      |
 
 The reports will be written to `crossTarget.value` by default. This can be overwritten by
 setting `dependencyCheckOutputDirectory`.
@@ -107,11 +110,12 @@ some options to that:
 
 - Install this plugin globally under `~/.sbt/<version>/plugins.sbt`, then define these values on that file.
 - Set the setting `dependencyCheckSettingsFile` using an external `dependencycheck.properties`.
-- Use System Properties when running an SBT Task: `sbt -Danalyzer.central.password=12348765 dependencyCheck` 
+- Use System Properties when running an SBT Task: `sbt -Danalyzer.central.password=12348765 dependencyCheck`
 
 #### NVD API
 
-Dependency-check has moved from using the NVD data-feed to the NVD API. It is **highly** encouraged to obtain an NVD API Key;
+Dependency-check has moved from using the NVD data-feed to the NVD API. It is **highly** encouraged to obtain an NVD API
+Key;
 see [Requesting an API Key](https://nvd.nist.gov/developers/request-an-api-key). Without an NVD API Key, updating will
 be **extremely slow**.
 
@@ -154,15 +158,18 @@ limit and receive 403 errors. In a CI environment one must use a caching strateg
 #### Suppression Settings
 
 Suppressions can be specified either as suppression files, as hosted suppressions, or as a SBT Setting Key.
-A suppression file can be either an  actual file or a URL. Hosted suppression are specified with a URL. The different
-between the two is that suppression files  are meant to be project specific, whereas hosted suppression are meant,
+A suppression file can be either an actual file or a URL. Hosted suppression are specified with a URL. The different
+between the two is that suppression files are meant to be project specific, whereas hosted suppression are meant,
 or can be, more general. Hosted Suppressions are considered "base" suppressions, whereas suppression files are not.
 
 Suppressions defined with the `suppressions` field on the `dependencyCheckSuppressions` key are created using the
-`net.nmoncho.sbt.dependencycheck.settings.SuppressionRule` class, providing an alternative to defining suppressions with XML files.
+`net.nmoncho.sbt.dependencycheck.settings.SuppressionRule` class, providing an alternative to defining suppressions with
+XML files.
 
-Whether this suppression is taken into account or not is governed by the Analyzer Setting `vulnerabilitySuppressionEnabled`.
-Another useful setting is `failOnUnusedSuppressionRule` which will fail the build if there is any non-base suppression not
+Whether this suppression is taken into account or not is governed by the Analyzer
+Setting `vulnerabilitySuppressionEnabled`.
+Another useful setting is `failOnUnusedSuppressionRule` which will fail the build if there is any non-base suppression
+not
 applied.
 
 **Suppression Files**
@@ -193,9 +200,11 @@ project, and then reuse those suppressions on downstream projects. For example, 
 includes a library with a CVE. And then another project including that "commons" project. If we run CI on both projects
 with a dependency check, we'd have to define the same suppression rule in both projects, as "commons" would have this
 dependency in its classpath, and the other project would also have it as a transitive dependency. If we could define the
-suppression only in "commons", and then reuse it on downstream projects, we would save us a lot of copy/paste and headaches.
+suppression only in "commons", and then reuse it on downstream projects, we would save us a lot of copy/paste and
+headaches.
 
-We can use and export package suppressions by enabling with the `packagedEnabled` field in the `dependencyCheckSuppressions` key.
+We can use and export package suppressions by enabling with the `packagedEnabled` field in
+the `dependencyCheckSuppressions` key.
 By default, packaged suppressions rules are disabled.
 
 **Using Packaged Suppressions**
@@ -209,7 +218,7 @@ would configure our builds like:
 dependencyCheckSuppressions := SuppressionSettings(
   packagedEnabled = true,
   packagedFilter = PackageFilter.ofGav {
-    case ("com.typesafe" | "com.lightbend", _ ,_) => true
+    case ("com.typesafe" | "com.lightbend", _, _) => true
     case _ => false
   }
 )
@@ -217,16 +226,18 @@ dependencyCheckSuppressions := SuppressionSettings(
 
 There are other ways to define `PackageFilter`s that can filter each dependency available in the classpath.
 
-
 **Exporting Packaged Suppressions**
-We can export the suppression rules we define in a project by just enabling the packaged suppression rules. An XML suppression
+We can export the suppression rules we define in a project by just enabling the packaged suppression rules. An XML
+suppression
 rules file will be created and treated as a managed resource (i.e. will be included in the packaged JAR).
 
 Only the suppression rules defined in the `files` (non-URLs, just files) and the `suppressions` fields on the
-`dependencyCheckSuppressions` key will be included in the packaged suppressions rules. The rationale is that `URLs` defined
+`dependencyCheckSuppressions` key will be included in the packaged suppressions rules. The rationale is that `URLs`
+defined
 in the `files` field, or the hosted suppressions can be easily shared already.
 
-Every packaged suppression rule will be marked as "base", meaning it won't show in the dependency check report, nor on the
+Every packaged suppression rule will be marked as "base", meaning it won't show in the dependency check report, nor on
+the
 unused suppressions rules list. This is to avoid duplicating information on multiple projects.
 
 #### Analyzer Settings
@@ -234,7 +245,8 @@ unused suppressions rules list. This is to avoid duplicating information on mult
 Analyzer settings are grouped together where they make sense. This is an attempt to make the Setting Keys offered by the
 plugin a bit more readable and comprehensible.
 
-To learn more see the available [File Type Analyzers](https://jeremylong.github.io/DependencyCheck/analyzers/index.html).
+To learn more see the
+available [File Type Analyzers](https://jeremylong.github.io/DependencyCheck/analyzers/index.html).
 Some analyzers may be enabled but marked as experimental, which may not run if `experimentalEnabled` is disabled.
 If you don't care about a particular Analyzer, feel free to ignore it, leaving the default values as they are.
 
@@ -466,7 +478,9 @@ sbt -Dhttp.proxyHost=proxy.example.com \
 ```
 
 ### Changing Log Level
+
 Add `-Dlog4j2.level=<level>` when running a task, for example:
+
 ```bash
 sbt -Dlog4j2.level=debug dependencyCheck
 ```
