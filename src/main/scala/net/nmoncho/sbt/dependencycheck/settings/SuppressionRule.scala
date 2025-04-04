@@ -190,7 +190,7 @@ object SuppressionRule {
         caseSensitive = (value.pattern.flags() & Pattern.CASE_INSENSITIVE) == 0
       )
 
-    def string(value: String, caseSensitive: Boolean): PropertyType =
+    def string(value: String, caseSensitive: Boolean = false): PropertyType =
       PropertyType(
         value         = value,
         regex         = false,
