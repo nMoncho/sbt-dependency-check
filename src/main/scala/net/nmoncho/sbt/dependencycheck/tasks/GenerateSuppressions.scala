@@ -20,7 +20,7 @@ import sbt._
   */
 object GenerateSuppressions {
 
-  def forProject(): Def.Initialize[Task[Seq[SuppressionRule]]] =
+  def forProject(): Def.Initialize[Task[Set[SuppressionRule]]] =
     Def.task {
       implicit val log: Logger = streams.value.log
       val settings             = dependencyCheckSuppressions.value
@@ -32,10 +32,10 @@ object GenerateSuppressions {
         dependencies
       )
 
-      buildSuppressions ++ importedPackagedSuppressions
+      (buildSuppressions ++ importedPackagedSuppressions).toSet
     }
 
-  def forAggregate(): Def.Initialize[Task[Seq[SuppressionRule]]] =
+  def forAggregate(): Def.Initialize[Task[Set[SuppressionRule]]] =
     Def.task {
       implicit val log: Logger = streams.value.log
       val settings             = dependencyCheckSuppressions.value
@@ -47,10 +47,10 @@ object GenerateSuppressions {
         dependencies
       )
 
-      buildSuppressions ++ importedPackagedSuppressions
+      (buildSuppressions ++ importedPackagedSuppressions).toSet
     }
 
-  def forAllProjects(): Def.Initialize[Task[Seq[SuppressionRule]]] =
+  def forAllProjects(): Def.Initialize[Task[Set[SuppressionRule]]] =
     Def.task {
       implicit val log: Logger = streams.value.log
       val settings             = dependencyCheckSuppressions.value
@@ -62,7 +62,7 @@ object GenerateSuppressions {
         dependencies
       )
 
-      buildSuppressions ++ importedPackagedSuppressions
+      (buildSuppressions ++ importedPackagedSuppressions).toSet
     }
 
   /** Collects all [[SuppressionRule]]s packaged on the libraries included in this project.
@@ -152,7 +152,7 @@ object GenerateSuppressions {
       }
     }
 
-    val rules = (buildSuppressions ++ suppressionsFiles).map(
+    val rules = (buildSuppressions ++ suppressionsFiles).distinct.map(
       // Make all packaged suppressions "base", so they don't show on downstream projects' reports.
       _.copy(base = true)
     )

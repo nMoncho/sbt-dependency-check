@@ -85,7 +85,7 @@ package object tasks {
       projectName: String,
       engine: Engine,
       dependencies: Set[Attributed[File]],
-      suppressionRules: Seq[SuppressionRule],
+      suppressionRules: Set[SuppressionRule],
       scanSet: Seq[File],
       failCvssScore: Double,
       outputDir: File,
@@ -113,7 +113,7 @@ package object tasks {
     failOnFoundVulnerabilities(failCvssScore, engine, projectName)
   }
 
-  private def addSuppressionRules(rules: Seq[SuppressionRule], engine: Engine)(
+  private def addSuppressionRules(rules: Set[SuppressionRule], engine: Engine)(
       implicit log: Logger
   ): Unit = {
     import scala.jdk.CollectionConverters.*
