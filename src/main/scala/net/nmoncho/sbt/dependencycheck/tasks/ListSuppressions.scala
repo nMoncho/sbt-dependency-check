@@ -43,16 +43,18 @@ object ListSuppressions {
         if (rules.nonEmpty) {
           log.info(s"Suppression rules added for [${name.value}]")
           rules.foreach(rule => log.info(s"\t${rule.toOwasp.toString}"))
+          log.info("\n\n")
         } else {
           log.info(s"No suppression rules added for [${name.value}]")
+          log.info("\n\n")
         }
-      }
+      } tag NonParallel
     } else {
       Def.task {
         log.info(s"Skipping dependency check for [${name.value}]")
       }
     }
-  }
+  } tag NonParallel
 
   private sealed abstract class ParseResult extends Product with Serializable
   private object ParseResult {
