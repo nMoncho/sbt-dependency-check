@@ -27,7 +27,7 @@ object ListSuppressions {
   private val AllProjects = (Space ~> token("all-projects")) ^^^ ParseResult.AllProjects
   private val Aggregate   = (Space ~> token("aggregate")) ^^^ ParseResult.Aggregate
 
-  private val listParser: Parser[ParseResult] = PerProject | AllProjects | Aggregate
+  private val listParser: Parser[Option[ParseResult]] = (PerProject | AllProjects | Aggregate).?
 
   def apply(): Def.Initialize[InputTask[Unit]] = Def.inputTaskDyn {
     implicit val log: Logger = streams.value.log
@@ -35,9 +35,9 @@ object ListSuppressions {
     if (!dependencyCheckSkip.value) {
       Def.task {
         val rules = (listParser.parsed match {
-          case ParseResult.AllProjects => GenerateSuppressions.forAllProjects()
-          case ParseResult.Aggregate => GenerateSuppressions.forAggregate()
-          case ParseResult.PerProject | _ => GenerateSuppressions.forProject()
+          case Some(ParseResult.AllProjects) => GenerateSuppressions.forAllProjects()
+          case Some(ParseResult.Aggregate) => GenerateSuppressions.forAggregate()
+          case Some(ParseResult.PerProject) | _ => GenerateSuppressions.forProject()
         }).value
 
         if (rules.nonEmpty) {
