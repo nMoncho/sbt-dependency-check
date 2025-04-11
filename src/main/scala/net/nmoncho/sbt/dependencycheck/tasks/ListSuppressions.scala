@@ -12,8 +12,6 @@ import sbt.InputTask
 import sbt.Keys.name
 import sbt.Keys.streams
 import sbt.Logger
-import sbt.complete.DefaultParsers._
-import sbt.complete.Parser
 
 /** Lists Suppression Rules that are added to the Owasp Engine by defining them on
   * the project definition (ie. `build.sbt`) or imported as packaged suppressions rules.
@@ -22,12 +20,6 @@ import sbt.complete.Parser
   * by the SBT plugin but not through the usual DependencyCheck configuration (e.g. properties file)
   */
 object ListSuppressions {
-
-  private val PerProject  = (Space ~> token("per-project")) ^^^ ParseResult.PerProject
-  private val AllProjects = (Space ~> token("all-projects")) ^^^ ParseResult.AllProjects
-  private val Aggregate   = (Space ~> token("aggregate")) ^^^ ParseResult.Aggregate
-
-  private val listParser: Parser[Option[ParseResult]] = (PerProject | AllProjects | Aggregate).?
 
   def apply(): Def.Initialize[InputTask[Unit]] = Def.inputTaskDyn {
     implicit val log: Logger = streams.value.log
@@ -55,12 +47,5 @@ object ListSuppressions {
       }
     }
   } tag NonParallel
-
-  private sealed abstract class ParseResult extends Product with Serializable
-  private object ParseResult {
-    case object PerProject extends ParseResult
-    case object AllProjects extends ParseResult
-    case object Aggregate extends ParseResult
-  }
 
 }

@@ -29,9 +29,25 @@ import org.owasp.dependencycheck.utils.Settings
 import org.owasp.dependencycheck.utils.SeverityUtil
 import org.owasp.dependencycheck.xml.suppression.{ SuppressionRule => OwaspSuppressionRule }
 import sbt.Tags.Tag
+import sbt.complete.DefaultParsers._
+import sbt.complete.Parser
 import sbt.{ Keys => SbtKeys, _ }
 
 package object tasks {
+
+  private[tasks] sealed abstract class ParseResult extends Product with Serializable
+  private[tasks] object ParseResult {
+    case object PerProject extends ParseResult
+    case object AllProjects extends ParseResult
+    case object Aggregate extends ParseResult
+  }
+
+  private[tasks] val PerProject  = (Space ~> token("per-project")) ^^^ ParseResult.PerProject
+  private[tasks] val AllProjects = (Space ~> token("all-projects")) ^^^ ParseResult.AllProjects
+  private[tasks] val Aggregate   = (Space ~> token("aggregate")) ^^^ ParseResult.Aggregate
+
+  private[tasks] val listParser: Parser[Option[ParseResult]] =
+    (PerProject | AllProjects | Aggregate).?
 
   val NonParallel: Tag = Tags.Tag("NonParallel")
 
