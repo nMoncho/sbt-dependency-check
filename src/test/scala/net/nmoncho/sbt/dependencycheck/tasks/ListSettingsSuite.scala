@@ -152,14 +152,14 @@ class ListSettingsSuite extends munit.FunSuite {
       |	downloader.quick.query.timestamp: true
       |	downloader.tls.protocols: TLSv1.1,TLSv1.2,TLSv1.3
       |	ecosystem.skip.cpeanalyzer: npm
-      |	engine.version.url: https://jeremylong.github.io/DependencyCheck/current.txt
+      |	engine.version.url: https://dependency-check.github.io/DependencyCheck/current.txt
       |	extensions.zip: null
       |	hints.file: null
       |	hosted.suppressions.bearertoken: null
       |	hosted.suppressions.enabled: true
       |	hosted.suppressions.forceupdate: null
       |	hosted.suppressions.password: null
-      |	hosted.suppressions.url: https://jeremylong.github.io/DependencyCheck/suppressions/publishedSuppressions.xml
+      |	hosted.suppressions.url: https://dependency-check.github.io/DependencyCheck/suppressions/publishedSuppressions.xml
       |	hosted.suppressions.user: null
       |	hosted.suppressions.validforhours: 2
       |	junit.fail.on.cvss: 0
@@ -183,7 +183,7 @@ class ListSettingsSuite extends munit.FunSuite {
       |	nvd.api.results.per.page: null
       |	odc.analysis.timeout: 180
       |	odc.application.name: Dependency-Check Core
-      |	odc.application.version: 12.1.0
+      |	odc.application.version: 12.1.1
       |	odc.autoupdate: true
       |	odc.ecosystem.maxquerylimit.: null
       |	odc.ecosystem.maxquerylimit.default: 100
