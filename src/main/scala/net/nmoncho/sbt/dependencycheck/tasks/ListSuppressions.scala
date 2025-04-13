@@ -27,7 +27,7 @@ object ListSuppressions {
     if (!dependencyCheckSkip.value) {
       Def.task {
         val rules = (listParser.parsed match {
-          case Some(ParseResult.AllProjects) => GenerateSuppressions.forAllProjects()
+          case Some(ParseResult.AllProjects) => AllProjectsCheck.suppressions()
           case Some(ParseResult.Aggregate) => GenerateSuppressions.forAggregate()
           case Some(ParseResult.PerProject) | _ => GenerateSuppressions.forProject()
         }).value

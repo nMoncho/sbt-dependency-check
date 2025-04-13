@@ -9,10 +9,13 @@ package net.nmoncho.sbt.dependencycheck.tasks
 import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.engineSettings
 import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.scanSet
 import net.nmoncho.sbt.dependencycheck.Keys._
+import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
 import net.nmoncho.sbt.dependencycheck.tasks.Dependencies._
+import net.nmoncho.sbt.dependencycheck.tasks.GenerateSuppressions.collectImportedPackagedSuppressions
 import sbt.Def
 import sbt.Keys._
 import sbt._
+import sbt.plugins.JvmPlugin
 
 object AllProjectsCheck {
 
@@ -22,7 +25,7 @@ object AllProjectsCheck {
 
     val failCvssScore    = dependencyCheckFailBuildOnCVSS.value
     val allDependencies  = dependencies().value
-    val suppressionRules = GenerateSuppressions.forAllProjects().value
+    val suppressionRules = suppressions().value
     val scanSetFiles     = scanSet.value
 
     log.info("Scanning following dependencies: ")
@@ -55,6 +58,10 @@ object AllProjectsCheck {
     dependencies.toSet
   }
 
+  def suppressions(): Def.Initialize[Task[Set[SuppressionRule]]] = Def.task {
+    suppressionRulesFilter.value.flatten.toSet
+  }
+
   private lazy val anyCompileFilter = Def.settingDyn {
     compileDependenciesTask.all(ScopeFilter(inAnyProject, inConfigurations(Compile)))
   }
@@ -70,4 +77,29 @@ object AllProjectsCheck {
   private lazy val anyOptionalFilter = Def.settingDyn {
     optionalDependenciesTask.all(ScopeFilter(inAnyProject, inConfigurations(Optional)))
   }
+  private lazy val suppressionRulesFilter = Def.settingDyn {
+    suppressionRulesTask.all(ScopeFilter(inAnyProject, inConfigurations(Compile)))
+  }
+
+  private lazy val suppressionRulesTask: Def.Initialize[Task[Seq[SuppressionRule]]] =
+    Def.taskDyn {
+      if (
+        !thisProject.value.autoPlugins.contains(JvmPlugin) || (dependencyCheckSkip ?? false).value
+      )
+        Def.task(Seq.empty)
+      else
+        Def.task {
+          implicit val log: Logger = streams.value.log
+          val settings             = dependencyCheckSuppressions.value
+          val dependencies         = AllProjectsCheck.dependencies().value
+
+          val buildSuppressions = settings.suppressions
+          val importedPackagedSuppressions = collectImportedPackagedSuppressions(
+            settings,
+            dependencies
+          )
+
+          buildSuppressions ++ importedPackagedSuppressions
+        }
+    }
 }
