@@ -28,7 +28,7 @@ object ListSuppressions {
       Def.task {
         val rules = (listParser.parsed match {
           case Some(ParseResult.AllProjects) => AllProjectsCheck.suppressions()
-          case Some(ParseResult.Aggregate) => GenerateSuppressions.forAggregate()
+          case Some(ParseResult.Aggregate) => AggregateCheck.suppressions()
           case Some(ParseResult.PerProject) | _ => GenerateSuppressions.forProject()
         }).value
 

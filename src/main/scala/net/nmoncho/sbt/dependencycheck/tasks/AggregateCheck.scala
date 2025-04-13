@@ -6,13 +6,14 @@
 
 package net.nmoncho.sbt.dependencycheck.tasks
 
-import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.engineSettings
-import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.scanSet
-import net.nmoncho.sbt.dependencycheck.Keys._
-import net.nmoncho.sbt.dependencycheck.tasks.Dependencies._
-import sbt.Def
-import sbt.Keys._
-import sbt._
+import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.{ engineSettings, scanSet }
+import net.nmoncho.sbt.dependencycheck.Keys.*
+import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
+import net.nmoncho.sbt.dependencycheck.tasks.Dependencies.*
+import net.nmoncho.sbt.dependencycheck.tasks.GenerateSuppressions.collectImportedPackagedSuppressions
+import sbt.{ Def, * }
+import sbt.Keys.*
+import sbt.plugins.JvmPlugin
 
 object AggregateCheck {
 
@@ -22,7 +23,7 @@ object AggregateCheck {
 
     val failCvssScore         = dependencyCheckFailBuildOnCVSS.value
     val aggregateDependencies = dependencies().value
-    val suppressionRules      = GenerateSuppressions.forAggregate().value
+    val suppressionRules      = suppressions().value
     val scanSetFiles          = scanSet.value
 
     log.info("Scanning following dependencies: ")
@@ -54,6 +55,10 @@ object AggregateCheck {
     dependencies.toSet
   }
 
+  def suppressions(): Def.Initialize[Task[Set[SuppressionRule]]] = Def.task {
+    suppressionRulesFilter.value.flatten.toSet
+  }
+
   private lazy val aggregateCompileFilter = Def.settingDyn {
     compileDependenciesTask.all(
       ScopeFilter(inAggregates(thisProjectRef.value), inConfigurations(Compile))
@@ -83,4 +88,32 @@ object AggregateCheck {
       ScopeFilter(inAggregates(thisProjectRef.value), inConfigurations(Optional))
     )
   }
+
+  private lazy val suppressionRulesFilter = Def.settingDyn {
+    suppressionRulesTask.all(
+      ScopeFilter(inAggregates(thisProjectRef.value), inConfigurations(Compile))
+    )
+  }
+
+  private lazy val suppressionRulesTask: Def.Initialize[Task[Seq[SuppressionRule]]] =
+    Def.taskDyn {
+      if (
+        !thisProject.value.autoPlugins.contains(JvmPlugin) || (dependencyCheckSkip ?? false).value
+      )
+        Def.task(Seq.empty)
+      else
+        Def.task {
+          implicit val log: Logger = streams.value.log
+          val settings             = dependencyCheckSuppressions.value
+          val dependencies         = AggregateCheck.dependencies().value
+
+          val buildSuppressions = settings.suppressions
+          val importedPackagedSuppressions = collectImportedPackagedSuppressions(
+            settings,
+            dependencies
+          )
+
+          buildSuppressions ++ importedPackagedSuppressions
+        }
+    }
 }
