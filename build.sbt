@@ -1,6 +1,8 @@
 import Dependencies.*
+import xerial.sbt.Sonatype.sonatypeCentralHost
 
 ThisBuild / organization := "net.nmoncho"
+ThisBuild / sonatypeCredentialHost := sonatypeCentralHost
 
 addCommandAlias(
   "testCoverage",
