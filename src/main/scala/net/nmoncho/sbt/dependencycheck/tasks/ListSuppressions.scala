@@ -6,12 +6,12 @@
 
 package net.nmoncho.sbt.dependencycheck.tasks
 
-import net.nmoncho.sbt.dependencycheck.Keys.dependencyCheckSkip
-import sbt.Def
-import sbt.InputTask
-import sbt.Keys.name
-import sbt.Keys.streams
-import sbt.Logger
+import net.nmoncho.sbt.dependencycheck.Keys._
+import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
+import net.nmoncho.sbt.dependencycheck.tasks.GenerateSuppressions.collectImportedPackagedSuppressions
+import sbt.Keys._
+import sbt._
+import sbt.plugins.JvmPlugin
 
 /** Lists Suppression Rules that are added to the Owasp Engine by defining them on
   * the project definition (ie. `build.sbt`) or imported as packaged suppressions rules.
@@ -24,28 +24,55 @@ object ListSuppressions {
   def apply(): Def.Initialize[InputTask[Unit]] = Def.inputTaskDyn {
     implicit val log: Logger = streams.value.log
 
-    if (!dependencyCheckSkip.value) {
-      Def.task {
-        val rules = (listParser.parsed match {
-          case Some(ParseResult.AllProjects) => AllProjectsCheck.suppressions()
-          case Some(ParseResult.Aggregate) => AggregateCheck.suppressions()
-          case Some(ParseResult.PerProject) | _ => GenerateSuppressions.forProject()
-        }).value
+    Def.task {
+      val rules = listParser.parsed match {
+        case Some(ParseResult.AllProjects) =>
+          Seq(name.value -> AllProjectsCheck.suppressions().tag(NonParallel).value)
 
+        case Some(ParseResult.Aggregate) =>
+          Seq(name.value -> AggregateCheck.suppressions().tag(NonParallel).value)
+
+        case Some(ParseResult.PerProject) | _ =>
+          suppressionRulesFilter.tag(NonParallel).value.sortBy { case (name, _) => name }
+      }
+
+      rules.foreach { case (name, rules) =>
         if (rules.nonEmpty) {
-          log.info(s"Suppression rules added for [${name.value}]")
+          log.info(s"Suppression rules added for [$name]")
           rules.foreach(rule => log.info(s"\t${rule.toOwasp.toString}"))
           log.info("\n\n")
         } else {
-          log.info(s"No suppression rules added for [${name.value}]")
+          log.info(s"No suppression rules added for [$name]")
           log.info("\n\n")
         }
-      } tag NonParallel
-    } else {
-      Def.task {
-        log.info(s"Skipping dependency check for [${name.value}]")
       }
-    }
-  } tag NonParallel
+    } tag NonParallel
+  }
 
+  private lazy val suppressionRulesFilter = Def.settingDyn {
+    suppressionRulesTask
+      .all(ScopeFilter(inAggregates(thisProjectRef.value), inConfigurations(Compile)))
+  }
+
+  private lazy val suppressionRulesTask: Def.Initialize[Task[(String, Set[SuppressionRule])]] =
+    Def.taskDyn {
+      if (
+        !thisProject.value.autoPlugins.contains(JvmPlugin) || (dependencyCheckSkip ?? false).value
+      )
+        Def.task(name.value -> Set.empty)
+      else
+        Def.task {
+          implicit val log: Logger = streams.value.log
+          val settings             = dependencyCheckSuppressions.value
+          val dependencies         = AggregateCheck.dependencies().value
+
+          val buildSuppressions = settings.suppressions
+          val importedPackagedSuppressions = collectImportedPackagedSuppressions(
+            settings,
+            dependencies
+          )
+
+          name.value -> (buildSuppressions ++ importedPackagedSuppressions).toSet
+        }
+    }
 }

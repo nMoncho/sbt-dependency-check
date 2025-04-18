@@ -6,13 +6,15 @@
 
 package net.nmoncho.sbt.dependencycheck.tasks
 
-import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.{ engineSettings, scanSet }
-import net.nmoncho.sbt.dependencycheck.Keys.*
+import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.engineSettings
+import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.scanSet
+import net.nmoncho.sbt.dependencycheck.Keys._
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
-import net.nmoncho.sbt.dependencycheck.tasks.Dependencies.*
+import net.nmoncho.sbt.dependencycheck.tasks.Dependencies._
 import net.nmoncho.sbt.dependencycheck.tasks.GenerateSuppressions.collectImportedPackagedSuppressions
-import sbt.{ Def, * }
-import sbt.Keys.*
+import sbt.Def
+import sbt.Keys._
+import sbt._
 import sbt.plugins.JvmPlugin
 
 object AggregateCheck {

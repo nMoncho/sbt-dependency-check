@@ -68,6 +68,7 @@ object DependencyCheckPlugin extends AutoPlugin {
     dependencyCheckUpdate / aggregate := false,
     dependencyCheckPurge / aggregate := false,
     dependencyCheckListSettings / aggregate := false,
+    dependencyCheckListSuppressions / aggregate := false,
     Global / concurrentRestrictions += Tags.exclusive(NonParallel)
   )
 
