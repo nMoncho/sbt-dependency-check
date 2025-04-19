@@ -30,6 +30,7 @@ lazy val root = (project in file("."))
     ),
     sonatypeCredentialHost := sonatypeCentralHost,
     sonatypeRepository := "https://s01.oss.sonatype.org/service/local",
+    sbtPluginPublishLegacyMavenStyle := false,
     developers := List(
       Developer(
         "nMoncho",
