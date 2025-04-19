@@ -2,7 +2,6 @@ import Dependencies.*
 import xerial.sbt.Sonatype.sonatypeCentralHost
 
 ThisBuild / organization := "net.nmoncho"
-ThisBuild / sonatypeCredentialHost := sonatypeCentralHost
 
 addCommandAlias(
   "testCoverage",
@@ -29,7 +28,7 @@ lazy val root = (project in file("."))
     headerLicense := Some(
       HeaderLicense.MIT("2025", "the original author or authors", HeaderLicenseStyle.SpdxSyntax)
     ),
-    sonatypeCredentialHost := "s01.oss.sonatype.org",
+    sonatypeCredentialHost := sonatypeCentralHost,
     sonatypeRepository := "https://s01.oss.sonatype.org/service/local",
     developers := List(
       Developer(
