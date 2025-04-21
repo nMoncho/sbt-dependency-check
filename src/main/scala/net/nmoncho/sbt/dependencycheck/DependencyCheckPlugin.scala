@@ -15,6 +15,7 @@ import sbt.Compile
 import sbt.Def
 import sbt.File
 import sbt.Global
+import sbt.InputTask
 import sbt.Keys._
 import sbt.PluginTrigger
 import sbt.Tags
@@ -53,7 +54,7 @@ object DependencyCheckPlugin extends AutoPlugin {
   override def projectSettings: Seq[Def.Setting[?]] = Seq(
     dependencyCheckSkip := false,
     dependencyCheckScanSet := List(baseDirectory.value / "src" / "main" / "resources"),
-    dependencyCheck := dependencyCheckTask.value,
+    dependencyCheck := dependencyCheckTask.evaluated,
     dependencyCheckAggregate := dependencyCheckAggregateTask.value,
     dependencyCheckAllProjects := dependencyCheckAllProjectsTask.value,
     dependencyCheckUpdate := dependencyCheckUpdateTask.value,
@@ -72,7 +73,7 @@ object DependencyCheckPlugin extends AutoPlugin {
     Global / concurrentRestrictions += Tags.exclusive(NonParallel)
   )
 
-  private def dependencyCheckTask: Def.Initialize[Task[Unit]] = Check()
+  private def dependencyCheckTask: Def.Initialize[InputTask[Unit]] = Check()
 
   private def dependencyCheckAggregateTask: Def.Initialize[Task[Unit]] = AggregateCheck()
 

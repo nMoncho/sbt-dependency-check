@@ -25,14 +25,14 @@ object ListSuppressions {
     implicit val log: Logger = streams.value.log
 
     Def.task {
-      val rules = listParser.parsed match {
-        case Some(ParseResult.AllProjects) =>
+      val rules = projectSelectionParser.parsed match {
+        case Some(ProjectSelection.AllProjects) =>
           Seq(name.value -> AllProjectsCheck.suppressions().tag(NonParallel).value)
 
-        case Some(ParseResult.Aggregate) =>
+        case Some(ProjectSelection.Aggregate) =>
           Seq(name.value -> AggregateCheck.suppressions().tag(NonParallel).value)
 
-        case Some(ParseResult.PerProject) | _ =>
+        case Some(ProjectSelection.PerProject) | _ =>
           suppressionRulesFilter.tag(NonParallel).value.sortBy { case (name, _) => name }
       }
 

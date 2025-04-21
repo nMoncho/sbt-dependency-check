@@ -18,7 +18,7 @@ class ListSettingsSuite extends munit.FunSuite {
     ListSettings(new Settings(), ScopesSettings.Default)
 
     val result = log.sb.result()
-    assertEquals(result, expected)
+    assertEquals(result.trim, expected.trim)
 
     assert(result.contains("data.password: ********"), "sensitive settings are masked properly")
   }
@@ -208,5 +208,6 @@ class ListSettingsSuite extends munit.FunSuite {
       |	vfeed.download_file: null
       |	vfeed.download_url: null
       |	vfeed.update_status: null
+      |
       |""".stripMargin
 }

@@ -36,17 +36,27 @@ import sbt.{ Keys => SbtKeys, _ }
 package object tasks {
 
   private[tasks] sealed abstract class ParseResult extends Product with Serializable
-  private[tasks] object ParseResult {
-    case object PerProject extends ParseResult
-    case object AllProjects extends ParseResult
-    case object Aggregate extends ParseResult
+
+  private[tasks] sealed abstract class ProjectSelection extends ParseResult
+  private[tasks] object ProjectSelection {
+    case object PerProject extends ProjectSelection
+    case object AllProjects extends ProjectSelection
+    case object Aggregate extends ProjectSelection
   }
 
-  private[tasks] val PerProject  = (Space ~> token("per-project")) ^^^ ParseResult.PerProject
-  private[tasks] val AllProjects = (Space ~> token("all-projects")) ^^^ ParseResult.AllProjects
-  private[tasks] val Aggregate   = (Space ~> token("aggregate")) ^^^ ParseResult.Aggregate
+  private[tasks] sealed abstract class ParseOptions extends ParseResult
+  private[tasks] object ParseOptions {
+    case object ListSettings extends ParseOptions
+  }
 
-  private[tasks] val listParser: Parser[Option[ParseResult]] =
+  private[tasks] val PerProject  = (Space ~> token("per-project")) ^^^ ProjectSelection.PerProject
+  private[tasks] val AllProjects = (Space ~> token("all-projects")) ^^^ ProjectSelection.AllProjects
+  private[tasks] val Aggregate   = (Space ~> token("aggregate")) ^^^ ProjectSelection.Aggregate
+
+  private[tasks] val ListSettingsArg =
+    (Space ~> token("list-settings")) ^^^ ParseOptions.ListSettings
+
+  private[tasks] val projectSelectionParser: Parser[Option[ParseResult]] =
     (PerProject | AllProjects | Aggregate).?
 
   val NonParallel: Tag = Tags.Tag("NonParallel")

@@ -75,7 +75,7 @@ object Keys {
   )
 
   // Tasks
-  lazy val dependencyCheck: TaskKey[Unit] = taskKey(
+  lazy val dependencyCheck: InputKey[Unit] = inputKey(
     "Runs dependency-check against the project and generates a report per sub project."
   )
   lazy val dependencyCheckAggregate: TaskKey[Unit] = taskKey(

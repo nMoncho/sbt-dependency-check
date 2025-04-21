@@ -10,12 +10,17 @@ package tasks
 import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.engineSettings
 import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.scanSet
 import net.nmoncho.sbt.dependencycheck.Keys._
+import sbt.Def
 import sbt.Keys._
 import sbt._
+import sbt.complete.Parser
 
 object Check {
 
-  def apply(): Def.Initialize[Task[Unit]] = Def.taskDyn {
+  private[tasks] val listSettingsParser: Parser[Option[ParseOptions]] =
+    ListSettingsArg.?
+
+  def apply(): Def.Initialize[InputTask[Unit]] = Def.inputTaskDyn {
     implicit val log: Logger = streams.value.log
 
     if (!dependencyCheckSkip.value) {
@@ -30,7 +35,17 @@ object Check {
         log.info("Scanning following dependencies: ")
         dependencies.foreach(f => log.info("\t" + f.data.getName))
 
-        withEngine(engineSettings.value) { engine =>
+        val settings = engineSettings.value
+
+        listSettingsParser.parsed.foreach {
+          case ParseOptions.ListSettings =>
+            log.info(s"\nDependencyCheck settings for [${name.value}]:")
+            ListSettings(settings, dependencyCheckScopes.value)
+
+          case _ =>
+        }
+
+        withEngine(settings) { engine =>
           analyzeProject(
             name.value,
             engine,

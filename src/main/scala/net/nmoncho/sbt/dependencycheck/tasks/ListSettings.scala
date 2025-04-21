@@ -47,6 +47,7 @@ object ListSettings {
         log.info(s"\t$key: $value")
       }
     }
+    log.info("\n\n")
   }
 
   /** Collect all [[Settings.KEYS]] values
