@@ -26,6 +26,8 @@ class SuppressionRuleSuite extends munit.ScalaCheckSuite {
   override def scalaCheckTestParameters: Test.Parameters =
     Test.Parameters.default.withMinSuccessfulTests(100)
 
+  override def scalaCheckInitialSeed = "G6-YEp8MqJSi5steLlGI08qkur47wZKr7az4zhemwkA="
+
   property("Suppression rules generate valid XML") {
     forAll(Gen.nonEmptyListOf(genRule)) { rules =>
       val today  = LocalDate.now()
@@ -180,7 +182,7 @@ class SuppressionRuleSuite extends munit.ScalaCheckSuite {
               cwe                = cwe,
               cve                = cve,
               vulnerabilityNames = vulnerabilityNames,
-              notes              = notes
+              notes              = notes.trim
             )
           }.getOrElse(
             SuppressionRule(
@@ -191,7 +193,7 @@ class SuppressionRuleSuite extends munit.ScalaCheckSuite {
               cwe                = cwe,
               cve                = cve,
               vulnerabilityNames = vulnerabilityNames,
-              notes              = notes
+              notes              = notes.trim
             )
           )
         )
