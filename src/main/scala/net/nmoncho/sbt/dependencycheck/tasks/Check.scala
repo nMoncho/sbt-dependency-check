@@ -17,46 +17,53 @@ import sbt.complete.Parser
 
 object Check {
 
-  private[tasks] val listSettingsParser: Parser[Option[ParseOptions]] =
-    ListSettingsArg.?
+  private[tasks] val listSettingsParser: Parser[Seq[ParseOptions]] =
+    (ListSettingsArg | SingleReportArg).*
 
   def apply(): Def.Initialize[InputTask[Unit]] = Def.inputTaskDyn {
     implicit val log: Logger = streams.value.log
 
-    if (!dependencyCheckSkip.value) {
-      Def.task {
+    val arguments    = listSettingsParser.parsed
+    val singleReport = arguments.contains(ParseOptions.SingleReport)
+
+    // Don't run if this project has been configured to be skipped
+    // But if it's a singleReport, then users may run the `dependencyCheckAggregate`
+    if (!dependencyCheckSkip.value || singleReport) {
+      Def.taskDyn {
         log.info(s"Running check for [${name.value}]")
 
-        val failCvssScore    = dependencyCheckFailBuildOnCVSS.value
-        val dependencies     = Dependencies.projectDependencies.value
-        val suppressionRules = GenerateSuppressions.forProject().value
-        val scanSetFiles     = scanSet.value
+        val (dependencies, suppressionRules) = if (singleReport) {
+          AggregateCheck.dependencies().value -> AggregateCheck.suppressions().value
+        } else {
+          Dependencies.projectDependencies.value -> GenerateSuppressions.forProject().value
+        }
+
+        val failCvssScore = dependencyCheckFailBuildOnCVSS.value
+        val scanSetFiles  = scanSet.value
+        val settings      = engineSettings.value
 
         log.info("Scanning following dependencies: ")
         dependencies.foreach(f => log.info("\t" + f.data.getName))
 
-        val settings = engineSettings.value
-
-        listSettingsParser.parsed.foreach {
-          case ParseOptions.ListSettings =>
-            log.info(s"\nDependencyCheck settings for [${name.value}]:")
-            ListSettings(settings, dependencyCheckScopes.value)
-
-          case _ =>
+        if (arguments.contains(ParseOptions.ListSettings)) {
+          log.info(s"\nDependencyCheck settings for [${name.value}]:")
+          ListSettings(settings, dependencyCheckScopes.value)
         }
 
-        withEngine(settings) { engine =>
-          analyzeProject(
-            name.value,
-            engine,
-            dependencies,
-            suppressionRules,
-            scanSetFiles,
-            failCvssScore,
-            dependencyCheckOutputDirectory.value,
-            dependencyCheckFormats.value
-          )
-        }
+        Def.task(
+          withEngine(settings) { engine =>
+            analyzeProject(
+              name.value,
+              engine,
+              dependencies,
+              suppressionRules,
+              scanSetFiles,
+              failCvssScore,
+              dependencyCheckOutputDirectory.value,
+              dependencyCheckFormats.value
+            )
+          }
+        )
       } tag NonParallel
     } else {
       Def.task {

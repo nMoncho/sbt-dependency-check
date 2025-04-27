@@ -6,8 +6,6 @@
 
 package net.nmoncho.sbt.dependencycheck.tasks
 
-import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.engineSettings
-import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.scanSet
 import net.nmoncho.sbt.dependencycheck.Keys._
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
 import net.nmoncho.sbt.dependencycheck.tasks.Dependencies._
@@ -19,31 +17,7 @@ import sbt.plugins.JvmPlugin
 
 object AggregateCheck {
 
-  def apply(): Def.Initialize[Task[Unit]] = Def.task {
-    implicit val log: Logger = streams.value.log
-    log.info(s"Running aggregate check for [${name.value}]")
-
-    val failCvssScore         = dependencyCheckFailBuildOnCVSS.value
-    val aggregateDependencies = dependencies().value
-    val suppressionRules      = suppressions().value
-    val scanSetFiles          = scanSet.value
-
-    log.info("Scanning following dependencies: ")
-    aggregateDependencies.foreach(f => log.info("\t" + f.data.getName))
-
-    withEngine(engineSettings.value) { engine =>
-      analyzeProject(
-        name.value,
-        engine,
-        aggregateDependencies,
-        suppressionRules,
-        scanSetFiles,
-        failCvssScore,
-        dependencyCheckOutputDirectory.value,
-        dependencyCheckFormats.value
-      )
-    }
-  }
+  def apply(): Def.Initialize[Task[Unit]] = Check().toTask(" single-report")
 
   def dependencies(): Def.Initialize[Task[Set[Attributed[File]]]] = Def.task {
     implicit val log: Logger = streams.value.log
