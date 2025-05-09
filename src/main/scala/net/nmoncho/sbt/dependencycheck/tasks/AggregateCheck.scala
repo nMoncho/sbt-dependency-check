@@ -29,6 +29,7 @@ object AggregateCheck {
     val scanSetFiles          = scanSet.value
 
     log.info("Scanning following dependencies: ")
+    aggregateDependencies.foreach(f => log.info("\t" + f.data.getName))
 
     withEngine(engineSettings.value) { engine =>
       analyzeProject(
