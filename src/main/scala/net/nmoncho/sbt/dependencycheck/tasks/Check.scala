@@ -18,24 +18,31 @@ import sbt.complete.Parser
 object Check {
 
   private[tasks] val listSettingsParser: Parser[Seq[ParseOptions]] =
-    (ListSettingsArg | SingleReportArg).*
+    (ListSettingsArg | SingleReportArg | AllProjectsArg).*
 
   def apply(): Def.Initialize[InputTask[Unit]] = Def.inputTaskDyn {
     implicit val log: Logger = streams.value.log
 
     val arguments    = listSettingsParser.parsed
     val singleReport = arguments.contains(ParseOptions.SingleReport)
+    val allProjects  = arguments.contains(ParseOptions.AllProjects)
 
     // Don't run if this project has been configured to be skipped
     // But if it's a singleReport, then users may run the `dependencyCheckAggregate`
     if (!dependencyCheckSkip.value || singleReport) {
       Def.taskDyn {
-        log.info(s"Running check for [${name.value}]")
 
-        val (dependencies, suppressionRules) = if (singleReport) {
+        val (dependencies, suppressionRules) = if (singleReport && allProjects) {
+          log.info(s"Running AllProjects dependency check for [${name.value}]")
+          AllProjectsCheck.dependencies().value -> AllProjectsCheck.suppressions().value
+        } else if (singleReport) {
+          log.info(s"Running Aggregate dependency check for [${name.value}]")
           AggregateCheck.dependencies().value -> AggregateCheck.suppressions().value
-        } else {
+        } else if (!singleReport) {
+          log.info(s"Running dependency check for [${name.value}]")
           Dependencies.projectDependencies.value -> GenerateSuppressions.forProject().value
+        } else {
+          sys.error("'all-projects' argument isn't supported without the use of 'single-project'")
         }
 
         val failCvssScore = dependencyCheckFailBuildOnCVSS.value

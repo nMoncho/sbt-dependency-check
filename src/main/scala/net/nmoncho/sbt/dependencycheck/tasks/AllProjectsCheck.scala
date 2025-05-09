@@ -6,8 +6,6 @@
 
 package net.nmoncho.sbt.dependencycheck.tasks
 
-import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.engineSettings
-import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.scanSet
 import net.nmoncho.sbt.dependencycheck.Keys._
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
 import net.nmoncho.sbt.dependencycheck.tasks.Dependencies._
@@ -19,31 +17,7 @@ import sbt.plugins.JvmPlugin
 
 object AllProjectsCheck {
 
-  def apply(): Def.Initialize[Task[Unit]] = Def.task {
-    implicit val log: Logger = streams.value.log
-    log.info(s"Running AllProjects check for [${name.value}]")
-
-    val failCvssScore    = dependencyCheckFailBuildOnCVSS.value
-    val allDependencies  = dependencies().value
-    val suppressionRules = suppressions().value
-    val scanSetFiles     = scanSet.value
-
-    log.info("Scanning following dependencies: ")
-    allDependencies.foreach(f => log.info("\t" + f.data.getName))
-
-    withEngine(engineSettings.value) { engine =>
-      analyzeProject(
-        name.value,
-        engine,
-        allDependencies,
-        suppressionRules,
-        scanSetFiles,
-        failCvssScore,
-        dependencyCheckOutputDirectory.value,
-        dependencyCheckFormats.value
-      )
-    }
-  }
+  def apply(): Def.Initialize[Task[Unit]] = Check().toTask(" single-report all-projects")
 
   def dependencies(): Def.Initialize[Task[Set[Attributed[File]]]] = Def.task {
     implicit val log: Logger = streams.value.log

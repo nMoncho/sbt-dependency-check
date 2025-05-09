@@ -48,6 +48,7 @@ package object tasks {
   private[tasks] object ParseOptions {
     case object ListSettings extends ParseOptions
     case object SingleReport extends ParseOptions
+    case object AllProjects extends ParseOptions
   }
 
   private[tasks] val PerProject  = (Space ~> token("per-project")) ^^^ ProjectSelection.PerProject
@@ -58,6 +59,8 @@ package object tasks {
     (Space ~> token("list-settings")) ^^^ ParseOptions.ListSettings
   private[tasks] val SingleReportArg =
     (Space ~> token("single-report")) ^^^ ParseOptions.SingleReport
+  private[tasks] val AllProjectsArg =
+    (Space ~> token("all-projects")) ^^^ ParseOptions.AllProjects
 
   private[tasks] val projectSelectionParser: Parser[Option[ParseResult]] =
     (PerProject | AllProjects | Aggregate).?
