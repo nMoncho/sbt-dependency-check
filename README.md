@@ -63,9 +63,22 @@ The following tasks are available:
 | `dependencyCheckListUnusedSuppressions` | List unused suppressions, only considering suppression files or rules defined in the project definition (ie. build.sbt), not hosted suppressions nor packed suppressions. |
 | `dependencyCheckListSuppressions`       | List suppression rules added to the Owasp Engine which are defined in the project definition (ie. build.sbt), or are imported packaged suppressions.                      |
 
-The reports will be written to `crossTarget.value` by default. This can be overwritten by
-setting `dependencyCheckOutputDirectory`.
-See Configuration for details.
+The reports will be written to `crossTarget.value` by default. This can be overwritten by setting `dependencyCheckOutputDirectory`.
+See [Configuration](#configuration) for details.
+
+#### `dependencyCheck` Arguments
+
+By default `dependencyCheck` will run under the selected project, or `root` if none is selected. And it will also run
+on projects aggregated by that project, like any other task on SBT, generating one report per project.
+
+The task `dependencyCheck` supports arguments that can be used to change its behavior:
+
+- `list-settings`: The settings used for the analysis will be printed before running the analysis. This works the same
+  way as the task `dependencyCheckListSettings`.
+- `single-report`: A single report will be generated for this project, and all aggregates if any. This works the same
+  way as the task `dependencyCheckAggregate`.
+- `all-projects`: A single report will be generated for all projects. This works the same way as the task `dependencyCheckAllProjects`.
+  **Important**: This arguments needs to be used together with `single-report`.
 
 ### Configuration
 
