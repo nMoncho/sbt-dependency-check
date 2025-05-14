@@ -8,7 +8,6 @@ package net.nmoncho.sbt.dependencycheck.tasks
 
 import net.nmoncho.sbt.dependencycheck.Keys._
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
-import net.nmoncho.sbt.dependencycheck.tasks.Dependencies._
 import net.nmoncho.sbt.dependencycheck.tasks.GenerateSuppressions.collectImportedPackagedSuppressions
 import sbt.Def
 import sbt.Keys._
@@ -20,55 +19,22 @@ object AggregateCheck {
   def apply(): Def.Initialize[Task[Unit]] = Check().toTask(" single-report")
 
   def dependencies(): Def.Initialize[Task[Set[Attributed[File]]]] = Def.task {
-    implicit val log: Logger = streams.value.log
-
-    val dependencies = scala.collection.mutable.Set[Attributed[File]]()
-    dependencies ++= logAddDependencies(aggregateCompileFilter.value.flatten, Compile)
-    dependencies ++= logAddDependencies(aggregateTestFilter.value.flatten, Test)
-    dependencies ++= logAddDependencies(aggregateRuntimeFilter.value.flatten, Runtime)
-    dependencies --= logRemoveDependencies(aggregateProvidedFilter.value.flatten, Provided)
-    dependencies --= logRemoveDependencies(aggregateOptionalFilter.value.flatten, Optional)
-
-    dependencies.toSet
+    dependenciesFilter.value.toSet.flatten
   }
 
   def suppressions(): Def.Initialize[Task[Set[SuppressionRule]]] = Def.task {
     suppressionRulesFilter.value.flatten.toSet
   }
 
-  private lazy val aggregateCompileFilter = Def.settingDyn {
-    compileDependenciesTask.all(
-      ScopeFilter(inAggregates(thisProjectRef.value), inConfigurations(Compile))
-    )
-  }
-
-  private lazy val aggregateRuntimeFilter = Def.settingDyn {
-    runtimeDependenciesTask.all(
-      ScopeFilter(inAggregates(thisProjectRef.value), inConfigurations(Runtime))
-    )
-  }
-
-  private lazy val aggregateTestFilter = Def.settingDyn {
-    testDependenciesTask.all(
-      ScopeFilter(inAggregates(thisProjectRef.value), inConfigurations(Test))
-    )
-  }
-
-  private lazy val aggregateProvidedFilter = Def.settingDyn {
-    providedDependenciesTask.all(
-      ScopeFilter(inAggregates(thisProjectRef.value), inConfigurations(Provided))
-    )
-  }
-
-  private lazy val aggregateOptionalFilter = Def.settingDyn {
-    optionalDependenciesTask.all(
-      ScopeFilter(inAggregates(thisProjectRef.value), inConfigurations(Optional))
+  private lazy val dependenciesFilter = Def.settingDyn {
+    Dependencies.projectDependencies.all(
+      ScopeFilter(inAggregates(thisProjectRef.value))
     )
   }
 
   private lazy val suppressionRulesFilter = Def.settingDyn {
     suppressionRulesTask.all(
-      ScopeFilter(inAggregates(thisProjectRef.value), inConfigurations(Compile))
+      ScopeFilter(inAggregates(thisProjectRef.value))
     )
   }
 
