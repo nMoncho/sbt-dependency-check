@@ -7,6 +7,7 @@
 package net.nmoncho.sbt.dependencycheck
 package tasks
 
+import net.nmoncho.sbt.dependencycheck.Keys.dependencyCheckSkip
 import net.nmoncho.sbt.dependencycheck.Keys.dependencyCheckSuppressions
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings
@@ -14,25 +15,33 @@ import net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings._
 import org.owasp.dependencycheck.xml.suppression.SuppressionParser
 import sbt.Keys._
 import sbt._
+import sbt.plugins.JvmPlugin
 
 /** Generates the XML Suppression File containing suppressions specified
   * using [[SuppressionRule]]s
   */
 object GenerateSuppressions {
 
-  def forProject(): Def.Initialize[Task[Set[SuppressionRule]]] =
-    Def.task {
-      implicit val log: Logger = streams.value.log
-      val settings             = dependencyCheckSuppressions.value
-      val dependencies         = Dependencies.projectDependencies.value
-
-      val buildSuppressions = settings.suppressions
-      val importedPackagedSuppressions = collectImportedPackagedSuppressions(
-        settings,
-        dependencies
+  lazy val forProject: Def.Initialize[Task[Set[SuppressionRule]]] =
+    Def.taskDyn {
+      if (
+        !thisProject.value.autoPlugins.contains(JvmPlugin) || (dependencyCheckSkip ?? false).value
       )
+        Def.task(Set.empty)
+      else
+        Def.task {
+          implicit val log: Logger = streams.value.log
+          val settings             = dependencyCheckSuppressions.value
+          val dependencies         = AggregateCheck.dependencies().value
 
-      (buildSuppressions ++ importedPackagedSuppressions).toSet
+          val buildSuppressions = settings.suppressions
+          val importedPackagedSuppressions = collectImportedPackagedSuppressions(
+            settings,
+            dependencies
+          )
+
+          (buildSuppressions ++ importedPackagedSuppressions).toSet
+        }
     }
 
   /** Collects all [[SuppressionRule]]s packaged on the libraries included in this project.

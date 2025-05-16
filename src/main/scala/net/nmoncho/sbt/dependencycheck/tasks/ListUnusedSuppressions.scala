@@ -29,7 +29,7 @@ object ListUnusedSuppressions {
         val failCvssScore    = dependencyCheckFailBuildOnCVSS.value
         val scanSetFiles     = scanSet.value
         val dependencies     = Dependencies.projectDependencies.value
-        val suppressionRules = GenerateSuppressions.forProject().value
+        val suppressionRules = GenerateSuppressions.forProject.value
 
         log.info("Scanning following dependencies: ")
         dependencies.foreach(f => log.info("\t" + f.data.getName))

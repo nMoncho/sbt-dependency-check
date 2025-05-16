@@ -36,7 +36,7 @@ object Check {
         Def.task(AggregateCheck.dependencies().value -> AggregateCheck.suppressions().value)
       } else if (!singleReport) {
         log.info(s"Running dependency check for [${name.value}]")
-        Def.task(Dependencies.projectDependencies.value -> GenerateSuppressions.forProject().value)
+        Def.task(Dependencies.projectDependencies.value -> GenerateSuppressions.forProject.value)
       } else {
         sys.error("'all-projects' argument isn't supported without the use of 'single-project'")
       }
