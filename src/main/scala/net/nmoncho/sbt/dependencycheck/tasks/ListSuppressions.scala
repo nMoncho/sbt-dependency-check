@@ -8,7 +8,6 @@ package net.nmoncho.sbt.dependencycheck.tasks
 
 import net.nmoncho.sbt.dependencycheck.Keys._
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
-import net.nmoncho.sbt.dependencycheck.tasks.GenerateSuppressions.collectImportedPackagedSuppressions
 import sbt.Keys._
 import sbt._
 import sbt.plugins.JvmPlugin
@@ -61,18 +60,6 @@ object ListSuppressions {
       )
         Def.task(name.value -> Set.empty)
       else
-        Def.task {
-          implicit val log: Logger = streams.value.log
-          val settings             = dependencyCheckSuppressions.value
-          val dependencies         = AggregateCheck.dependencies().value
-
-          val buildSuppressions = settings.suppressions
-          val importedPackagedSuppressions = collectImportedPackagedSuppressions(
-            settings,
-            dependencies
-          )
-
-          name.value -> (buildSuppressions ++ importedPackagedSuppressions).toSet
-        }
+        Def.task(name.value -> GenerateSuppressions.forProject.value)
     }
 }
