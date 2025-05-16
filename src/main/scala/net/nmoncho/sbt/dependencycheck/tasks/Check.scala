@@ -27,23 +27,26 @@ object Check {
     val singleReport = arguments.contains(ParseOptions.SingleReport)
     val allProjects  = arguments.contains(ParseOptions.AllProjects)
 
+    val dependenciesAndSuppressionsTask = Def.taskDyn {
+      if (singleReport && allProjects) {
+        log.info(s"Running AllProjects dependency check for [${name.value}]")
+        Def.task(AllProjectsCheck.dependencies().value -> AllProjectsCheck.suppressions().value)
+      } else if (singleReport) {
+        log.info(s"Running Aggregate dependency check for [${name.value}]")
+        Def.task(AggregateCheck.dependencies().value -> AggregateCheck.suppressions().value)
+      } else if (!singleReport) {
+        log.info(s"Running dependency check for [${name.value}]")
+        Def.task(Dependencies.projectDependencies.value -> GenerateSuppressions.forProject().value)
+      } else {
+        sys.error("'all-projects' argument isn't supported without the use of 'single-project'")
+      }
+    }
+
     // Don't run if this project has been configured to be skipped
     // But if it's a singleReport, then users may run the `dependencyCheckAggregate`
     if (!dependencyCheckSkip.value || singleReport) {
       Def.taskDyn {
-
-        val (dependencies, suppressionRules) = if (singleReport && allProjects) {
-          log.info(s"Running AllProjects dependency check for [${name.value}]")
-          AllProjectsCheck.dependencies().value -> AllProjectsCheck.suppressions().value
-        } else if (singleReport) {
-          log.info(s"Running Aggregate dependency check for [${name.value}]")
-          AggregateCheck.dependencies().value -> AggregateCheck.suppressions().value
-        } else if (!singleReport) {
-          log.info(s"Running dependency check for [${name.value}]")
-          Dependencies.projectDependencies.value -> GenerateSuppressions.forProject().value
-        } else {
-          sys.error("'all-projects' argument isn't supported without the use of 'single-project'")
-        }
+        val (dependencies, suppressionRules) = dependenciesAndSuppressionsTask.value
 
         val failCvssScore = dependencyCheckFailBuildOnCVSS.value
         val scanSetFiles  = scanSet.value
