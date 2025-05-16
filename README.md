@@ -75,6 +75,8 @@ The task `dependencyCheck` supports arguments that can be used to change its beh
 
 - `list-settings`: The settings used for the analysis will be printed before running the analysis. This works the same
   way as the task `dependencyCheckListSettings`.
+- `list-unused-suppressions`: Any unused suppression rule will be printed after the analysis. This works the same way as
+  the task `dependencyCheckListUnusedSuppressions`.
 - `single-report`: A single report will be generated for this project, and all aggregates if any. This works the same
   way as the task `dependencyCheckAggregate`.
 - `all-projects`: A single report will be generated for all projects. This works the same way as the task `dependencyCheckAllProjects`.

@@ -7,25 +7,29 @@
 package net.nmoncho.sbt.dependencycheck
 package tasks
 
+import scala.jdk.CollectionConverters._
+
 import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.engineSettings
 import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.scanSet
 import net.nmoncho.sbt.dependencycheck.Keys._
-import sbt.Def
+import org.owasp.dependencycheck.analyzer.AbstractSuppressionAnalyzer.SUPPRESSION_OBJECT_KEY
+import org.owasp.dependencycheck.xml.suppression.SuppressionRule
 import sbt.Keys._
 import sbt._
 import sbt.complete.Parser
 
 object Check {
 
-  private[tasks] val listSettingsParser: Parser[Seq[ParseOptions]] =
-    (ListSettingsArg | SingleReportArg | AllProjectsArg).*
+  private[tasks] val argumentsParser: Parser[Seq[ParseOptions]] =
+    (ListSettingsArg | SingleReportArg | AllProjectsArg | ListUnusedSuppressionsArg).*
 
   def apply(): Def.Initialize[InputTask[Unit]] = Def.inputTaskDyn {
     implicit val log: Logger = streams.value.log
 
-    val arguments    = listSettingsParser.parsed
-    val singleReport = arguments.contains(ParseOptions.SingleReport)
-    val allProjects  = arguments.contains(ParseOptions.AllProjects)
+    val arguments              = argumentsParser.parsed
+    val singleReport           = arguments.contains(ParseOptions.SingleReport)
+    val allProjects            = arguments.contains(ParseOptions.AllProjects)
+    val listUnusedSuppressions = arguments.contains(ParseOptions.ListUnusedSuppressions)
 
     val dependenciesAndSuppressionsTask = Def.taskDyn {
       if (singleReport && allProjects) {
@@ -62,16 +66,39 @@ object Check {
 
         Def.task(
           withEngine(settings) { engine =>
-            analyzeProject(
-              name.value,
-              engine,
-              dependencies,
-              suppressionRules,
-              scanSetFiles,
-              failCvssScore,
-              dependencyCheckOutputDirectory.value,
-              dependencyCheckFormats.value
-            )
+            try {
+              analyzeProject(
+                name.value,
+                engine,
+                dependencies,
+                suppressionRules,
+                scanSetFiles,
+                failCvssScore,
+                dependencyCheckOutputDirectory.value,
+                dependencyCheckFormats.value
+              )
+            } catch {
+              case _: VulnerabilityFoundException if listUnusedSuppressions => // ignore
+            }
+
+            if (listUnusedSuppressions) {
+              val unusedSuppressions = engine
+                .getObject(SUPPRESSION_OBJECT_KEY)
+                .asInstanceOf[java.util.List[SuppressionRule]]
+                .asScala
+                .filter(sup => !sup.isMatched && !sup.isBase)
+
+              if (unusedSuppressions.nonEmpty) {
+                log.info(s"""
+                            |
+                            |Found [${unusedSuppressions.size}] unused suppressions for project [${name.value}]:
+                            |${unusedSuppressions.mkString("\n\t", "\n\t", "\n")}
+                            |
+                            |""".stripMargin)
+              } else {
+                log.info("No unused suppressions.")
+              }
+            }
           }
         )
       } tag NonParallel
