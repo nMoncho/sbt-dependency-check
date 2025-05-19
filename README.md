@@ -20,7 +20,7 @@ the [Migration Guide](MIGRATION.md)
 Add the plugin to your project configuration:
 
 ```scala
-addSbtPlugin("net.nmoncho" % "sbt-dependency-check" % "1.6.0")
+addSbtPlugin("net.nmoncho" % "sbt-dependency-check" % "1.7.0")
 ```
 
 The minimum SBT version supported is `1.9.0`.
