@@ -12,16 +12,33 @@ import scala.jdk.CollectionConverters._
 import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.engineSettings
 import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.scanSet
 import net.nmoncho.sbt.dependencycheck.Keys._
+import net.nmoncho.sbt.dependencycheck.settings.ScopesSettings
+import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
 import org.owasp.dependencycheck.analyzer.AbstractSuppressionAnalyzer.SUPPRESSION_OBJECT_KEY
-import org.owasp.dependencycheck.xml.suppression.SuppressionRule
+import org.owasp.dependencycheck.reporting.ReportGenerator
+import org.owasp.dependencycheck.xml.suppression.{ SuppressionRule => DcSuppressionRule }
+import sbt.Def
 import sbt.Keys._
 import sbt._
 import sbt.complete.Parser
+import sbt.plugins.JvmPlugin
 
 object Check {
 
   private[tasks] val argumentsParser: Parser[Seq[ParseOptions]] =
     (ListSettingsArg | SingleReportArg | AllProjectsArg | ListUnusedSuppressionsArg).*
+
+  private case class CheckSettings(
+      name: String,
+      scopes: ScopesSettings,
+      failureScore: Double,
+      scanSet: Seq[File],
+      engineSettings: org.owasp.dependencycheck.utils.Settings,
+      dependencies: Set[Attributed[File]],
+      suppressions: Set[SuppressionRule],
+      outputDirectory: File,
+      reportFormats: Seq[ReportGenerator.Format]
+  )
 
   def apply(): Def.Initialize[InputTask[Unit]] = Def.inputTaskDyn {
     implicit val log: Logger = streams.value.log
@@ -33,14 +50,11 @@ object Check {
 
     val dependenciesAndSuppressionsTask = Def.taskDyn {
       if (singleReport && allProjects) {
-        log.info(s"Running AllProjects dependency check for [${name.value}]")
-        Def.task(AllProjectsCheck.dependencies().value -> AllProjectsCheck.suppressions().value)
+        allProjectsSettings.map(Seq(_))
       } else if (singleReport) {
-        log.info(s"Running Aggregate dependency check for [${name.value}]")
-        Def.task(AggregateCheck.dependencies().value -> AggregateCheck.suppressions().value)
+        aggregateProjectsSettings.map(Seq(_))
       } else if (!singleReport) {
-        log.info(s"Running dependency check for [${name.value}]")
-        Def.task(Dependencies.projectDependencies.value -> GenerateSuppressions.forProject.value)
+        aggregateProjectsFilter.map(_.flatten)
       } else {
         sys.error("'all-projects' argument isn't supported without the use of 'single-project'")
       }
@@ -49,33 +63,31 @@ object Check {
     // Don't run if this project has been configured to be skipped
     // But if it's a singleReport, then users may run the `dependencyCheckAggregate`
     if (!dependencyCheckSkip.value || singleReport) {
-      Def.taskDyn {
-        val (dependencies, suppressionRules) = dependenciesAndSuppressionsTask.value
+      Def.task {
+        dependenciesAndSuppressionsTask.value.foreach { checkSettings =>
+          log.info(s"Running dependency check for [${checkSettings.name}]")
 
-        val failCvssScore = dependencyCheckFailBuildOnCVSS.value
-        val scanSetFiles  = scanSet.value
-        val settings      = engineSettings.value
+          val settings = checkSettings.engineSettings
 
-        log.info("Scanning following dependencies: ")
-        dependencies.foreach(f => log.info("\t" + f.data.getName))
+          log.info("Scanning following dependencies: ")
+          checkSettings.dependencies.foreach(f => log.info("\t" + f.data.getName))
 
-        if (arguments.contains(ParseOptions.ListSettings)) {
-          log.info(s"\nDependencyCheck settings for [${name.value}]:")
-          ListSettings(settings, dependencyCheckScopes.value)
-        }
+          if (arguments.contains(ParseOptions.ListSettings)) {
+            log.info(s"\nDependencyCheck settings for [${checkSettings.name}]:")
+            ListSettings(settings, checkSettings.scopes)
+          }
 
-        Def.task(
           withEngine(settings) { engine =>
             try {
               analyzeProject(
-                name.value,
+                checkSettings.name,
                 engine,
-                dependencies,
-                suppressionRules,
-                scanSetFiles,
-                failCvssScore,
-                dependencyCheckOutputDirectory.value,
-                dependencyCheckFormats.value
+                checkSettings.dependencies,
+                checkSettings.suppressions,
+                checkSettings.scanSet,
+                checkSettings.failureScore,
+                checkSettings.outputDirectory,
+                checkSettings.reportFormats
               )
             } catch {
               case _: VulnerabilityFoundException if listUnusedSuppressions => // ignore
@@ -84,14 +96,14 @@ object Check {
             if (listUnusedSuppressions) {
               val unusedSuppressions = engine
                 .getObject(SUPPRESSION_OBJECT_KEY)
-                .asInstanceOf[java.util.List[SuppressionRule]]
+                .asInstanceOf[java.util.List[DcSuppressionRule]]
                 .asScala
                 .filter(sup => !sup.isMatched && !sup.isBase)
 
               if (unusedSuppressions.nonEmpty) {
                 log.info(s"""
                             |
-                            |Found [${unusedSuppressions.size}] unused suppressions for project [${name.value}]:
+                            |Found [${unusedSuppressions.size}] unused suppressions for project [${checkSettings.name}]:
                             |${unusedSuppressions.mkString("\n\t", "\n\t", "\n")}
                             |
                             |""".stripMargin)
@@ -100,7 +112,7 @@ object Check {
               }
             }
           }
-        )
+        }
       } tag NonParallel
     } else {
       Def.task {
@@ -109,4 +121,59 @@ object Check {
     }
   } tag NonParallel
 
+  private lazy val allProjectsSettings: Def.Initialize[Task[CheckSettings]] = Def.task {
+    CheckSettings(
+      name.value,
+      dependencyCheckScopes.value,
+      dependencyCheckFailBuildOnCVSS.value,
+      scanSet.value,
+      engineSettings.value,
+      AllProjectsCheck.dependencies().value,
+      AllProjectsCheck.suppressions().value,
+      dependencyCheckOutputDirectory.value,
+      dependencyCheckFormats.value
+    )
+  }
+
+  private lazy val aggregateProjectsSettings: Def.Initialize[Task[CheckSettings]] = Def.task {
+    CheckSettings(
+      name.value,
+      dependencyCheckScopes.value,
+      dependencyCheckFailBuildOnCVSS.value,
+      scanSet.value,
+      engineSettings.value,
+      AggregateCheck.dependencies().value,
+      AggregateCheck.suppressions().value,
+      dependencyCheckOutputDirectory.value,
+      dependencyCheckFormats.value
+    )
+  }
+
+  private lazy val aggregateProjectsFilter = Def.settingDyn {
+    perProjectSettingsTask.all(ScopeFilter(inAggregates(thisProjectRef.value)))
+  }
+
+  private lazy val perProjectSettingsTask: Def.Initialize[Task[Seq[CheckSettings]]] =
+    Def.taskDyn {
+      if (
+        !thisProject.value.autoPlugins.contains(JvmPlugin) || (dependencyCheckSkip ?? false).value
+      )
+        Def.task(Seq.empty[CheckSettings])
+      else
+        Def.task(
+          Seq(
+            CheckSettings(
+              name.value,
+              dependencyCheckScopes.value,
+              dependencyCheckFailBuildOnCVSS.value,
+              scanSet.value,
+              engineSettings.value,
+              Dependencies.projectDependencies.value,
+              GenerateSuppressions.forProject.value,
+              dependencyCheckOutputDirectory.value,
+              dependencyCheckFormats.value
+            )
+          )
+        )
+    }
 }

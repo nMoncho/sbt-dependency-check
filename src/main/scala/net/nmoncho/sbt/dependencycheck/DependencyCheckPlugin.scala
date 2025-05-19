@@ -64,6 +64,7 @@ object DependencyCheckPlugin extends AutoPlugin {
     dependencyCheckListSuppressions := ListSuppressions().evaluated,
     Compile / resourceGenerators += GenerateSuppressions.exportPackagedSuppressions(),
     dependencyCheckOutputDirectory := crossTarget.value,
+    dependencyCheck / aggregate := false,
     dependencyCheckAggregate / aggregate := false,
     dependencyCheckAllProjects / aggregate := false,
     dependencyCheckUpdate / aggregate := false,
