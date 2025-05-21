@@ -78,20 +78,25 @@ object Check {
           }
 
           withEngine(settings) { engine =>
-            try {
-              analyzeProject(
-                checkSettings.name,
-                engine,
-                checkSettings.dependencies,
-                checkSettings.suppressions,
-                checkSettings.scanSet,
-                checkSettings.failureScore,
-                checkSettings.outputDirectory,
-                checkSettings.reportFormats
-              )
-            } catch {
-              case _: VulnerabilityFoundException if listUnusedSuppressions => // ignore
-            }
+            val failureOpt =
+              try {
+                analyzeProject(
+                  checkSettings.name,
+                  engine,
+                  checkSettings.dependencies,
+                  checkSettings.suppressions,
+                  checkSettings.scanSet,
+                  checkSettings.failureScore,
+                  checkSettings.outputDirectory,
+                  checkSettings.reportFormats
+                )
+
+                Option.empty[Throwable] // success
+              } catch {
+                case t: VulnerabilityFoundException if listUnusedSuppressions =>
+                  // Hold and throw later
+                  Some(t)
+              }
 
             if (listUnusedSuppressions) {
               val unusedSuppressions = engine
@@ -110,6 +115,9 @@ object Check {
               } else {
                 log.info("No unused suppressions.")
               }
+
+              // We must throw an exception if it was caught to list the unused suppressions
+              failureOpt.foreach(ex => throw ex)
             }
           }
         }
