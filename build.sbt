@@ -1,5 +1,4 @@
 import Dependencies.*
-import xerial.sbt.Sonatype.sonatypeCentralHost
 
 ThisBuild / organization := "net.nmoncho"
 
@@ -28,8 +27,6 @@ lazy val root = (project in file("."))
     headerLicense := Some(
       HeaderLicense.MIT("2025", "the original author or authors", HeaderLicenseStyle.SpdxSyntax)
     ),
-    sonatypeCredentialHost := sonatypeCentralHost,
-    sonatypeRepository := "https://s01.oss.sonatype.org/service/local",
     sbtPluginPublishLegacyMavenStyle := false,
     developers := List(
       Developer(
