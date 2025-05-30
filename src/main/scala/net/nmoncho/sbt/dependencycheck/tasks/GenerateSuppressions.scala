@@ -34,7 +34,7 @@ object GenerateSuppressions {
           val settings             = dependencyCheckSuppressions.value
           val dependencies         = AggregateCheck.dependencies().value
 
-          val buildSuppressions = settings.suppressions
+          val buildSuppressions            = settings.suppressions
           val importedPackagedSuppressions = collectImportedPackagedSuppressions(
             settings,
             dependencies
