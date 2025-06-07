@@ -183,7 +183,7 @@ class ListSettingsSuite extends munit.FunSuite {
       |	nvd.api.results.per.page: null
       |	odc.analysis.timeout: 180
       |	odc.application.name: Dependency-Check Core
-      |	odc.application.version: 12.1.1
+      |	odc.application.version: 12.1.2
       |	odc.autoupdate: true
       |	odc.ecosystem.maxquerylimit.: null
       |	odc.ecosystem.maxquerylimit.default: 100
