@@ -29,7 +29,7 @@ class GenerateSuppressionsSuite extends munit.FunSuite {
   test("Packaged suppressions should be disabled by default, and blacklist all jars") {
     implicit val log: Logger = Logger.Null
 
-    val settings = SuppressionSettings.Default
+    val settings     = SuppressionSettings.Default
     val suppressions = GenerateSuppressions.collectImportedPackagedSuppressions(
       settings,
       Set(
@@ -90,7 +90,7 @@ class GenerateSuppressionsSuite extends munit.FunSuite {
       SuppressionSettings(
         packagedEnabled = true,
         files           = SuppressionFilesSettings.files()(suppressionFile),
-        suppressions = Seq(
+        suppressions    = Seq(
           SuppressionRule(cvssBelow = Seq(10.0))
         )
       )
