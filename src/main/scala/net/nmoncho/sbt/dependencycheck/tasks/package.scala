@@ -11,9 +11,9 @@ import scala.util.Success
 import scala.util.Try
 import scala.util.control.NonFatal
 
+import net.nmoncho.sbt.dependencycheck.settings.SummaryReport
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
 import org.owasp.dependencycheck.Engine
-import org.owasp.dependencycheck.agent.DependencyCheckScanAgent
 import org.owasp.dependencycheck.analyzer.AbstractSuppressionAnalyzer.SUPPRESSION_OBJECT_KEY
 import org.owasp.dependencycheck.analyzer.VulnerabilitySuppressionAnalyzer
 import org.owasp.dependencycheck.data.nexus.MavenArtifact
@@ -50,6 +50,10 @@ package object tasks {
     case object SingleReport extends ParseOptions
     case object AllProjects extends ParseOptions
     case object ListUnusedSuppressions extends ParseOptions
+
+    case object OriginalSummary extends ParseOptions
+    case object AllVulnerabilitiesSummary extends ParseOptions
+    case object OffendingVulnerabilitiesSummary extends ParseOptions
   }
 
   private[tasks] val PerProject  = (Space ~> token("per-project")) ^^^ ProjectSelection.PerProject
@@ -64,6 +68,15 @@ package object tasks {
     (Space ~> token("all-projects")) ^^^ ParseOptions.AllProjects
   private[tasks] val ListUnusedSuppressionsArg =
     (Space ~> token("list-unused-suppressions")) ^^^ ParseOptions.ListUnusedSuppressions
+
+  private[tasks] val OriginalSummaryArg =
+    (Space ~> token("original-summary")) ^^^ ParseOptions.OriginalSummary
+  private[tasks] val AllVulnerabilitiesSummaryArg =
+    (Space ~> token("all-vulnerabilities-summary")) ^^^ ParseOptions.AllVulnerabilitiesSummary
+  private[tasks] val OffendingVulnerabilitiesSummaryArg =
+    (Space ~> token(
+      "offending-vulnerabilities-summary"
+    )) ^^^ ParseOptions.OffendingVulnerabilitiesSummary
 
   private[tasks] val projectSelectionParser: Parser[Option[ParseResult]] =
     (PerProject | AllProjects | Aggregate).?
@@ -124,7 +137,8 @@ package object tasks {
       scanSet: Seq[File],
       failCvssScore: Double,
       outputDir: File,
-      reportFormats: Seq[Format]
+      reportFormats: Seq[Format],
+      summaryReport: SummaryReport
   )(implicit log: Logger): Unit = {
     addSuppressionRules(suppressionRules, engine)
     addDependencies(dependencies, engine)
@@ -145,7 +159,7 @@ package object tasks {
       )
     )
 
-    failOnFoundVulnerabilities(failCvssScore, engine, projectName)
+    failOnFoundVulnerabilities(failCvssScore, engine, projectName, summaryReport)
   }
 
   private def addSuppressionRules(rules: Set[SuppressionRule], engine: Engine)(
@@ -235,8 +249,9 @@ package object tasks {
   private def failOnFoundVulnerabilities(
       failCvssScore: Double,
       engine: Engine,
-      name: String
-  ): Unit = {
+      name: String,
+      summaryReport: SummaryReport
+  )(implicit log: Logger): Unit = {
     import scala.jdk.CollectionConverters.*
 
     val hasFailingVulnerabilities = engine.getDependencies.exists { p =>
@@ -251,7 +266,7 @@ package object tasks {
     }
 
     if (hasFailingVulnerabilities) {
-      DependencyCheckScanAgent.showSummary(name, engine.getDependencies)
+      SummaryReport.showSummary(name, engine.getDependencies, failCvssScore, summaryReport)
 
       throw new VulnerabilityFoundException(
         s"Vulnerability with CVSS score higher than [$failCvssScore] found"

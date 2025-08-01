@@ -13,11 +13,11 @@ import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.engineSettings
 import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.scanSet
 import net.nmoncho.sbt.dependencycheck.Keys._
 import net.nmoncho.sbt.dependencycheck.settings.ScopesSettings
+import net.nmoncho.sbt.dependencycheck.settings.SummaryReport
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
 import org.owasp.dependencycheck.analyzer.AbstractSuppressionAnalyzer.SUPPRESSION_OBJECT_KEY
 import org.owasp.dependencycheck.reporting.ReportGenerator
 import org.owasp.dependencycheck.xml.suppression.{ SuppressionRule => DcSuppressionRule }
-import sbt.Def
 import sbt.Keys._
 import sbt._
 import sbt.complete.Parser
@@ -26,7 +26,7 @@ import sbt.plugins.JvmPlugin
 object Check {
 
   private[tasks] val argumentsParser: Parser[Seq[ParseOptions]] =
-    (ListSettingsArg | SingleReportArg | AllProjectsArg | ListUnusedSuppressionsArg).*
+    (ListSettingsArg | SingleReportArg | AllProjectsArg | ListUnusedSuppressionsArg | OriginalSummaryArg | AllVulnerabilitiesSummaryArg | OffendingVulnerabilitiesSummaryArg).*
 
   private case class CheckSettings(
       name: String,
@@ -47,6 +47,15 @@ object Check {
     val singleReport           = arguments.contains(ParseOptions.SingleReport)
     val allProjects            = arguments.contains(ParseOptions.AllProjects)
     val listUnusedSuppressions = arguments.contains(ParseOptions.ListUnusedSuppressions)
+
+    val summary = arguments.find(arg =>
+      arg == ParseOptions.OriginalSummary || arg == ParseOptions.AllVulnerabilitiesSummary || arg == ParseOptions.OffendingVulnerabilitiesSummary
+    ) match {
+      case Some(ParseOptions.AllVulnerabilitiesSummary) => SummaryReport.AllVulnerabilities
+      case Some(ParseOptions.OffendingVulnerabilitiesSummary) =>
+        SummaryReport.OffendingVulnerabilities
+      case _ => SummaryReport.Original
+    }
 
     val dependenciesAndSuppressionsTask = Def.taskDyn {
       if (singleReport && allProjects) {
@@ -88,7 +97,8 @@ object Check {
                   checkSettings.scanSet,
                   checkSettings.failureScore,
                   checkSettings.outputDirectory,
-                  checkSettings.reportFormats
+                  checkSettings.reportFormats,
+                  summary
                 )
 
                 Option.empty[Throwable] // success

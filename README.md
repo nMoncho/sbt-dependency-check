@@ -82,6 +82,15 @@ The task `dependencyCheck` supports arguments that can be used to change its beh
 - `all-projects`: A single report will be generated for all projects. This works the same way as the task `dependencyCheckAllProjects`.
   **Important**: This arguments needs to be used together with `single-report`.
 
+This task also supports modifying how the reporting summary is shown at the end:
+
+- `original-summary`: This is the original summary provided by previous version of the plugin. Follows the structure as
+  `org.owasp.dependencycheck.agent.DependencyCheckScanAgent.showSummary`
+- `all-vulnerabilities-summary`: Shows a more compact report than `original-summary`, but includes the score for each
+  vulnerability.
+- `offending-vulnerabilities-summary`: Same as `all-vulnerabilities-summary` but only shows the offending vulnerabilities
+  (i.e. the ones that made the build fail).
+
 ### Configuration
 
 The plugin uses the default [DependencyCheck](https://github.com/dependency-check/DependencyCheck) configuration which

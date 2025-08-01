@@ -199,6 +199,24 @@ object SuppressionRule {
 
     def fromOwasp(prop: org.owasp.dependencycheck.xml.suppression.PropertyType): PropertyType =
       new PropertyType(prop.getValue, prop.isRegex, prop.isCaseSensitive)
+
+    implicit class PropertyTypeStringOps(private val str: String) extends AnyVal {
+      def toPropertyType(caseSensitive: Boolean = false): PropertyType = string(str, caseSensitive)
+    }
+
+    implicit class PropertyTypeRegexOps(private val expr: Regex) extends AnyVal {
+      def toPropertyType: PropertyType = regex(expr)
+    }
+
+    object PropertyTypeImplicitConversions {
+      import scala.language.implicitConversions
+
+      implicit def stringToPropertyType(str: String): PropertyType =
+        string(str, caseSensitive = true)
+
+      implicit def regexToPropertyType(expr: Regex): PropertyType = regex(expr)
+
+    }
   }
 
   /** Converts [[org.owasp.dependencycheck.xml.suppression.SuppressionRule]] into a [[SuppressionRule]]
