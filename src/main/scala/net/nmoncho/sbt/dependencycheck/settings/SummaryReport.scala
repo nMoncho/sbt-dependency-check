@@ -76,6 +76,7 @@ object SummaryReport {
   private def dependencyProcessor(
       dependencies: Seq[Dependency],
       reportVulnerability: (Vulnerability, Double) => Boolean,
+      failCvssScore: Double,
       summary: StringBuilder
   ): Unit =
     dependencies.foreach { dependency =>
@@ -85,7 +86,11 @@ object SummaryReport {
             getScore(vulnerability)
               .filter(reportVulnerability(vulnerability, _))
               .map(score =>
-                s"${vulnerability.getName()} (${scala.Console.YELLOW}${score}${scala.Console.RESET})"
+                if (score >= failCvssScore) {
+                  s"${scala.Console.YELLOW}${vulnerability.getName()}${scala.Console.RESET} (${scala.Console.YELLOW}${score}${scala.Console.RESET})"
+                } else {
+                  s"${vulnerability.getName()} (${score})"
+                }
               )
           }
 
@@ -139,7 +144,7 @@ object SummaryReport {
     override def buildSummary(dependencies: Seq[Dependency], failCvssScore: Double): String = {
       val summary = StringBuilder.newBuilder
 
-      dependencyProcessor(dependencies, (_, _) => true, summary)
+      dependencyProcessor(dependencies, (_, _) => true, failCvssScore, summary)
 
       summary.toString()
     }
@@ -153,7 +158,12 @@ object SummaryReport {
     override def buildSummary(dependencies: Seq[Dependency], failCvssScore: Double): String = {
       val summary = StringBuilder.newBuilder
 
-      dependencyProcessor(dependencies, (_, score) => score >= failCvssScore, summary)
+      dependencyProcessor(
+        dependencies,
+        (_, score) => score >= failCvssScore,
+        failCvssScore,
+        summary
+      )
 
       summary.toString()
     }
