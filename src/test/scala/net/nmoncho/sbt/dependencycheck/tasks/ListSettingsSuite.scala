@@ -50,7 +50,7 @@ class ListSettingsSuite extends munit.FunSuite {
       |	analyzer.central.parallel.analysis: false
       |	analyzer.central.password: null
       |	analyzer.central.query: %s?q=1:%s&wt=xml
-      |	analyzer.central.retry.count: 7
+      |	analyzer.central.retry.count: 3
       |	analyzer.central.url: https://search.maven.org/solrsearch/select
       |	analyzer.central.use.cache: true
       |	analyzer.central.username: null
@@ -183,7 +183,7 @@ class ListSettingsSuite extends munit.FunSuite {
       |	nvd.api.results.per.page: null
       |	odc.analysis.timeout: 180
       |	odc.application.name: Dependency-Check Core
-      |	odc.application.version: 12.1.6
+      |	odc.application.version: 12.1.8
       |	odc.autoupdate: true
       |	odc.ecosystem.maxquerylimit.: null
       |	odc.ecosystem.maxquerylimit.default: 100
