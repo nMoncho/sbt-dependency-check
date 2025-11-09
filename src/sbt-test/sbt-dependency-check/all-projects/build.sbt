@@ -18,7 +18,7 @@ lazy val commonSettings = Seq(
 
 lazy val root = (project in file("."))
   .aggregate(core)
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
   .settings(
     dependencyCheckFailBuildOnCVSS := 0,
     TaskKey[Unit]("check") := {
@@ -57,7 +57,7 @@ lazy val root = (project in file("."))
   )
 
 lazy val core = (project in file("core"))
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
   .settings(
     libraryDependencies += "org.apache.commons" % "commons-collections4" % "4.1",
     dependencyCheckSuppressions := SuppressionSettings(
@@ -68,7 +68,7 @@ lazy val core = (project in file("core"))
   )
 
 lazy val inScope = (project in file("inScope"))
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
   .settings(
     libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.9",
     dependencyCheckSuppressions := SuppressionSettings(
