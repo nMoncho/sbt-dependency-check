@@ -54,8 +54,10 @@ lazy val root = (project in file("."))
       scalaBinaryVersion.value match {
         // set minimum sbt version so we have `sbtPluginPublishLegacyMavenStyle`
         case "2.12" => "1.9.0"
+        case "3" => "2.0.0-RC6"
       }
     },
+    crossScalaVersions += "3.7.4",
     scriptedLaunchOpts := {
       scriptedLaunchOpts.value ++
       Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
