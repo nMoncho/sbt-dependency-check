@@ -8,9 +8,9 @@ package net.nmoncho.sbt.dependencycheck.settings
 
 import scala.util.matching.Regex
 
+import net.nmoncho.sbt.dependencycheck.DependencyCheckCompat
 import org.owasp.dependencycheck.utils.Settings
 import sbt.File
-import sbt.Keys
 import sbt.internal.util.Attributed
 
 /** Suppression Settings
@@ -82,7 +82,9 @@ object SuppressionSettings {
       */
     def ofGav(pred: (String, String, String) => Boolean): PackagedFilter =
       (dependency: Attributed[File]) => {
-        dependency.get(Keys.moduleID.key).exists(m => pred(m.organization, m.name, m.revision))
+        DependencyCheckCompat
+          .getModuleId(dependency)
+          .exists(m => pred(m.organization, m.name, m.revision))
       }
 
     /** Filter dependencies based on a file check

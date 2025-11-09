@@ -29,9 +29,10 @@ import org.owasp.dependencycheck.utils.Settings
 import org.owasp.dependencycheck.utils.SeverityUtil
 import org.owasp.dependencycheck.xml.suppression.{ SuppressionRule => OwaspSuppressionRule }
 import sbt.Tags.Tag
+import sbt._
 import sbt.complete.DefaultParsers._
 import sbt.complete.Parser
-import sbt.{ Keys => SbtKeys, _ }
+import xsbti.FileConverter
 
 package object tasks {
 
@@ -108,10 +109,13 @@ package object tasks {
   }
 
   def logAddDependencies(
-      classpath: Seq[Attributed[File]],
-      configuration: Configuration
-  )(implicit log: Logger): Seq[Attributed[File]] =
-    logDependencies(classpath, configuration, "Adding")
+      classpath: sbt.Def.Classpath,
+      configuration: Configuration,
+      converter: FileConverter
+  )(implicit log: Logger): Seq[Attributed[File]] = {
+    val values = DependencyCheckCompat.classpathToFiles(classpath, converter)
+    logDependencies(values, configuration, "Adding")
+  }
 
   def logRemoveDependencies(
       classpath: Seq[Attributed[File]],
@@ -197,7 +201,7 @@ package object tasks {
 
         // Add evidence if is managed dependency, otherwise just scan the file
         for {
-          moduleId <- attributed.get(SbtKeys.moduleID.key)
+          moduleId <- DependencyCheckCompat.getModuleId(attributed)
           nonEmptyDependencies <- Option(dependencies).filterNot(_.isEmpty)
           dependency <- Option(nonEmptyDependencies.get(0))
         } yield addEvidence(moduleId, dependency)

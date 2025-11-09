@@ -36,7 +36,7 @@ import sbt.Logger
   * @param vulnerabilityNames vulnerability name entries to suppress
   * @param notes notes added in suppression file
   */
-case class SuppressionRule private (
+case class SuppressionRule private[dependencycheck] (
     base: Boolean,
     until: LocalDate,
     identifier: Option[Identifier],
@@ -248,6 +248,7 @@ object SuppressionRule {
             .asInstanceOf[java.util.List[OwaspPropertyType]]
             .asScala
             .map(PropertyType.fromOwasp)
+            .toSeq
         }
     }.recover { case t: Throwable =>
       log.warn("Failed to get 'vulnerabilityNames' using reflection")

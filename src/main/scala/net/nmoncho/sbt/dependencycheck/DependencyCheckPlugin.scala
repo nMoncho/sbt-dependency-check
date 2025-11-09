@@ -10,17 +10,8 @@ import net.nmoncho.sbt.dependencycheck.settings._
 import net.nmoncho.sbt.dependencycheck.tasks._
 import org.owasp.dependencycheck.reporting.ReportGenerator.Format
 import org.owasp.dependencycheck.utils.Settings
-import sbt.AutoPlugin
-import sbt.Compile
-import sbt.Def
-import sbt.File
-import sbt.Global
-import sbt.InputTask
 import sbt.Keys._
-import sbt.PluginTrigger
-import sbt.Tags
-import sbt.Task
-import sbt.io.syntax._
+import sbt._
 import sbt.plugins.JvmPlugin
 
 object DependencyCheckPlugin extends AutoPlugin {
@@ -29,7 +20,7 @@ object DependencyCheckPlugin extends AutoPlugin {
 
   override def trigger: PluginTrigger = allRequirements
 
-  val autoImport: Keys.type = Keys
+  val autoImport: net.nmoncho.sbt.dependencycheck.Keys.type = net.nmoncho.sbt.dependencycheck.Keys
 
   import autoImport.*
 
