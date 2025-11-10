@@ -20,7 +20,7 @@ ThisBuild / dependencyCheckNvdApi := sys.env
 
 lazy val root = (project in file("."))
   .aggregate(core)
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
   .settings(
     libraryDependencies += "org.eclipse.jetty" % "jetty-runner" % "9.2.4.v20141103" % "provided",
     libraryDependencies += "commons-collections" % "commons-collections" % "3.2.1" % "optional",
@@ -66,7 +66,7 @@ lazy val root = (project in file("."))
   )
 
 lazy val util = (project in file("util"))
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
       "commons-beanutils"            % "commons-beanutils"   % "1.9.1"         % "test",
@@ -76,13 +76,13 @@ lazy val util = (project in file("util"))
 
 lazy val core = project
   .dependsOn(util)
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
   .settings(
     libraryDependencies += "org.apache.commons" % "commons-collections4" % "4.1"
   )
 
 lazy val ignore = (project in file("ignore"))
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
   .settings(
     libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.9"
   )
