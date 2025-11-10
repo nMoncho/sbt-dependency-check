@@ -23,7 +23,7 @@ lazy val root = (project in file("."))
     name := "sbt-dependency-check",
     startYear := Some(2025),
     homepage := Some(url("https://github.com/nMoncho/sbt-dependency-check")),
-    licenses := Seq("MIT License" -> new URL("http://opensource.org/licenses/MIT")),
+    licenses := Seq("MIT License" -> url("http://opensource.org/licenses/MIT")),
     headerLicense := Some(
       HeaderLicense.MIT("2025", "the original author or authors", HeaderLicenseStyle.SpdxSyntax)
     ),
