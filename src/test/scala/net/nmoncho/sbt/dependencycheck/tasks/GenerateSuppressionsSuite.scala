@@ -8,6 +8,7 @@ package net.nmoncho.sbt.dependencycheck.tasks
 
 import java.nio.file.Files
 
+import net.nmoncho.sbt.dependencycheck.DependencyCheckTestCompat
 import net.nmoncho.sbt.dependencycheck.Utils.StringLogger
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionFilesSettings
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
@@ -15,10 +16,7 @@ import net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings.PackagedFilter
 import org.owasp.dependencycheck.xml.suppression.SuppressionParser
 import sbt.File
-import sbt.Keys
 import sbt.Logger
-import sbt.internal.util.AttributeEntry
-import sbt.internal.util.AttributeMap
 import sbt.internal.util.Attributed
 import sbt.librarymanagement.ModuleID
 
@@ -141,6 +139,8 @@ class GenerateSuppressionsSuite extends munit.FunSuite {
 
   private def attributedFile(path: String, gav: (String, String, String)): Attributed[File] =
     Attributed(new File(s"src/test/resources/$path"))(
-      AttributeMap(AttributeEntry(Keys.moduleID.key, ModuleID(gav._1, gav._1, gav._3)))
+      DependencyCheckTestCompat.attributeMap(
+        ModuleID(gav._1, gav._1, gav._3)
+      )
     )
 }

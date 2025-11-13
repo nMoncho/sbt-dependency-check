@@ -6,6 +6,7 @@
 
 package net.nmoncho.sbt.dependencycheck.tasks
 
+import net.nmoncho.sbt.dependencycheck.DependencyCheckCompat
 import net.nmoncho.sbt.dependencycheck.Keys.dependencyCheckScopes
 import net.nmoncho.sbt.dependencycheck.Keys.dependencyCheckSkip
 import sbt.Keys._
@@ -28,41 +29,47 @@ object Dependencies {
         val scopes             = dependencyCheckScopes.value
         val classpathTypeValue = classpathTypes.value
         val updateValue        = update.value
+        val converter          = fileConverter.value
 
         if (scopes.compile) {
           dependencies ++= logAddDependencies(
-            Classpaths.managedJars(Compile, classpathTypeValue, updateValue),
-            Compile
+            DependencyCheckCompat.managedJars(Compile, classpathTypeValue, updateValue, converter),
+            Compile,
+            converter
           )
         }
 
         if (scopes.test) {
           dependencies ++= logAddDependencies(
-            Classpaths.managedJars(Test, classpathTypeValue, updateValue),
-            Test
+            DependencyCheckCompat.managedJars(Test, classpathTypeValue, updateValue, converter),
+            Test,
+            converter
           )
         }
 
         // Provided dependencies are include in Compile dependencies: remove instead of adding
         if (scopes.provided) {
           dependencies ++= logAddDependencies(
-            Classpaths.managedJars(Provided, classpathTypeValue, updateValue),
-            Provided
+            DependencyCheckCompat.managedJars(Provided, classpathTypeValue, updateValue, converter),
+            Provided,
+            converter
           )
         }
 
         if (scopes.runtime) {
           dependencies ++= logAddDependencies(
-            Classpaths.managedJars(Runtime, classpathTypeValue, updateValue),
-            Runtime
+            DependencyCheckCompat.managedJars(Runtime, classpathTypeValue, updateValue, converter),
+            Runtime,
+            converter
           )
         }
 
         // Optional dependencies are include in Compile dependencies: remove instead of adding
         if (scopes.optional) {
           dependencies ++= logAddDependencies(
-            Classpaths.managedJars(Optional, classpathTypeValue, updateValue),
-            Optional
+            DependencyCheckCompat.managedJars(Optional, classpathTypeValue, updateValue, converter),
+            Optional,
+            converter
           )
         }
 

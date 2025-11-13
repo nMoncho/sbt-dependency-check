@@ -156,7 +156,7 @@ object GenerateSuppressions {
     try {
       import scala.jdk.CollectionConverters.*
 
-      parser.parseSuppressionRules(file).asScala.map(SuppressionRule.fromOwasp)
+      parser.parseSuppressionRules(file).asScala.map(SuppressionRule.fromOwasp).toSeq
     } catch {
       case t: Throwable =>
         log.warn(

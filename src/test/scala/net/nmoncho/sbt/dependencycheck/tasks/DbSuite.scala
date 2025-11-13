@@ -32,7 +32,7 @@ class DbSuite extends munit.FunSuite {
 
       withEngine(settings) { engine =>
         engine.analyzeDependencies()
-      }(Logger.Null)
+      }(using Logger.Null)
     }
   }
 

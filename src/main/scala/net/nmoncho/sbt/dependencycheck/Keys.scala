@@ -8,8 +8,6 @@ package net.nmoncho.sbt.dependencycheck
 
 import java.time.Duration
 
-import scala.collection.Seq
-
 import net.nmoncho.sbt.dependencycheck.settings._
 import org.owasp.dependencycheck.reporting.ReportGenerator
 import sbt._
