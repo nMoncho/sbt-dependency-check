@@ -34,7 +34,7 @@ lazy val root = (project in file("."))
       def assert(cond: Boolean, msg: => String): Unit =
         if (!cond) sys.error(msg)
 
-      val logFiles = (target.value / "global-logging")
+      val logFiles = (baseDirectory.value / "target" / "global-logging")
         .listFiles(new FilenameFilter {
           override def accept(dir: File, name: String) = name.endsWith("log")
         })

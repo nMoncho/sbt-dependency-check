@@ -23,7 +23,7 @@ checkLogContains := {
     _.isDefined
   ) ~ (Space ~> StringEscapable) ~ (Space ~> StringEscapable).?).parsed
 
-  val logFiles = (target.value / "global-logging")
+  val logFiles = (baseDirectory.value / "target" / "global-logging")
     .listFiles(new FilenameFilter {
       override def accept(dir: File, name: String) = name.endsWith("log")
     })
@@ -67,7 +67,7 @@ checkAddedSuppressions := {
 
   val count = (Space ~> charClass(_.isDigit, "digit").+).map(_.mkString.toInt).parsed
 
-  val logFiles = (target.value / "global-logging")
+  val logFiles = (baseDirectory.value / "target" / "global-logging")
     .listFiles(new FilenameFilter {
       override def accept(dir: File, name: String) = name.endsWith("log")
     })

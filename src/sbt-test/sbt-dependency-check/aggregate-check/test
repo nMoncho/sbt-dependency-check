@@ -1,4 +1,4 @@
 > dependencyCheckAggregate
-$ exists target/scala-2.13/dependency-check-report.html
--$ exists core/target/scala-2.13/dependency-check-report.html
+$ exists target/**/dependency-check-report.html
+$ absent core/target/**/dependency-check-report.html
 > check

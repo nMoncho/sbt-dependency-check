@@ -4,7 +4,7 @@ ThisBuild / organization := "net.nmoncho"
 
 addCommandAlias(
   "testCoverage",
-  "; clean ; coverage; test; scripted; coverageAggregate; coverageReport; coverageOff"
+  "; clean ; coverage; test; +scripted; coverageAggregate; coverageReport; coverageOff"
 )
 
 addCommandAlias(
@@ -53,7 +53,9 @@ lazy val root = (project in file("."))
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
         // set minimum sbt version so we have `sbtPluginPublishLegacyMavenStyle`
-        case "2.12" => "1.9.0"
+        // and to be able to use glob expressions on scripted tests due to
+        // SBT 1.x and 2.x target files being on different paths
+        case "2.12" => "1.10.7"
         case "3" => "2.0.0-RC6"
       }
     },
