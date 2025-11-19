@@ -18,16 +18,17 @@ import sbt.internal.util.Attributed
 import xsbti.FileConverter
 
 private[dependencycheck] object DependencyCheckCompat {
-  def getModuleId[A](x: Attributed[A]): Option[ModuleID] =
-    x.get(sbt.Keys.moduleID.key)
+
+  def getModuleId[A](attributed: Attributed[A]): Option[ModuleID] =
+    attributed.get(sbt.Keys.moduleID.key)
 
   def managedJars(
       config: Configuration,
       jarTypes: Set[String],
-      up: UpdateReport,
+      updateReport: UpdateReport,
       @unused converter: FileConverter
   ): Classpath =
-    sbt.Classpaths.managedJars(config, jarTypes, up)
+    sbt.Classpaths.managedJars(config, jarTypes, updateReport)
 
   def classpathToFiles(
       classpath: Classpath,
