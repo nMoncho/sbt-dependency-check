@@ -152,16 +152,17 @@ package object tasks {
 
     if (reportFormats.isEmpty) {
       log.info("No Report Format was selected for the Dependency Check Analysis")
-    }
-
-    reportFormats.foreach(reportFormat =>
-      engine.writeReports(
-        projectName,
-        outputDir,
-        reportFormat.name(),
-        null
+    } else {
+      log.info(s"Writing Dependency Check reports to [${outputDir.getAbsolutePath}]")
+      reportFormats.foreach(reportFormat =>
+        engine.writeReports(
+          projectName,
+          outputDir,
+          reportFormat.name(),
+          null
+        )
       )
-    )
+    }
 
     failOnFoundVulnerabilities(failCvssScore, engine, projectName, summaryReport)
   }

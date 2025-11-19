@@ -44,7 +44,9 @@ sbt -Dlog4j2.level=info dependencyCheck
 ```
 
 The first time you run these tasks it will take some time, even a couple of minutes. The analysis will write a report
-to `target/{scala-version}/dependency-check-report.html`.
+to `target/{scala-version}/dependency-check-report.html` for SBT 1.x,
+and `target/out/jvm/{scala-version}/{project}/dependency-check-report.html` for SBT 2.x. The plugin will log where the
+reports are being written to.
 
 After this, feel free to take a look at the available tasks and settings.
 
