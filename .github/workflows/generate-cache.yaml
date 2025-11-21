@@ -1,8 +1,6 @@
-name: Pull Request
+name: Generate CVE Cache
 
-on:
-  pull_request:
-    branches: [ "main" ]
+on: workflow_dispatch
 
 permissions:
   contents: write
@@ -29,15 +27,17 @@ jobs:
 
       - uses: sbt/setup-sbt@v1
 
-      - name: Check formatting, scalafix, and headers
-        run: sbt styleCheck
+      - name: Create CVE Database folder (optional, but robust)
+        run: mkdir -p ~/cve-data
 
-      - name: Restore CVE Database
+      - name: Generate CVE db
+        run: sbt 'testOnly *DbSuite'
+
+      - name: Save generated CVE Database
         id: restore-cve-db
-        uses: actions/cache/restore@v4
+        uses: actions/cache/save@v4
         with:
           path: ~/cve-data/
           key: ${{ runner.os }}-cve-cache-${{ hashFiles('**/build.sbt') }}
-
-      - name: Test Coverage
-        run: sbt testCoverage
+          restore-keys: |
+            ${{ runner.os }}-cve-cache-${{ hashFiles('**/build.sbt') }}

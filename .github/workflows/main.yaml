@@ -34,7 +34,7 @@ jobs:
 
       - name: Restore CVE Database
         id: restore-cve-db
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/cve-data/
           key: ${{ runner.os }}-cve-cache-${{ hashFiles('**/build.sbt') }}
