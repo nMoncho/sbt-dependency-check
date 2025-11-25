@@ -34,7 +34,9 @@ Don't feel deterred by all the configuration settings defined in this plugin. Al
 The best way to get started is to install the plugin, set your [NVD API Key](#nvd-api):
 
 ```sbt
-dependencyCheckNvdApi := NvdApiSettings("YOUR_NVD_API_KEY")
+import net.nmoncho.sbt.dependencycheck.settings._
+
+dependencyCheckNvdApi := NvdApiSettings(apiKey = "YOUR_NVD_API_KEY")
 ```
 
 And then just run:
