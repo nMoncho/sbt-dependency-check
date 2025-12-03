@@ -7,7 +7,7 @@ permissions:
 
 env:
   LOG_LEVEL: INFO
-  DATA_DIRECTORY: ~/cve-data/
+  DATA_DIRECTORY: cve-data/
   CI: true
   NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
 
@@ -28,7 +28,7 @@ jobs:
       - uses: sbt/setup-sbt@v1
 
       - name: Create CVE Database folder (optional, but robust)
-        run: mkdir -p ~/cve-data
+        run: mkdir -p cve-data
 
       - name: Generate CVE db
         run: sbt 'testOnly *DbSuite'
@@ -37,7 +37,7 @@ jobs:
         id: restore-cve-db
         uses: actions/cache/save@v4
         with:
-          path: ~/cve-data/
+          path: cve-data
           key: ${{ runner.os }}-cve-cache-${{ hashFiles('**/build.sbt') }}
           restore-keys: |
             ${{ runner.os }}-cve-cache-${{ hashFiles('**/build.sbt') }}
