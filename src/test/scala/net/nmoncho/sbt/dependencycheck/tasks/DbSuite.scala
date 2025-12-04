@@ -23,6 +23,7 @@ class DbSuite extends munit.FunSuite {
   test("Pull DB") {
     for {
       _ <- envOrNone("CI").filter(_.toBoolean)
+      _ <- envOrNone("FORCE_REFRESH").filter(_.toBoolean)
       folder <- envOrNone("DATA_DIRECTORY")
       nvdApiKey <- envOrNone("NVD_API_KEY")
     } yield {

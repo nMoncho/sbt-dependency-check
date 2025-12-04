@@ -9,6 +9,7 @@ env:
   LOG_LEVEL: INFO
   DATA_DIRECTORY: cve-data/
   CI: true
+  FORCE_REFRESH: true
   NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
 
 jobs:
