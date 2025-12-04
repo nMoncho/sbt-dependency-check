@@ -9,7 +9,7 @@ permissions:
 
 env:
   LOG_LEVEL: INFO
-  DATA_DIRECTORY: cve-data/
+  DATA_DIRECTORY: /tmp/cve-data/
   CI: true
   NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
 
@@ -36,7 +36,7 @@ jobs:
         id: restore-cve-db
         uses: actions/cache/restore@v4
         with:
-          path: cve-data
+          path: /tmp/cve-data
           key: ${{ runner.os }}-cve-cache-${{ hashFiles('**/build.sbt') }}
 
       - name: Test Coverage
@@ -46,7 +46,5 @@ jobs:
         id: save-cve-db
         uses: actions/cache/save@v4
         with:
-          path: cve-data
+          path: /tmp/cve-data
           key: ${{ runner.os }}-cve-cache-${{ hashFiles('**/build.sbt') }}
-          restore-keys: |
-            ${{ runner.os }}-cve-cache-${{ hashFiles('**/build.sbt') }}
