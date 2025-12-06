@@ -39,6 +39,6 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: cve-data
-          key: ${{ runner.os }}-cve-cache-${{ hashFiles('**/build.sbt') }}
+          key: ${{ runner.os }}-cve-cache
           restore-keys: |
-            ${{ runner.os }}-cve-cache-${{ hashFiles('**/build.sbt') }}
+            ${{ runner.os }}-cve-cache
