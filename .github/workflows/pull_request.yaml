@@ -34,7 +34,7 @@ jobs:
 
       - name: Restore CVE Database
         id: restore-cve-db
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: /tmp/cve-data
           key: ${{ runner.os }}-cve-cache
@@ -44,7 +44,7 @@ jobs:
 
       - name: Save generated CVE Database
         id: save-cve-db
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: /tmp/cve-data
           key: ${{ runner.os }}-cve-cache
