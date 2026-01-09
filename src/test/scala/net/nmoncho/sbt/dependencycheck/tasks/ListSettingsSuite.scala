@@ -106,6 +106,7 @@ class ListSettingsSuite extends munit.FunSuite {
       |	analyzer.pip.enabled: true
       |	analyzer.pipfile.enabled: true
       |	analyzer.pnpm.audit.enabled: true
+      |	analyzer.pnpm.audit.registry: https://registry.npmjs.org/
       |	analyzer.pnpm.path: null
       |	analyzer.poetry.enabled: true
       |	analyzer.python.distribution.enabled: true
@@ -180,10 +181,12 @@ class ListSettingsSuite extends munit.FunSuite {
       |	nvd.api.endpoint: null
       |	nvd.api.key: null
       |	nvd.api.max.retry.count: 30
+      |	nvd.api.requestsperthirtysecondswithapikey: 50
+      |	nvd.api.requestsperthirtysecondswithoutapikey: 5
       |	nvd.api.results.per.page: null
       |	odc.analysis.timeout: 180
       |	odc.application.name: Dependency-Check Core
-      |	odc.application.version: 12.1.9
+      |	odc.application.version: 12.2.0
       |	odc.autoupdate: true
       |	odc.ecosystem.maxquerylimit.: null
       |	odc.ecosystem.maxquerylimit.default: 100
