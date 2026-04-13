@@ -202,6 +202,8 @@ object SuppressionRule {
 
     implicit class PropertyTypeStringOps(private val str: String) extends AnyVal {
       def toPropertyType(caseSensitive: Boolean = false): PropertyType = string(str, caseSensitive)
+
+      def toPropertyType: PropertyType = toPropertyType()
     }
 
     implicit class PropertyTypeRegexOps(private val expr: Regex) extends AnyVal {
@@ -209,10 +211,14 @@ object SuppressionRule {
     }
 
     object PropertyTypeImplicitConversions {
+
       import scala.language.implicitConversions
 
       implicit def stringToPropertyType(str: String): PropertyType =
-        string(str, caseSensitive = true)
+        string(
+          str,
+          caseSensitive = true
+        ) // FIXME all the other default values are `false` but this one is `true` making it confusing. It should be true for all!!!
 
       implicit def regexToPropertyType(expr: Regex): PropertyType = regex(expr)
 

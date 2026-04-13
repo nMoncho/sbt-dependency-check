@@ -18,11 +18,11 @@ import sbt.internal.util.Attributed
   * are project specific, whereas the latter are "base" suppression which can be
   * more general.
   *
-  * @param files suppression files
-  * @param hosted hosted suppressions
-  * @param suppressions suppressions defined in the project definition (e.g. a `build.sbt`)
+  * @param files           suppression files
+  * @param hosted          hosted suppressions
+  * @param suppressions    suppressions defined in the project definition (e.g. a `build.sbt`)
   * @param packagedEnabled whether the packaged suppressions rules are enabled
-  * @param packagedFilter which dependencies should be considered when importing packaged suppression rules
+  * @param packagedFilter  which dependencies should be considered when importing packaged suppression rules
   */
 case class SuppressionSettings(
     files: SuppressionFilesSettings,
