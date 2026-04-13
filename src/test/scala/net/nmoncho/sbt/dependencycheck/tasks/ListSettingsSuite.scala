@@ -135,8 +135,8 @@ class ListSettingsSuite extends munit.FunSuite {
       |	central.content.username: null
       |	connection.read.timeout: null
       |	connection.timeout: null
-      |	cpe.url: https://static.nvd.nist.gov/feeds/xml/cpe/dictionary/official-cpe-dictionary_v2.3.xml.gz
-      |	cpe.validfordays: 30
+      |	cpe.url: null
+      |	cpe.validfordays: null
       |	cve.cpe.startswith.filter: cpe:2.3:a:
       |	data.connection_string: jdbc:h2:file:%s;AUTOCOMMIT=ON;CACHE_SIZE=65536;RETENTION_TIME=1000;MAX_COMPACT_TIME=10000;
       |	data.directory: [JAR]/data/11.0
@@ -186,14 +186,14 @@ class ListSettingsSuite extends munit.FunSuite {
       |	nvd.api.results.per.page: null
       |	odc.analysis.timeout: 180
       |	odc.application.name: Dependency-Check Core
-      |	odc.application.version: 12.2.0
+      |	odc.application.version: 12.2.1
       |	odc.autoupdate: true
       |	odc.ecosystem.maxquerylimit.: null
       |	odc.ecosystem.maxquerylimit.default: 100
       |	odc.maven.local.repo: null
       |	odc.reports.pretty.print: false
       |	odc.settings.mask: .*password.*,.*token.*,.*api.key.*
-      |	proxy.disableSchemas: true
+      |	proxy.disableSchemas: null
       |	proxy.nonproxyhosts: null
       |	proxy.password: null
       |	proxy.port: null
