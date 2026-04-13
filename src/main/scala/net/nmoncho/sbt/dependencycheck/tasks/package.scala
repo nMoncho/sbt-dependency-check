@@ -110,18 +110,21 @@ package object tasks {
 
   def logAddDependencies(
       classpath: sbt.Def.Classpath,
-      configuration: Configuration,
-      converter: FileConverter
-  )(implicit log: Logger): Seq[Attributed[File]] = {
-    val values = DependencyCheckCompat.classpathToFiles(classpath, converter)
-    logDependencies(values, configuration, "Adding")
+      configuration: Configuration
+  )(implicit log: Logger, converter: FileConverter): Seq[Attributed[File]] = {
+    import sbtcompat.PluginCompat.*
+
+    logDependencies(classpath.map(_.map(toFile)), configuration, "Adding")
   }
 
   def logRemoveDependencies(
-      classpath: Seq[Attributed[File]],
+      classpath: sbt.Def.Classpath,
       configuration: Configuration
-  )(implicit log: Logger): Seq[Attributed[File]] =
-    logDependencies(classpath, configuration, "Removing")
+  )(implicit log: Logger, converter: FileConverter): Seq[Attributed[File]] = {
+    import sbtcompat.PluginCompat.*
+
+    logDependencies(classpath.map(_.map(toFile)), configuration, "Removing")
+  }
 
   def logDependencies(
       classpath: Seq[Attributed[File]],
@@ -198,11 +201,13 @@ package object tasks {
   )(implicit log: Logger): Unit =
     checkClasspath.foreach(attributed =>
       if (attributed.data != null) {
+        import sbtcompat.PluginCompat._
+
         val dependencies = engine.scan(new File(attributed.data.getAbsolutePath))
 
         // Add evidence if is managed dependency, otherwise just scan the file
         for {
-          moduleId <- DependencyCheckCompat.getModuleId(attributed)
+          moduleId <- attributed.get(moduleIDStr).map(parseModuleIDStrAttribute)
           nonEmptyDependencies <- Option(dependencies).filterNot(_.isEmpty)
           dependency <- Option(nonEmptyDependencies.get(0))
         } yield addEvidence(moduleId, dependency)

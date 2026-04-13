@@ -8,7 +8,6 @@ package net.nmoncho.sbt.dependencycheck.settings
 
 import scala.util.matching.Regex
 
-import net.nmoncho.sbt.dependencycheck.DependencyCheckCompat
 import org.owasp.dependencycheck.utils.Settings
 import sbt.File
 import sbt.internal.util.Attributed
@@ -80,12 +79,15 @@ object SuppressionSettings {
       *
       * @param pred a function that takes a GAV (GroudId, ArtifactId, Version) return true if it should consider that artifact.
       */
-    def ofGav(pred: (String, String, String) => Boolean): PackagedFilter =
-      (dependency: Attributed[File]) => {
-        DependencyCheckCompat
-          .getModuleId(dependency)
+    def ofGav(pred: (String, String, String) => Boolean): PackagedFilter = {
+      (dependency: Attributed[File]) =>
+        import sbtcompat.PluginCompat.*
+
+        dependency
+          .get(moduleIDStr)
+          .map(parseModuleIDStrAttribute)
           .exists(m => pred(m.organization, m.name, m.revision))
-      }
+    }
 
     /** Filter dependencies based on a file check
       */

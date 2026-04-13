@@ -13,6 +13,7 @@ import sbt.Keys._
 import sbt._
 import sbt.internal.util.Attributed
 import sbt.plugins.JvmPlugin
+import xsbti.FileConverter
 
 object Dependencies {
 
@@ -23,27 +24,25 @@ object Dependencies {
       Def.task(Set.empty)
     } else {
       Def.task {
-        implicit val log: Logger = streams.value.log
+        implicit val log: Logger              = streams.value.log
+        implicit val converter: FileConverter = fileConverter.value
 
         val dependencies       = scala.collection.mutable.Set[Attributed[File]]()
         val scopes             = dependencyCheckScopes.value
         val classpathTypeValue = classpathTypes.value
         val updateValue        = update.value
-        val converter          = fileConverter.value
 
         if (scopes.compile) {
           dependencies ++= logAddDependencies(
             DependencyCheckCompat.managedJars(Compile, classpathTypeValue, updateValue, converter),
-            Compile,
-            converter
+            Compile
           )
         }
 
         if (scopes.test) {
           dependencies ++= logAddDependencies(
             DependencyCheckCompat.managedJars(Test, classpathTypeValue, updateValue, converter),
-            Test,
-            converter
+            Test
           )
         }
 
@@ -51,16 +50,14 @@ object Dependencies {
         if (scopes.provided) {
           dependencies ++= logAddDependencies(
             DependencyCheckCompat.managedJars(Provided, classpathTypeValue, updateValue, converter),
-            Provided,
-            converter
+            Provided
           )
         }
 
         if (scopes.runtime) {
           dependencies ++= logAddDependencies(
             DependencyCheckCompat.managedJars(Runtime, classpathTypeValue, updateValue, converter),
-            Runtime,
-            converter
+            Runtime
           )
         }
 
@@ -68,8 +65,7 @@ object Dependencies {
         if (scopes.optional) {
           dependencies ++= logAddDependencies(
             DependencyCheckCompat.managedJars(Optional, classpathTypeValue, updateValue, converter),
-            Optional,
-            converter
+            Optional
           )
         }
 
