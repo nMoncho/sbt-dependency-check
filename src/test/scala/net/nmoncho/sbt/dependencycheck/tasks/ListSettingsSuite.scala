@@ -95,11 +95,12 @@ class ListSettingsSuite extends munit.FunSuite {
       |	analyzer.nvdcve.enabled: true
       |	analyzer.openssl.enabled: true
       |	analyzer.ossindex.batch.size: null
+      |	analyzer.ossindex.cache.validforhours: null
       |	analyzer.ossindex.enabled: true
       |	analyzer.ossindex.password: null
       |	analyzer.ossindex.remote-error.warn-only: null
       |	analyzer.ossindex.request.delay: null
-      |	analyzer.ossindex.url: https://ossindex.sonatype.org
+      |	analyzer.ossindex.url: https://api.guide.sonatype.com
       |	analyzer.ossindex.use.cache: true
       |	analyzer.ossindex.user: null
       |	analyzer.pe.enabled: true
@@ -146,7 +147,7 @@ class ListSettingsSuite extends munit.FunSuite {
       |	data.h2.directory: null
       |	data.password: ********
       |	data.user: dcuser
-      |	data.version: 5.5
+      |	data.version: 5.6
       |	data.writelock.shutdownhook: org.owasp.dependencycheck.utils.WriteLockCleanupHook
       |	database.batchinsert.enabled: true
       |	database.batchinsert.maxsize: 1000
@@ -186,7 +187,7 @@ class ListSettingsSuite extends munit.FunSuite {
       |	nvd.api.results.per.page: null
       |	odc.analysis.timeout: 180
       |	odc.application.name: Dependency-Check Core
-      |	odc.application.version: 12.2.1
+      |	odc.application.version: 12.2.2
       |	odc.autoupdate: true
       |	odc.ecosystem.maxquerylimit.: null
       |	odc.ecosystem.maxquerylimit.default: 100
