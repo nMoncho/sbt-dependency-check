@@ -13,7 +13,7 @@ can be located in our [wiki](https://github.com/nMoncho/sbt-dependency-check/wik
 Add the plugin to your project configuration:
 
 ```scala
-addSbtPlugin("net.nmoncho" % "sbt-dependency-check" % "1.9.0")
+addSbtPlugin("net.nmoncho" % "sbt-dependency-check" % "1.9.1")
 ```
 
 The minimum SBT version supported is `1.9.0`.
