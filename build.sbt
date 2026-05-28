@@ -60,6 +60,12 @@ lazy val root = (project in file("."))
         case "3" => "2.0.0-RC13"
       }
     },
+    javacOptions ++= {
+      scalaBinaryVersion.value match {
+        case "2.12" => Seq("-source", "11", "-target", "11")
+        case "3" => Seq("-source", "17", "-target", "17")
+      }
+    },
     crossScalaVersions += "3.8.3",
     scriptedLaunchOpts := {
       scriptedLaunchOpts.value ++
