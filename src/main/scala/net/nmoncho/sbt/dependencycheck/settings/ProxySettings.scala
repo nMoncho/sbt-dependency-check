@@ -9,7 +9,15 @@ package net.nmoncho.sbt.dependencycheck.settings
 import org.owasp.dependencycheck.utils.Settings
 import org.owasp.dependencycheck.utils.Settings.KEYS._
 
+/** Proxy Settings
+  *
+  * @param disableSchemas Whether or not if using basic auth with a proxy the system setting
+  *                       'jdk.http.auth.tunneling.disabledSchemes' should be set to an empty
+  *                       string.
+  * @param nonProxyHosts The properties key for the non proxy hosts.
+  */
 case class ProxySettings(
+    @deprecated("No longer used; will be removed in a future release")
     disableSchemas: Option[Boolean],
     nonProxyHosts: Option[Seq[String]]
 ) {
