@@ -11,7 +11,9 @@ import java.io.StringWriter
 
 import scala.util.Using
 
+import org.owasp.dependencycheck.dependency.Vulnerability
 import org.owasp.dependencycheck.exception.ExceptionCollection
+import org.owasp.dependencycheck.utils.SeverityUtil
 import sbt.Logger
 
 package object dependencycheck {
@@ -52,4 +54,20 @@ package object dependencycheck {
       t.printStackTrace(pw)
       log.error(sw.toString)
     }
+
+  /** Checks if the given vulnerability is higher than the `failCvssScore`
+    *
+    * This will check against the different CVSS versions
+    *
+    * @param v             vulnerability to check
+    * @param failCvssScore failing score
+    * @return true if any score is higher than the failing score, false otherwise.
+    */
+  def failingVulnerability(v: Vulnerability, failCvssScore: Double): Boolean =
+    (v.getCvssV2 != null && v.getCvssV2.getCvssData.getBaseScore >= failCvssScore) ||
+      (v.getCvssV3 != null && v.getCvssV3.getCvssData.getBaseScore >= failCvssScore) ||
+      (v.getUnscoredSeverity != null && SeverityUtil.estimateCvssV2(
+        v.getUnscoredSeverity
+      ) >= failCvssScore) ||
+      (failCvssScore <= 0.0f)
 }

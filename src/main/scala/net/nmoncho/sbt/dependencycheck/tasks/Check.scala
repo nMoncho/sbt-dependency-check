@@ -51,9 +51,12 @@ object Check {
     val summary = arguments.find(arg =>
       arg == ParseOptions.OriginalSummary || arg == ParseOptions.AllVulnerabilitiesSummary || arg == ParseOptions.OffendingVulnerabilitiesSummary
     ) match {
-      case Some(ParseOptions.AllVulnerabilitiesSummary) => SummaryReport.AllVulnerabilities
+      case Some(ParseOptions.AllVulnerabilitiesSummary) =>
+        SummaryReport.AllVulnerabilities
+
       case Some(ParseOptions.OffendingVulnerabilitiesSummary) =>
         SummaryReport.OffendingVulnerabilities
+
       case _ => SummaryReport.Original
     }
 

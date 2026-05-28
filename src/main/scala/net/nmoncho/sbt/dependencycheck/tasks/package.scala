@@ -26,7 +26,6 @@ import org.owasp.dependencycheck.dependency.naming.PurlIdentifier
 import org.owasp.dependencycheck.reporting.ReportGenerator.Format
 import org.owasp.dependencycheck.utils.Downloader
 import org.owasp.dependencycheck.utils.Settings
-import org.owasp.dependencycheck.utils.SeverityUtil
 import org.owasp.dependencycheck.xml.suppression.{ SuppressionRule => OwaspSuppressionRule }
 import sbt.Tags.Tag
 import sbt._
@@ -265,14 +264,7 @@ package object tasks {
     import scala.jdk.CollectionConverters.*
 
     val hasFailingVulnerabilities = engine.getDependencies.exists { p =>
-      p.getVulnerabilities.asScala.exists { v =>
-        (v.getCvssV2 != null && v.getCvssV2.getCvssData.getBaseScore >= failCvssScore) ||
-        (v.getCvssV3 != null && v.getCvssV3.getCvssData.getBaseScore >= failCvssScore) ||
-        (v.getUnscoredSeverity != null && SeverityUtil.estimateCvssV2(
-          v.getUnscoredSeverity
-        ) >= failCvssScore) ||
-        (failCvssScore <= 0.0f)
-      }
+      p.getVulnerabilities.asScala.exists(failingVulnerability(_, failCvssScore))
     }
 
     if (hasFailingVulnerabilities) {

@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-package net.nmoncho.sbt.dependencycheck.settings
+package net.nmoncho.sbt.dependencycheck
+package settings
 
 import scala.jdk.CollectionConverters._
 
@@ -19,7 +20,7 @@ trait SummaryReport {
 
   /** Builds an analysis summary using the scanned dependencies and the failing CVSS Score
     *
-    * @param dependencies scanned dependencies
+    * @param dependencies  scanned dependencies
     * @param failCvssScore failing CVSS Score
     * @return
     */
@@ -33,11 +34,11 @@ object SummaryReport {
 
   /** Shows the summary to the console
     *
-    * @param name project name
-    * @param dependencies scanned dependencies
+    * @param name          project name
+    * @param dependencies  scanned dependencies
     * @param failCvssScore failing CVSS Score
-    * @param report report type
-    * @param log logger
+    * @param report        report type
+    * @param log           logger
     */
   def showSummary(
       name: String,
@@ -55,23 +56,35 @@ object SummaryReport {
     )
   }
 
-  /** Gets the score of a given [[Vulnerability]], if exists
+  /** Processes a vulnerability to include in a report
+    *
+    * If it's a failing vulnerability, it will output the line in yellow.
+    *
+    * @param v vulnerability to report
+    * @param failCvssScore failing score
+    * @return vulnerability report line
     */
-  private def getScore(vulnerability: Vulnerability): Option[Double] =
-    Option(vulnerability.getCvssV2)
-      .map[Double](_.getCvssData.getBaseScore)
-      .orElse(
-        Option(vulnerability.getCvssV3).map[Double](_.getCvssData.getBaseScore)
+  private def processVulnerability(v: Vulnerability, failCvssScore: Double): String = {
+    val score = Seq(
+      Option(v.getCvssV2).map(s => s"CVSSv2 ${s.getCvssData.getBaseScore}"),
+      Option(v.getCvssV3).map(s => s"CVSSv3 ${s.getCvssData.getBaseScore}"),
+      Option(v.getUnscoredSeverity).map(s =>
+        s"Unscored (estimated) ${SeverityUtil.estimateCvssV2(s)}"
       )
-      .orElse(
-        Option(vulnerability.getUnscoredSeverity).map[Double](SeverityUtil.estimateCvssV2)
-      )
+    ).flatten.mkString(", ")
+
+    if (failingVulnerability(v, failCvssScore)) {
+      s"${scala.Console.YELLOW}${v.getName()}${scala.Console.RESET} (${scala.Console.YELLOW}${score}${scala.Console.RESET})"
+    } else {
+      s"${v.getName()} (${score})"
+    }
+  }
 
   /** Processes dependencies to be included in the report
     *
-    * @param dependencies scanned dependencies
+    * @param dependencies        scanned dependencies
     * @param reportVulnerability predicate to define if a [[Vulnerability]] should be shown or not in the summary
-    * @param summary [[StringBuilder]] used for aggregating the report
+    * @param summary             [[StringBuilder]] used for aggregating the report
     */
   private def dependencyProcessor(
       dependencies: Seq[Dependency],
@@ -82,17 +95,13 @@ object SummaryReport {
     dependencies.foreach { dependency =>
       if (!dependency.getVulnerabilities.isEmpty) {
         val formattedVulnerabilities =
-          dependency.getVulnerabilities(true).asScala.flatMap { vulnerability =>
-            getScore(vulnerability)
-              .filter(reportVulnerability(vulnerability, _))
-              .map(score =>
-                if (score >= failCvssScore) {
-                  s"${scala.Console.YELLOW}${vulnerability.getName()}${scala.Console.RESET} (${scala.Console.YELLOW}${score}${scala.Console.RESET})"
-                } else {
-                  s"${vulnerability.getName()} (${score})"
-                }
-              )
-          }
+          dependency
+            .getVulnerabilities(true)
+            .asScala
+            .collect {
+              case v if reportVulnerability(v, failCvssScore) =>
+                processVulnerability(v, failCvssScore)
+            }
 
         if (formattedVulnerabilities.nonEmpty) {
           summary
@@ -160,7 +169,7 @@ object SummaryReport {
 
       dependencyProcessor(
         dependencies,
-        (_, score) => score >= failCvssScore,
+        failingVulnerability,
         failCvssScore,
         summary
       )
