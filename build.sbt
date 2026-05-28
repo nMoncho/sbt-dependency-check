@@ -57,7 +57,7 @@ lazy val root = (project in file("."))
         // and to be able to use glob expressions on scripted tests due to
         // SBT 1.x and 2.x target files being on different paths
         case "2.12" => "1.10.7"
-        case "3" => "2.0.0-RC6"
+        case "3" => "2.0.0-RC13"
       }
     },
     crossScalaVersions += "3.8.3",
