@@ -16,7 +16,8 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.13.15"
 )
 
-lazy val root = project.in(file("."))
+lazy val root = project
+  .in(file("."))
   .aggregate(core)
   .settings(commonSettings)
   .settings(
@@ -56,7 +57,8 @@ lazy val root = project.in(file("."))
     }
   )
 
-lazy val core = project.in(file("core"))
+lazy val core = project
+  .in(file("core"))
   .settings(commonSettings)
   .settings(
     libraryDependencies += "org.apache.commons" % "commons-collections4" % "4.1",
@@ -67,7 +69,8 @@ lazy val core = project.in(file("core"))
     )
   )
 
-lazy val inScope = project.in(file("inScope"))
+lazy val inScope = project
+  .in(file("inScope"))
   .settings(commonSettings)
   .settings(
     libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.9",

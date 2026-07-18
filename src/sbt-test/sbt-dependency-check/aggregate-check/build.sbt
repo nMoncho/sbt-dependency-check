@@ -18,7 +18,8 @@ ThisBuild / dependencyCheckNvdApi := sys.env
   .map(key => NvdApiSettings(key))
   .getOrElse(NvdApiSettings.Default)
 
-lazy val root = project.in(file("."))
+lazy val root = project
+  .in(file("."))
   .aggregate(core)
   .settings(commonSettings)
   .settings(
@@ -65,7 +66,8 @@ lazy val root = project.in(file("."))
     }
   )
 
-lazy val util = project.in(file("util"))
+lazy val util = project
+  .in(file("util"))
   .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
@@ -81,7 +83,8 @@ lazy val core = project
     libraryDependencies += "org.apache.commons" % "commons-collections4" % "4.1"
   )
 
-lazy val ignore = project.in(file("ignore"))
+lazy val ignore = project
+  .in(file("ignore"))
   .settings(commonSettings)
   .settings(
     libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.9"
