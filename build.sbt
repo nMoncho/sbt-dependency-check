@@ -50,7 +50,7 @@ lazy val root = (project in file("."))
       log4jSf4jImpl   % Test,
       mockito         % Test
     ),
-    addSbtPlugin("com.github.sbt" % "sbt2-compat" % "0.1.0"),
+    addSbtPlugin("com.github.sbt" % "sbt2-compat" % "0.2.0"),
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
         // set minimum sbt version so we have `sbtPluginPublishLegacyMavenStyle`
