@@ -1,7 +1,7 @@
 import sbt.*
 
 object Dependencies {
-  lazy val dependencyCheck = "org.owasp"                % "dependency-check-core" % "12.2.2"
+  lazy val dependencyCheck = "org.owasp"                % "dependency-check-core" % "13.0.0"
   lazy val munit           = "org.scalameta"           %% "munit"                 % "1.3.3"
   lazy val munitScalaCheck = "org.scalameta"           %% "munit-scalacheck"      % "1.3.0"
   lazy val log4jSf4jImpl   = "org.apache.logging.log4j" % "log4j-slf4j2-impl"     % "2.26.0"
