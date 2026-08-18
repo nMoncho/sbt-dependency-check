@@ -168,15 +168,8 @@ object SuppressionRule {
     */
   case class PropertyType(value: String, regex: Boolean, caseSensitive: Boolean) {
 
-    def toOwasp: OwaspPropertyType = {
-      val prop = new OwaspPropertyType()
-
-      prop.setValue(value)
-      prop.setRegex(regex)
-      prop.setCaseSensitive(caseSensitive)
-
-      prop
-    }
+    def toOwasp: OwaspPropertyType =
+      new OwaspPropertyType(value, regex, caseSensitive)
 
   }
 

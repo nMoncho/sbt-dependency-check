@@ -11,19 +11,13 @@ import org.owasp.dependencycheck.utils.Settings.KEYS._
 
 /** Proxy Settings
   *
-  * @param disableSchemas Whether or not if using basic auth with a proxy the system setting
-  *                       'jdk.http.auth.tunneling.disabledSchemes' should be set to an empty
-  *                       string.
   * @param nonProxyHosts The properties key for the non proxy hosts.
   */
 case class ProxySettings(
-    @deprecated("No longer used; will be removed in a future release")
-    disableSchemas: Option[Boolean],
     nonProxyHosts: Option[Seq[String]]
 ) {
 
   def apply(settings: Settings): Unit = {
-    settings.set(PROXY_DISABLE_SCHEMAS, disableSchemas)
     settings.set(PROXY_NON_PROXY_HOSTS, nonProxyHosts)
 
     val httpsProxyHost = sys.props.get("https.proxyHost")
@@ -45,11 +39,8 @@ case class ProxySettings(
 }
 
 object ProxySettings {
-  val Default: ProxySettings = new ProxySettings(None, None)
+  val Default: ProxySettings = new ProxySettings(None)
 
-  def apply(
-      disableSchemas: Option[Boolean]    = None,
-      nonProxyHosts: Option[Seq[String]] = None
-  ): ProxySettings =
-    new ProxySettings(disableSchemas, nonProxyHosts)
+  def apply(nonProxyHosts: Option[Seq[String]] = None): ProxySettings =
+    new ProxySettings(nonProxyHosts)
 }

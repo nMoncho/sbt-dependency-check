@@ -81,7 +81,7 @@ class ListSettingsSuite extends munit.FunSuite {
       |	analyzer.nexus.enabled: false
       |	analyzer.nexus.password: null
       |	analyzer.nexus.proxy: true
-      |	analyzer.nexus.url: https://repository.sonatype.org/service/local/
+      |	analyzer.nexus.url: null
       |	analyzer.nexus.username: null
       |	analyzer.node.audit.enabled: true
       |	analyzer.node.audit.skipdev: null
@@ -136,8 +136,6 @@ class ListSettingsSuite extends munit.FunSuite {
       |	central.content.username: null
       |	connection.read.timeout: null
       |	connection.timeout: null
-      |	cpe.url: null
-      |	cpe.validfordays: null
       |	cve.cpe.startswith.filter: cpe:2.3:a:
       |	data.connection_string: jdbc:h2:file:%s;AUTOCOMMIT=ON;CACHE_SIZE=65536;RETENTION_TIME=1000;MAX_COMPACT_TIME=10000;
       |	data.directory: [JAR]/data/11.0
@@ -151,8 +149,6 @@ class ListSettingsSuite extends munit.FunSuite {
       |	data.writelock.shutdownhook: org.owasp.dependencycheck.utils.WriteLockCleanupHook
       |	database.batchinsert.enabled: true
       |	database.batchinsert.maxsize: 1000
-      |	downloader.quick.query.timestamp: true
-      |	downloader.tls.protocols: TLSv1.1,TLSv1.2,TLSv1.3
       |	ecosystem.skip.cpeanalyzer: npm
       |	engine.version.url: https://dependency-check.github.io/DependencyCheck/current.txt
       |	extensions.zip: null
@@ -180,21 +176,20 @@ class ListSettingsSuite extends munit.FunSuite {
       |	nvd.api.datafeed.validfordays: 7
       |	nvd.api.delay: 0
       |	nvd.api.endpoint: null
-      |	nvd.api.key: null
+      |	nvd.api.key: ********
       |	nvd.api.max.retry.count: 30
       |	nvd.api.requestsperthirtysecondswithapikey: 50
       |	nvd.api.requestsperthirtysecondswithoutapikey: 5
       |	nvd.api.results.per.page: null
       |	odc.analysis.timeout: 180
       |	odc.application.name: Dependency-Check Core
-      |	odc.application.version: 12.2.2
+      |	odc.application.version: 13.0.0
       |	odc.autoupdate: true
       |	odc.ecosystem.maxquerylimit.: null
       |	odc.ecosystem.maxquerylimit.default: 100
       |	odc.maven.local.repo: null
       |	odc.reports.pretty.print: false
       |	odc.settings.mask: .*password.*,.*token.*,.*api.key.*
-      |	proxy.disableSchemas: null
       |	proxy.nonproxyhosts: null
       |	proxy.password: null
       |	proxy.port: null
@@ -207,11 +202,6 @@ class ListSettingsSuite extends munit.FunSuite {
       |	temp.directory: null
       |	updater.nvdcve.enabled: true
       |	updater.versioncheck.enabled: true
-      |	vfeed.connection_string: null
-      |	vfeed.data_file: null
-      |	vfeed.download_file: null
-      |	vfeed.download_url: null
-      |	vfeed.update_status: null
       |
       |""".stripMargin
 }
