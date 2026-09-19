@@ -38,11 +38,19 @@ lazy val root = (project in file("."))
     ),
     semanticdbEnabled := true,
     semanticdbVersion := scalafixSemanticdb.revision,
-    scalacOptions := (Opts.compile.encoding("UTF-8") :+
-      Opts.compile.deprecation :+
-      Opts.compile.unchecked :+
-      "-feature" :+
-      "-Ywarn-unused"),
+    scalacOptions := {
+      val shared = Opts.compile.encoding("UTF-8") :+
+        Opts.compile.deprecation :+
+        Opts.compile.unchecked :+
+        "-feature"
+
+      // `-Ywarn-unused` is a Scala 2 spelling that Scala 3 ignores; use its Scala 3 equivalent so
+      // unused-symbol linting applies on both cross-versions.
+      shared ++ (scalaBinaryVersion.value match {
+        case "2.12" => Seq("-Ywarn-unused")
+        case "3" => Seq("-Wunused:all")
+      })
+    },
     libraryDependencies ++= Seq(
       dependencyCheck,
       munit           % Test,
