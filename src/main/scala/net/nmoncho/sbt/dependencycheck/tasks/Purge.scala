@@ -14,10 +14,8 @@ import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.engineSettings
 import org.owasp.dependencycheck.Engine
 import org.owasp.dependencycheck.utils.Settings
 import org.owasp.dependencycheck.utils.Settings.KEYS
-import sbt.Def
 import sbt.Keys.streams
-import sbt.Logger
-import sbt.Task
+import sbt._
 
 /** Purges DependencyCheck Cached Web Data Sources
   */
@@ -30,7 +28,10 @@ object Purge {
       engine.purge()
       Purge(engine)
     }
-  }
+    // Tagged NonParallel so it is serialized with every other `withEngine` caller under the exclusive
+    // NonParallel restriction, preventing a concurrent untagged engine task (e.g. a fanned-out Update)
+    // from racing on the process-global `Downloader` singleton and the shared NVD data directory.
+  } tag NonParallel
 
   def apply(engine: Engine)(implicit log: Logger): Unit = {
     val settings = engine.getSettings
