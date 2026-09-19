@@ -71,4 +71,33 @@ package object dependencycheck {
         v.getUnscoredSeverity
       ) >= failCvssScore) ||
       (failCvssScore <= 0.0f)
+
+  /** Policy describing which vulnerabilities should fail the build.
+    *
+    * A vulnerability fails the build when it meets the CVSS threshold, or its id is in the must-fail
+    * CVE list, or it is a Known Exploited Vulnerability and failing on those is enabled.
+    *
+    * @param failCvssScore CVSS score at or above which a vulnerability fails the build
+    * @param failOnCves CVE ids that must always fail the build, regardless of their score
+    * @param failOnKnownExploited whether any Known Exploited Vulnerability (KEV) should fail the build
+    */
+  final case class FailurePolicy(
+      failCvssScore: Double,
+      failOnCves: Set[String],
+      failOnKnownExploited: Boolean
+  ) {
+
+    /** @return true if the given vulnerability should fail the build under this policy */
+    def isFailing(v: Vulnerability): Boolean =
+      failingVulnerability(v, failCvssScore) ||
+        failOnCves.contains(v.getName) ||
+        (failOnKnownExploited && v.getKnownExploitedVulnerability != null)
+  }
+
+  object FailurePolicy {
+
+    /** A policy that gates the build on the CVSS threshold only (the historical behaviour). */
+    def cvssOnly(failCvssScore: Double): FailurePolicy =
+      FailurePolicy(failCvssScore, Set.empty, failOnKnownExploited = false)
+  }
 }

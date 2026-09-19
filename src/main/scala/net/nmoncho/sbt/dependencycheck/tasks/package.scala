@@ -141,7 +141,8 @@ package object tasks {
       dependencies: Set[Attributed[File]],
       suppressionRules: Set[SuppressionRule],
       scanSet: Seq[File],
-      failCvssScore: Double,
+      failurePolicy: FailurePolicy,
+      warnOnly: Boolean,
       outputDir: File,
       reportFormats: Seq[Format],
       summaryReport: SummaryReport
@@ -166,7 +167,7 @@ package object tasks {
       )
     }
 
-    failOnFoundVulnerabilities(failCvssScore, engine, projectName, summaryReport)
+    failOnFoundVulnerabilities(failurePolicy, warnOnly, engine, projectName, summaryReport)
   }
 
   private def addSuppressionRules(rules: Set[SuppressionRule], engine: Engine)(
@@ -256,7 +257,8 @@ package object tasks {
     }
 
   private def failOnFoundVulnerabilities(
-      failCvssScore: Double,
+      failurePolicy: FailurePolicy,
+      warnOnly: Boolean,
       engine: Engine,
       name: String,
       summaryReport: SummaryReport
@@ -264,15 +266,21 @@ package object tasks {
     import scala.jdk.CollectionConverters.*
 
     val hasFailingVulnerabilities = engine.getDependencies.exists { p =>
-      p.getVulnerabilities.asScala.exists(failingVulnerability(_, failCvssScore))
+      p.getVulnerabilities.asScala.exists(failurePolicy.isFailing)
     }
 
     if (hasFailingVulnerabilities) {
-      SummaryReport.showSummary(name, engine.getDependencies, failCvssScore, summaryReport)
+      SummaryReport.showSummary(name, engine.getDependencies, failurePolicy, summaryReport)
 
-      throw new VulnerabilityFoundException(
-        s"Vulnerability with CVSS score higher than [$failCvssScore] found"
-      )
+      if (warnOnly) {
+        log.warn(
+          s"Vulnerabilities failing the configured policy were found in [$name], but 'dependencyCheckWarnOnly' is enabled so the build will not fail."
+        )
+      } else {
+        throw new VulnerabilityFoundException(
+          s"Vulnerability failing the configured policy found (CVSS threshold [${failurePolicy.failCvssScore}])"
+        )
+      }
     }
   }
 

@@ -18,13 +18,13 @@ import sbt.Logger
   */
 trait SummaryReport {
 
-  /** Builds an analysis summary using the scanned dependencies and the failing CVSS Score
+  /** Builds an analysis summary using the scanned dependencies and the build-failure policy
     *
-    * @param dependencies  scanned dependencies
-    * @param failCvssScore failing CVSS Score
+    * @param dependencies scanned dependencies
+    * @param policy       policy deciding which vulnerabilities fail the build
     * @return
     */
-  def buildSummary(dependencies: Seq[Dependency], failCvssScore: Double): String
+  def buildSummary(dependencies: Seq[Dependency], policy: FailurePolicy): String
 
 }
 
@@ -36,19 +36,19 @@ object SummaryReport {
     *
     * @param name          project name
     * @param dependencies  scanned dependencies
-    * @param failCvssScore failing CVSS Score
+    * @param policy        policy deciding which vulnerabilities fail the build
     * @param report        report type
     * @param log           logger
     */
   def showSummary(
       name: String,
       dependencies: Seq[Dependency],
-      failCvssScore: Double,
+      policy: FailurePolicy,
       report: SummaryReport
   )(
       implicit log: Logger
   ): Unit = {
-    val summary = report.buildSummary(dependencies, failCvssScore)
+    val summary = report.buildSummary(dependencies, policy)
 
     log.warn(
       s"\n\nOne or more dependencies were identified with known vulnerabilities in [$name]:\n\n${summary}" +
@@ -61,10 +61,10 @@ object SummaryReport {
     * If it's a failing vulnerability, it will output the line in yellow.
     *
     * @param v vulnerability to report
-    * @param failCvssScore failing score
+    * @param policy policy deciding which vulnerabilities fail the build
     * @return vulnerability report line
     */
-  private def processVulnerability(v: Vulnerability, failCvssScore: Double): String = {
+  private def processVulnerability(v: Vulnerability, policy: FailurePolicy): String = {
     val score = Seq(
       Option(v.getCvssV2).map(s => s"CVSSv2 ${s.getCvssData.getBaseScore}"),
       Option(v.getCvssV3).map(s => s"CVSSv3 ${s.getCvssData.getBaseScore}"),
@@ -74,7 +74,7 @@ object SummaryReport {
       )
     ).flatten.mkString(", ")
 
-    if (failingVulnerability(v, failCvssScore)) {
+    if (policy.isFailing(v)) {
       s"${scala.Console.YELLOW}${v.getName()}${scala.Console.RESET} (${scala.Console.YELLOW}${score}${scala.Console.RESET})"
     } else {
       s"${v.getName()} (${score})"
@@ -89,8 +89,8 @@ object SummaryReport {
     */
   private def dependencyProcessor(
       dependencies: Seq[Dependency],
-      reportVulnerability: (Vulnerability, Double) => Boolean,
-      failCvssScore: Double,
+      reportVulnerability: (Vulnerability, FailurePolicy) => Boolean,
+      policy: FailurePolicy,
       summary: StringBuilder
   ): Unit =
     dependencies.foreach { dependency =>
@@ -100,8 +100,8 @@ object SummaryReport {
             .getVulnerabilities(true)
             .asScala
             .collect {
-              case v if reportVulnerability(v, failCvssScore) =>
-                processVulnerability(v, failCvssScore)
+              case v if reportVulnerability(v, policy) =>
+                processVulnerability(v, policy)
             }
 
         if (formattedVulnerabilities.nonEmpty) {
@@ -124,7 +124,7 @@ object SummaryReport {
     */
   object Original extends SummaryReport {
 
-    override def buildSummary(dependencies: Seq[Dependency], failCvssScore: Double): String = {
+    override def buildSummary(dependencies: Seq[Dependency], policy: FailurePolicy): String = {
       val summary = StringBuilder.newBuilder
 
       dependencies.foreach { d =>
@@ -151,10 +151,10 @@ object SummaryReport {
     */
   object AllVulnerabilities extends SummaryReport {
 
-    override def buildSummary(dependencies: Seq[Dependency], failCvssScore: Double): String = {
+    override def buildSummary(dependencies: Seq[Dependency], policy: FailurePolicy): String = {
       val summary = StringBuilder.newBuilder
 
-      dependencyProcessor(dependencies, (_, _) => true, failCvssScore, summary)
+      dependencyProcessor(dependencies, (_, _) => true, policy, summary)
 
       summary.toString()
     }
@@ -165,13 +165,13 @@ object SummaryReport {
     */
   object OffendingVulnerabilities extends SummaryReport {
 
-    override def buildSummary(dependencies: Seq[Dependency], failCvssScore: Double): String = {
+    override def buildSummary(dependencies: Seq[Dependency], policy: FailurePolicy): String = {
       val summary = StringBuilder.newBuilder
 
       dependencyProcessor(
         dependencies,
-        failingVulnerability,
-        failCvssScore,
+        (v, p) => p.isFailing(v),
+        policy,
         summary
       )
 

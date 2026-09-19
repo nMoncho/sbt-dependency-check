@@ -22,6 +22,15 @@ object Keys {
     settingKey(
       "If using the jUnit, specifies the CVSS score that is considered a \"test\" failure when generating a jUnit style report. The default value is 0 - all vulnerabilities are considered a failure."
     )
+  lazy val dependencyCheckFailOnCves: SettingKey[Seq[String]] = settingKey(
+    "CVE ids (e.g. \"CVE-2021-44228\") that must always fail the build when found, regardless of their CVSS score. Defaults to an empty list."
+  )
+  lazy val dependencyCheckFailOnKnownExploited: SettingKey[Boolean] = settingKey(
+    "If true, the build fails when any dependency has a Known Exploited Vulnerability (KEV), regardless of its CVSS score. Requires the Known Exploited Vulnerabilities analyzer (enabled by default). Defaults to false."
+  )
+  lazy val dependencyCheckWarnOnly: SettingKey[Boolean] = settingKey(
+    "If true, vulnerabilities that would fail the build are reported (summary and report) but do not fail the build. Defaults to false."
+  )
   lazy val dependencyCheckSkip: SettingKey[Boolean] = settingKey(
     "Skips this project on the dependency-check analysis."
   )
