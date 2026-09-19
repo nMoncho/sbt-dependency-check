@@ -28,7 +28,9 @@ class DbSuite extends munit.FunSuite {
       nvdApiKey <- envOrNone("NVD_API_KEY")
     } yield {
       // Do not log the NVD API key itself; only report that one was provided.
-      println(s"Generating CVE Cache on folder [$folder] (NVD API key present: ${nvdApiKey.nonEmpty})")
+      println(
+        s"Generating CVE Cache on folder [$folder] (NVD API key present: ${nvdApiKey.nonEmpty})"
+      )
 
       val settings = new Settings()
       settings.setStringIfNotEmpty(DATA_DIRECTORY, folder)

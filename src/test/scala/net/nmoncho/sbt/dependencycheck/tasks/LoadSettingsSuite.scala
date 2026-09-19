@@ -7,14 +7,18 @@
 package net.nmoncho.sbt.dependencycheck.tasks
 
 import java.io.File
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
 import java.time.Duration
 
+import net.nmoncho.sbt.dependencycheck.Utils.StringLogger
+import net.nmoncho.sbt.dependencycheck.settings.ScopesSettings
 import org.owasp.dependencycheck.utils.Settings
 import org.owasp.dependencycheck.utils.Settings.KEYS._
 
-/** Tests for [[LoadSettings.applyBaseSettings]], the aggregation point that applies the top-level
-  * plugin settings onto the OWASP [[Settings]] and performs unit conversions (durations to
-  * millis/minutes, CVSS to float).
+/** Tests for [[LoadSettings]]: `applyBaseSettings` (the aggregation point that applies the top-level
+  * plugin settings and performs unit conversions) and `loadBaseSettings` (which must preserve the
+  * OWASP secret mask when a user properties file is supplied).
   */
 class LoadSettingsSuite extends munit.FunSuite {
 
@@ -74,5 +78,35 @@ class LoadSettingsSuite extends munit.FunSuite {
       assertEquals(settings.getString(ANALYSIS_TIMEOUT), "180", "analysis timeout default")
       assertEquals(settings.getString(JUNIT_FAIL_ON_CVSS), "0", "junit fail on cvss default")
     } finally settings.cleanup(true)
+  }
+
+  test("loadBaseSettings keeps the secret mask when a user properties file omits it") {
+    implicit val log: StringLogger = new StringLogger
+
+    // A user-supplied properties file that carries a secret but does NOT define odc.settings.mask.
+    val file = Files.createTempFile("dependencycheck", ".properties")
+    Files.write(file, "nvd.api.key=super-secret-key\n".getBytes(StandardCharsets.UTF_8))
+
+    val settings = LoadSettings.loadBaseSettings(file.toFile)
+    try {
+      // The user's override is applied...
+      assertEquals(settings.getString(NVD_API_KEY), "super-secret-key", "user override applied")
+      // ...and the bundled defaults survive (merge, not replace)...
+      assertEquals(settings.getString(DB_DRIVER_NAME), "org.h2.Driver", "bundled default preserved")
+      // ...including the mask, so the key is not empty.
+      assert(
+        Option(settings.getArray(MASKED_PROPERTIES)).exists(_.nonEmpty),
+        "odc.settings.mask must be preserved from the bundled defaults"
+      )
+
+      // And dependencyCheckListSettings must mask, not print, the secret.
+      ListSettings(settings, ScopesSettings.Default)
+      val output = log.sb.result()
+      assert(output.contains("nvd.api.key: ********"), s"nvd.api.key must be masked:\n$output")
+      assert(!output.contains("super-secret-key"), "the secret value must never be printed")
+    } finally {
+      settings.cleanup(true)
+      Files.deleteIfExists(file)
+    }
   }
 }
