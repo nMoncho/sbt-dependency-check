@@ -101,10 +101,34 @@ package object tasks {
       }
 
     } finally {
-      engine.close()
-      engine.getSettings.cleanup(true)
-      Thread.currentThread().setContextClassLoader(oldClassLoader)
+      cleanupEngine(engine, oldClassLoader)
     }
+  }
+
+  /** Closes the engine, cleans up its settings, and restores the thread context classloader.
+    *
+    * Each step is guarded independently so a failure in one does not skip the others. In particular
+    * the classloader restore must always run: the context classloader is swapped on a reused sbt
+    * worker thread, so a skipped restore could corrupt later tasks. Guarding also prevents a
+    * secondary cleanup failure from masking the primary exception being propagated out of
+    * [[withEngine]]'s `try`.
+    */
+  private[tasks] def cleanupEngine(engine: Engine, oldClassLoader: ClassLoader)(
+      implicit log: Logger
+  ): Unit = {
+    try engine.close()
+    catch {
+      case NonFatal(t) =>
+        log.warn(s"Failed to close the dependency-check engine: ${t.getMessage}")
+    }
+
+    try engine.getSettings.cleanup(true)
+    catch {
+      case NonFatal(t) =>
+        log.warn(s"Failed to clean up the dependency-check settings: ${t.getMessage}")
+    }
+
+    Thread.currentThread().setContextClassLoader(oldClassLoader)
   }
 
   def logAddDependencies(
