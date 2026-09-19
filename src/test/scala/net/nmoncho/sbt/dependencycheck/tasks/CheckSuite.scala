@@ -12,7 +12,9 @@ package net.nmoncho.sbt.dependencycheck.tasks
   */
 class CheckSuite extends munit.FunSuite {
 
-  test("all-projects always selects the combined all-projects report, with or without single-report") {
+  test(
+    "all-projects always selects the combined all-projects report, with or without single-report"
+  ) {
     assertEquals(
       Check.selectProjectMode(allProjects = true, singleReport = false),
       ProjectSelection.AllProjects

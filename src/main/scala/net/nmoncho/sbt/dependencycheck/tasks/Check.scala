@@ -47,7 +47,8 @@ object Check {
   private case class CheckSettings(
       name: String,
       scopes: ScopesSettings,
-      failureScore: Double,
+      failurePolicy: FailurePolicy,
+      warnOnly: Boolean,
       scanSet: Seq[File],
       engineSettings: org.owasp.dependencycheck.utils.Settings,
       dependencies: Set[Attributed[File]],
@@ -110,7 +111,8 @@ object Check {
                   checkSettings.dependencies,
                   checkSettings.suppressions,
                   checkSettings.scanSet,
-                  checkSettings.failureScore,
+                  checkSettings.failurePolicy,
+                  checkSettings.warnOnly,
                   checkSettings.outputDirectory,
                   checkSettings.reportFormats,
                   summary
@@ -158,7 +160,12 @@ object Check {
     CheckSettings(
       name.value,
       dependencyCheckScopes.value,
-      dependencyCheckFailBuildOnCVSS.value,
+      FailurePolicy(
+        dependencyCheckFailBuildOnCVSS.value,
+        dependencyCheckFailOnCves.value.toSet,
+        dependencyCheckFailOnKnownExploited.value
+      ),
+      dependencyCheckWarnOnly.value,
       scanSet.value,
       engineSettings.value,
       AllProjectsCheck.dependencies().value,
@@ -172,7 +179,12 @@ object Check {
     CheckSettings(
       name.value,
       dependencyCheckScopes.value,
-      dependencyCheckFailBuildOnCVSS.value,
+      FailurePolicy(
+        dependencyCheckFailBuildOnCVSS.value,
+        dependencyCheckFailOnCves.value.toSet,
+        dependencyCheckFailOnKnownExploited.value
+      ),
+      dependencyCheckWarnOnly.value,
       scanSet.value,
       engineSettings.value,
       AggregateCheck.dependencies().value,
@@ -198,7 +210,12 @@ object Check {
             CheckSettings(
               name.value,
               dependencyCheckScopes.value,
-              dependencyCheckFailBuildOnCVSS.value,
+              FailurePolicy(
+                dependencyCheckFailBuildOnCVSS.value,
+                dependencyCheckFailOnCves.value.toSet,
+                dependencyCheckFailOnKnownExploited.value
+              ),
+              dependencyCheckWarnOnly.value,
               scanSet.value,
               engineSettings.value,
               Dependencies.projectDependencies.value,
