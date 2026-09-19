@@ -50,6 +50,16 @@ jobs:
       - name: Test Coverage
         run: sbt testCoverage
 
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: scoverage-report
+          path: |
+            **/scoverage-report/**
+            **/coverage-report/**
+          if-no-files-found: warn
+
       - name: Save generated CVE Database
         id: save-cve-db
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
