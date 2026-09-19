@@ -9,7 +9,9 @@ package net.nmoncho.sbt.dependencycheck
 import io.github.jeremylong.openvulnerability.client.nvd.CvssV3
 import io.github.jeremylong.openvulnerability.client.nvd.CvssV3Data
 import org.mockito.Mockito._
-import org.owasp.dependencycheck.data.knownexploited.json.{ Vulnerability => KnownExploitedVulnerability }
+import org.owasp.dependencycheck.data.knownexploited.json.{
+  Vulnerability => KnownExploitedVulnerability
+}
 import org.owasp.dependencycheck.dependency.Vulnerability
 
 /** Tests for [[FailurePolicy]], which extends build gating beyond the single CVSS threshold with a
@@ -57,7 +59,10 @@ class FailurePolicySuite extends munit.FunSuite {
 
     assert(enabled.isFailing(vuln(knownExploited = true)), "KEV must fail when enabled")
     assert(!disabled.isFailing(vuln(knownExploited = true)), "KEV must not fail when disabled")
-    assert(!enabled.isFailing(vuln(knownExploited = false)), "non-KEV must not fail on the KEV rule")
+    assert(
+      !enabled.isFailing(vuln(knownExploited = false)),
+      "non-KEV must not fail on the KEV rule"
+    )
   }
 
   test("still gates on the CVSS threshold") {

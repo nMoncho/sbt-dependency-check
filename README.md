@@ -128,6 +128,25 @@ some configuration convenience.
 
 > **Build gating:** `dependencyCheckFailBuildOnCVSS` defaults to `11.0`, so out of the box the build is never failed by a vulnerability (CVSS scores range from 0 to 10). To gate CI on findings, set a starting threshold such as `dependencyCheckFailBuildOnCVSS := 7.0` (fail on High and Critical), and/or use the policy settings `dependencyCheckFailOnKnownExploited := true` and `dependencyCheckFailOnCves := Seq("CVE-...")`. Use `dependencyCheckWarnOnly := true` to surface findings without failing the build while you tune a policy.
 
+#### Report Formats
+
+`dependencyCheckFormats` selects which reports are written. The default is `HTML` only, which is convenient
+for humans but not for CI ingestion. The available formats are re-exported through the plugin's `Format`
+value, so no OWASP import is needed:
+
+```scala
+dependencyCheckFormats := Seq(Format.HTML, Format.SARIF)
+```
+
+Available formats: `HTML`, `XML`, `JSON`, `CSV`, `JUNIT`, `SARIF`, `JENKINS`, `GITLAB`, `ALL`.
+
+For CI, generate a machine-readable format alongside `HTML`:
+
+- **GitHub code scanning**: generate `SARIF` and upload `dependency-check-report.sarif` with the
+  `github/codeql-action/upload-sarif` action, so findings appear in the repository's Security tab.
+- **GitLab dependency scanning**: generate `GITLAB` to produce a report GitLab can ingest.
+- **Generic CI or dashboards**: generate `JSON` or `XML` for programmatic processing.
+
 #### Sensitive Configuration
 
 `DependencyCheck` may use sensitive information like usernames, passwords, and Bearer Tokens. Although these could be
