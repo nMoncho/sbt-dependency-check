@@ -80,5 +80,11 @@ lazy val root = (project in file("."))
       Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
     },
     scriptedBufferLog := false,
-    Test / testOptions += Tests.Argument("-F") // Show full stack trace
+    Test / testOptions += Tests.Argument("-F"), // Show full stack trace
+    // Coverage gate: fail the build when coverage regresses below these floors. They are set just
+    // below the current numbers (statement 82.93%, branch 69.53%) to leave a little headroom; raise
+    // them over time as coverage improves. `testCoverage` runs `coverageReport`, which enforces this.
+    coverageMinimumStmtTotal := 80.0,
+    coverageMinimumBranchTotal := 65.0,
+    coverageFailOnMinimum := true
   )
