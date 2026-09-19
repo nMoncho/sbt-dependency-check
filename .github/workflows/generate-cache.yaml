@@ -18,15 +18,15 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up JDK 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'sbt'
 
-      - uses: sbt/setup-sbt@v1
+      - uses: sbt/setup-sbt@82da71df4e122282484a99a8d70096bc2369dbd8 # v1.5.9
 
       - name: Create CVE Database folder (optional, but robust)
         run: mkdir -p cve-data
@@ -36,7 +36,7 @@ jobs:
 
       - name: Save generated CVE Database
         id: restore-cve-db
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: cve-data
           key: ${{ runner.os }}-cve-cache
