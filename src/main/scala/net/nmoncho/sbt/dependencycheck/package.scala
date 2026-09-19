@@ -66,6 +66,7 @@ package object dependencycheck {
   def failingVulnerability(v: Vulnerability, failCvssScore: Double): Boolean =
     (v.getCvssV2 != null && v.getCvssV2.getCvssData.getBaseScore >= failCvssScore) ||
       (v.getCvssV3 != null && v.getCvssV3.getCvssData.getBaseScore >= failCvssScore) ||
+      (v.getCvssV4 != null && v.getCvssV4.getCvssData.getBaseScore >= failCvssScore) ||
       (v.getUnscoredSeverity != null && SeverityUtil.estimateCvssV2(
         v.getUnscoredSeverity
       ) >= failCvssScore) ||

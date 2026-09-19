@@ -68,6 +68,7 @@ object SummaryReport {
     val score = Seq(
       Option(v.getCvssV2).map(s => s"CVSSv2 ${s.getCvssData.getBaseScore}"),
       Option(v.getCvssV3).map(s => s"CVSSv3 ${s.getCvssData.getBaseScore}"),
+      Option(v.getCvssV4).map(s => s"CVSSv4 ${s.getCvssData.getBaseScore}"),
       Option(v.getUnscoredSeverity).map(s =>
         s"Unscored (estimated) ${SeverityUtil.estimateCvssV2(s)}"
       )
