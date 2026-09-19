@@ -25,7 +25,7 @@ case class SuppressionFilesSettings(
     bearerToken: Option[String]
 ) {
 
-  def apply(settings: Settings): Unit = {
+  def configure(settings: Settings): Unit = {
     settings.set(SUPPRESSION_FILE, files)
     settings.set(SUPPRESSION_FILE_USER, user)
     settings.set(SUPPRESSION_FILE_PASSWORD, password)

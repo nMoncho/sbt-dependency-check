@@ -35,7 +35,7 @@ case class DatabaseSettings(
     batchInsertSize: Option[Int]        = None
 ) {
 
-  def apply(settings: Settings): Unit = {
+  def configure(settings: Settings): Unit = {
     settings.set(DB_DRIVER_NAME, driverName)
     settings.set(DB_DRIVER_PATH, driverPath)
     settings.set(DB_CONNECTION_STRING, connectionString)

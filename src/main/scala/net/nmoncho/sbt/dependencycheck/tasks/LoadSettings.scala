@@ -48,10 +48,10 @@ object LoadSettings {
       dependencyCheckDataDirectory.value
     )
 
-    dependencyCheckAnalyzers.value(baseSettings)
-    dependencyCheckDatabase.value(baseSettings)
-    dependencyCheckNvdApi.value(baseSettings)
-    dependencyCheckSuppressions.value(baseSettings)
+    dependencyCheckAnalyzers.value.configure(baseSettings)
+    dependencyCheckDatabase.value.configure(baseSettings)
+    dependencyCheckNvdApi.value.configure(baseSettings)
+    dependencyCheckSuppressions.value.configure(baseSettings)
 
     baseSettings
   }

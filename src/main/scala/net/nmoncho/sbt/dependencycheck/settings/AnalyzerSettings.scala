@@ -45,7 +45,7 @@ import sbt._
   * @param openSslEnabled whether the OpenSSL analyzer is enabled.
   * @param ossIndex OSS Index Settings.
   * @param php PHP Settings.
-  * @param pnmp PNPM Settings.
+  * @param pnpm PNPM Settings.
   * @param python Python Settings.
   * @param retiredEnabled whether the retired analyzers are enabled.
   * @param retireJS RetireJS Settings.
@@ -87,7 +87,7 @@ case class AnalyzerSettings(
     openSslEnabled: Option[Boolean]                  = None,
     ossIndex: AnalyzerSettings.OssIndex              = AnalyzerSettings.OssIndex.Default,
     php: AnalyzerSettings.Php                        = AnalyzerSettings.Php.Default,
-    pnmp: AnalyzerSettings.Pnpm                      = AnalyzerSettings.Pnpm.Default,
+    pnpm: AnalyzerSettings.Pnpm                      = AnalyzerSettings.Pnpm.Default,
     python: AnalyzerSettings.Python                  = AnalyzerSettings.Python.Default,
     retiredEnabled: Option[Boolean]                  = None,
     retireJS: AnalyzerSettings.RetireJS              = AnalyzerSettings.RetireJS.Default,
@@ -98,7 +98,7 @@ case class AnalyzerSettings(
     yarn: AnalyzerSettings.Yarn                      = AnalyzerSettings.Yarn.Default
 ) {
 
-  def apply(settings: Settings): Unit = {
+  def configure(settings: Settings): Unit = {
     settings.set(ADDITIONAL_ZIP_EXTENSIONS, additionalZipExtensions.map(_.mkString(",")))
     settings.set(ANALYZER_ARCHIVE_ENABLED, archiveEnabled)
     settings.set(ANALYZER_AUTOCONF_ENABLED, autoconfEnabled)
@@ -122,24 +122,27 @@ case class AnalyzerSettings(
     settings.set(ANALYZER_VERSION_FILTER_ENABLED, versionFilterEnabled)
     settings.set(ANALYZER_VULNERABILITY_SUPPRESSION_ENABLED, vulnerabilitySuppressionEnabled)
 
-    artifactory(settings)
-    dotNet(settings)
-    elixir(settings)
-    golang(settings)
-    hints(settings)
-    knownExploitedVulnerabilities(settings)
-    mavenCentral(settings)
-    nexus(settings)
-    node(settings)
-    ossIndex(settings)
-    php(settings)
-    pnmp(settings)
-    python(settings)
-    retireJS(settings)
-    ruby(settings)
-    swift(settings)
-    yarn(settings)
+    artifactory.configure(settings)
+    dotNet.configure(settings)
+    elixir.configure(settings)
+    golang.configure(settings)
+    hints.configure(settings)
+    knownExploitedVulnerabilities.configure(settings)
+    mavenCentral.configure(settings)
+    nexus.configure(settings)
+    node.configure(settings)
+    ossIndex.configure(settings)
+    php.configure(settings)
+    pnpm.configure(settings)
+    python.configure(settings)
+    retireJS.configure(settings)
+    ruby.configure(settings)
+    swift.configure(settings)
+    yarn.configure(settings)
   }
+
+  @deprecated("Use `pnpm` instead (this misspelled accessor will be removed)", "2.1.0")
+  def pnmp: AnalyzerSettings.Pnpm = pnpm
 }
 
 object AnalyzerSettings {
@@ -166,7 +169,7 @@ object AnalyzerSettings {
       usesProxy: Option[Boolean]        = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_ARTIFACTORY_ENABLED, enabled)
       settings.set(ANALYZER_ARTIFACTORY_URL, url)
       settings.set(ANALYZER_ARTIFACTORY_PARALLEL_ANALYSIS, parallelAnalysis)
@@ -199,7 +202,7 @@ object AnalyzerSettings {
       msBuildProjectEnabled: Option[Boolean] = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_ASSEMBLY_ENABLED, assemblyEnabled)
       settings.set(ANALYZER_ASSEMBLY_DOTNET_PATH, assemblyPath)
       settings.set(ANALYZER_NUSPEC_ENABLED, nuspecEnabled)
@@ -223,7 +226,7 @@ object AnalyzerSettings {
       mixAuditPath: Option[File]       = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_MIX_AUDIT_ENABLED, mixAuditEnabled)
       settings.set(ANALYZER_MIX_AUDIT_PATH, mixAuditPath)
     }
@@ -245,7 +248,7 @@ object AnalyzerSettings {
       path: Option[File]                         = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_GOLANG_DEP_ENABLED, dependencyAnalyzerEnabled)
       settings.set(ANALYZER_GOLANG_MOD_ENABLED, moduleAnalyzerEnabled)
       settings.set(ANALYZER_GOLANG_PATH, path)
@@ -262,7 +265,7 @@ object AnalyzerSettings {
     * @param hintsFile path to the hints file
     */
   case class Hints(enabled: Option[Boolean] = None, hintsFile: Option[String] = None) {
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_HINT_ENABLED, enabled)
       settings.set(HINTS_FILE, hintsFile)
     }
@@ -297,7 +300,7 @@ object AnalyzerSettings {
       bearerToken: Option[String] = None,
       validForHours: Option[Int]  = None
   ) {
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_KNOWN_EXPLOITED_ENABLED, enabled)
       settings.set(KEV_URL, url)
       settings.set(KEV_USER, username)
@@ -335,7 +338,7 @@ object AnalyzerSettings {
       bearerToken: Option[String]       = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_CENTRAL_ENABLED, enabled)
       settings.set(ANALYZER_CENTRAL_URL, url)
       settings.set(ANALYZER_CENTRAL_QUERY, query)
@@ -369,7 +372,7 @@ object AnalyzerSettings {
       usesProxy: Option[Boolean] = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_NEXUS_ENABLED, enabled)
       settings.set(ANALYZER_NEXUS_URL, url)
       settings.set(ANALYZER_NEXUS_USER, username)
@@ -403,7 +406,7 @@ object AnalyzerSettings {
       npmCpeEnabled: Option[Boolean]              = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_NODE_AUDIT_ENABLED, auditEnabled)
       settings.set(ANALYZER_NODE_AUDIT_URL, auditUrl)
       settings.set(ANALYZER_NODE_AUDIT_SKIPDEV, auditSkipDevDependencies)
@@ -443,7 +446,7 @@ object AnalyzerSettings {
       password: Option[String]                = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_OSSINDEX_ENABLED, enabled)
       settings.set(ANALYZER_OSSINDEX_URL, url)
       settings.set(ANALYZER_OSSINDEX_BATCH_SIZE, batchSize)
@@ -470,7 +473,7 @@ object AnalyzerSettings {
       composerLockSkipDevDependencies: Option[Boolean] = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_COMPOSER_LOCK_ENABLED, composerLockEnabled)
       settings.set(ANALYZER_COMPOSER_LOCK_SKIP_DEV, composerLockSkipDevDependencies)
     }
@@ -490,7 +493,7 @@ object AnalyzerSettings {
       path: Option[File]            = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_PNPM_AUDIT_ENABLED, auditEnabled)
       settings.set(ANALYZER_PNPM_PATH, path)
     }
@@ -516,7 +519,7 @@ object AnalyzerSettings {
       poetryEnabled: Option[Boolean]       = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_PIP_ENABLED, pipEnabled)
       settings.set(ANALYZER_PIPFILE_ENABLED, pipFileEnabled)
 
@@ -555,7 +558,7 @@ object AnalyzerSettings {
       validForHours: Option[Int]           = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_RETIREJS_ENABLED, enabled)
       settings.set(ANALYZER_RETIREJS_REPO_JS_URL, url)
       settings.set(ANALYZER_RETIREJS_FORCEUPDATE, forceUpdate)
@@ -587,7 +590,7 @@ object AnalyzerSettings {
       bundleAuditWorkingDirectory: Option[File] = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_RUBY_GEMSPEC_ENABLED, gemSpecEnabled)
       settings.set(ANALYZER_BUNDLE_AUDIT_ENABLED, bundleAuditEnabled)
       settings.set(ANALYZER_BUNDLE_AUDIT_PATH, bundleAuditPath)
@@ -613,7 +616,7 @@ object AnalyzerSettings {
       cocoapodsEnabled: Option[Boolean]       = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_SWIFT_PACKAGE_MANAGER_ENABLED, packageManagerEnabled)
       settings.set(ANALYZER_SWIFT_PACKAGE_RESOLVED_ENABLED, packageResolvedEnabled)
       settings.set(ANALYZER_CARTHAGE_ENABLED, carthageEnabled)
@@ -635,7 +638,7 @@ object AnalyzerSettings {
       path: Option[File]            = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_YARN_AUDIT_ENABLED, auditEnabled)
       settings.set(ANALYZER_YARN_PATH, path)
     }

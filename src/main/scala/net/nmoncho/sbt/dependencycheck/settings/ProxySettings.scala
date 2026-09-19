@@ -17,7 +17,7 @@ case class ProxySettings(
     nonProxyHosts: Option[Seq[String]] = None
 ) {
 
-  def apply(settings: Settings): Unit = {
+  def configure(settings: Settings): Unit = {
     settings.set(PROXY_NON_PROXY_HOSTS, nonProxyHosts)
 
     val httpsProxyHost = sys.props.get("https.proxyHost")
