@@ -244,3 +244,34 @@ sbt -Dlog4j2.level=debug dependencyCheck
 ```
 
 Replace `dependencyCheck` with the right [task name](#tasks) that you use for your project.
+
+### Dependency Footprint
+
+This plugin runs [OWASP dependency-check](https://github.com/dependency-check/DependencyCheck)
+in-process, so `dependency-check-core` and its (large) transitive dependency tree, including Lucene,
+an embedded H2 database, the Jackson stack, Guava, Apache HttpClient 5, and several Apache Commons
+libraries, are added to the sbt meta-build (`project/`) plugin classpath. They are never added to
+your application or runtime classpath and cannot affect your published artifacts. The cost is a
+larger plugin download and, occasionally, an eviction warning when another sbt plugin in the same
+build needs a different version of a shared library such as Jackson or Guava. This footprint is
+inherent to running OWASP dependency-check in-process (the Maven and Gradle integrations carry it
+too).
+
+If a conflict on the plugin classpath produces eviction warnings, or an eviction error under sbt 2,
+resolve it in your own `project/plugins.sbt` (the meta-build that hosts the plugin). For example, to
+downgrade a spurious eviction error to a warning:
+
+```scala
+// project/plugins.sbt
+ThisBuild / libraryDependencySchemes += "com.fasterxml.jackson.core" % "jackson-databind" % "always"
+```
+
+or to pin a specific version across the plugin classpath:
+
+```scala
+// project/plugins.sbt
+dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "<version-you-need>"
+```
+
+Setting these in your regular `build.sbt` has no effect here, because the conflict is on the
+meta-build classpath rather than your application's.
