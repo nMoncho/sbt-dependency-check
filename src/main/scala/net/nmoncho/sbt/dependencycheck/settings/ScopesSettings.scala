@@ -15,11 +15,11 @@ package net.nmoncho.sbt.dependencycheck.settings
   * @param optional whether Optional dependencies should be considered
   */
 case class ScopesSettings(
-    compile: Boolean,
-    test: Boolean,
-    runtime: Boolean,
-    provided: Boolean,
-    optional: Boolean
+    compile: Boolean  = true,
+    test: Boolean     = false,
+    runtime: Boolean  = true,
+    provided: Boolean = true,
+    optional: Boolean = true
 ) {
 
   def toPrettyString(): String =
@@ -35,20 +35,5 @@ case class ScopesSettings(
 
 object ScopesSettings {
 
-  final val Default: ScopesSettings = new ScopesSettings(
-    compile  = true,
-    test     = false,
-    runtime  = true,
-    provided = true,
-    optional = true
-  )
-
-  def apply(
-      compile: Boolean  = true,
-      test: Boolean     = false,
-      runtime: Boolean  = true,
-      provided: Boolean = true,
-      optional: Boolean = true
-  ): ScopesSettings =
-    new ScopesSettings(compile, test, runtime, provided, optional)
+  final val Default: ScopesSettings = ScopesSettings()
 }

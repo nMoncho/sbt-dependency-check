@@ -23,13 +23,13 @@ import org.owasp.dependencycheck.utils.Settings.KEYS._
   * @param bearerToken the hosted suppressions bearer token. For use when hosted suppressions are mirrored locally on a site requiring HTTP-Bearer-authentication
   */
 case class HostedSuppressionsSettings(
-    enabled: Option[Boolean],
-    url: Option[URL],
-    forceUpdate: Option[Boolean],
-    validForHours: Option[Int],
-    username: Option[String],
-    password: Option[String],
-    bearerToken: Option[String]
+    enabled: Option[Boolean]     = None,
+    url: Option[URL]             = None,
+    forceUpdate: Option[Boolean] = None,
+    validForHours: Option[Int]   = None,
+    username: Option[String]     = None,
+    password: Option[String]     = None,
+    bearerToken: Option[String]  = None
 ) {
   def apply(settings: Settings): Unit = {
     settings.set(HOSTED_SUPPRESSIONS_ENABLED, enabled)
@@ -44,25 +44,5 @@ case class HostedSuppressionsSettings(
 }
 
 object HostedSuppressionsSettings {
-  val Default: HostedSuppressionsSettings =
-    new HostedSuppressionsSettings(None, None, None, None, None, None, None)
-
-  def apply(
-      enabled: Option[Boolean]     = None,
-      url: Option[URL]             = None,
-      forceUpdate: Option[Boolean] = None,
-      validForHours: Option[Int]   = None,
-      username: Option[String]     = None,
-      password: Option[String]     = None,
-      bearerToken: Option[String]  = None
-  ): HostedSuppressionsSettings =
-    new HostedSuppressionsSettings(
-      enabled,
-      url,
-      forceUpdate,
-      validForHours,
-      username,
-      password,
-      bearerToken
-    )
+  val Default: HostedSuppressionsSettings = HostedSuppressionsSettings()
 }
