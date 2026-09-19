@@ -34,7 +34,7 @@ class PurgeSuite extends munit.FunSuite {
     println(s"Purging on ${dataDirectory.toFile.getAbsolutePath}")
     Purge(engine)
 
-    verify(engine, atMostOnce()).purge()
+    verify(engine, times(1)).purge()
     assert(log.sb.result().contains("Cached web data sources purged successfully"))
   }
 
@@ -56,7 +56,7 @@ class PurgeSuite extends munit.FunSuite {
     println(s"Purging on ${dataDirectory.toFile.getAbsolutePath}")
     Purge(engine)
 
-    verify(engine, atMostOnce()).purge()
+    verify(engine, times(1)).purge()
     assert(log.sb.result().contains("Failed to purge cached web data sources"))
     assert(!tmpFile.toFile.exists(), "db file should be deleted as fallback")
   }
