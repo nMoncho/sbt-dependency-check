@@ -13,9 +13,13 @@ package net.nmoncho.sbt.dependencycheck.settings
 class SettingsToStringSuite extends munit.FunSuite {
 
   private def assertRedacted(rendered: String, secrets: Seq[String], visible: Seq[String]): Unit = {
-    secrets.foreach(s => assert(!rendered.contains(s), s"secret [$s] must not appear in: $rendered"))
+    secrets.foreach(s =>
+      assert(!rendered.contains(s), s"secret [$s] must not appear in: $rendered")
+    )
     assert(rendered.contains("********"), s"expected a redaction marker in: $rendered")
-    visible.foreach(v => assert(rendered.contains(v), s"non-secret [$v] should appear in: $rendered"))
+    visible.foreach(v =>
+      assert(rendered.contains(v), s"non-secret [$v] should appear in: $rendered")
+    )
   }
 
   test("NvdApiSettings redacts the apiKey") {
@@ -29,7 +33,11 @@ class SettingsToStringSuite extends munit.FunSuite {
   test("NvdApiSettings.DataFeed redacts password and bearerToken") {
     assertRedacted(
       NvdApiSettings
-        .DataFeed(username = Some("feed-user"), password = Some("feed-pass"), bearerToken = Some("feed-tok"))
+        .DataFeed(
+          username    = Some("feed-user"),
+          password    = Some("feed-pass"),
+          bearerToken = Some("feed-tok")
+        )
         .toString,
       secrets = Seq("feed-pass", "feed-tok"),
       visible = Seq("feed-user")
@@ -58,7 +66,12 @@ class SettingsToStringSuite extends munit.FunSuite {
 
   test("SuppressionFilesSettings redacts password and bearerToken") {
     assertRedacted(
-      new SuppressionFilesSettings(Seq.empty, Some("sf-user"), Some("sf-pass"), Some("sf-tok")).toString,
+      new SuppressionFilesSettings(
+        Seq.empty,
+        Some("sf-user"),
+        Some("sf-pass"),
+        Some("sf-tok")
+      ).toString,
       secrets = Seq("sf-pass", "sf-tok"),
       visible = Seq("sf-user")
     )
@@ -67,7 +80,11 @@ class SettingsToStringSuite extends munit.FunSuite {
   test("AnalyzerSettings.Artifactory redacts apiToken and bearerToken") {
     assertRedacted(
       AnalyzerSettings
-        .Artifactory(apiToken = Some("art-tok"), username = Some("art-user"), bearerToken = Some("art-bear"))
+        .Artifactory(
+          apiToken    = Some("art-tok"),
+          username    = Some("art-user"),
+          bearerToken = Some("art-bear")
+        )
         .toString,
       secrets = Seq("art-tok", "art-bear"),
       visible = Seq("art-user")
@@ -76,11 +93,13 @@ class SettingsToStringSuite extends munit.FunSuite {
 
   test("AnalyzerSettings.KnownExploitedVulnerabilities redacts password and bearerToken") {
     assertRedacted(
-      AnalyzerSettings.KnownExploitedVulnerabilities(
-        username    = Some("kev-user"),
-        password    = Some("kev-pass"),
-        bearerToken = Some("kev-tok")
-      ).toString,
+      AnalyzerSettings
+        .KnownExploitedVulnerabilities(
+          username    = Some("kev-user"),
+          password    = Some("kev-pass"),
+          bearerToken = Some("kev-tok")
+        )
+        .toString,
       secrets = Seq("kev-pass", "kev-tok"),
       visible = Seq("kev-user")
     )
@@ -89,7 +108,11 @@ class SettingsToStringSuite extends munit.FunSuite {
   test("AnalyzerSettings.MavenCentral redacts password and bearerToken") {
     assertRedacted(
       AnalyzerSettings
-        .MavenCentral(username = Some("mc-user"), password = Some("mc-pass"), bearerToken = Some("mc-tok"))
+        .MavenCentral(
+          username    = Some("mc-user"),
+          password    = Some("mc-pass"),
+          bearerToken = Some("mc-tok")
+        )
         .toString,
       secrets = Seq("mc-pass", "mc-tok"),
       visible = Seq("mc-user")
@@ -114,11 +137,13 @@ class SettingsToStringSuite extends munit.FunSuite {
 
   test("AnalyzerSettings.RetireJS redacts password and bearerToken") {
     assertRedacted(
-      AnalyzerSettings.RetireJS(
-        username    = Some("rjs-user"),
-        password    = Some("rjs-pass"),
-        bearerToken = Some("rjs-tok")
-      ).toString,
+      AnalyzerSettings
+        .RetireJS(
+          username    = Some("rjs-user"),
+          password    = Some("rjs-pass"),
+          bearerToken = Some("rjs-tok")
+        )
+        .toString,
       secrets = Seq("rjs-pass", "rjs-tok"),
       visible = Seq("rjs-user")
     )
