@@ -26,10 +26,11 @@ import org.owasp.dependencycheck.utils.Settings.KEYS._
   * @param batchInsertSize Size of database batch inserts
   */
 case class DatabaseSettings(
-    driverName: Option[String]          = None,
-    driverPath: Option[String]          = None,
-    connectionString: Option[String]    = None,
-    username: Option[String]            = None,
+    driverName: Option[String]       = None,
+    driverPath: Option[String]       = None,
+    connectionString: Option[String] = None,
+    username: Option[String]         = None,
+    @redacted
     password: Option[String]            = None,
     batchInsertEnabled: Option[Boolean] = None,
     batchInsertSize: Option[Int]        = None
@@ -45,6 +46,8 @@ case class DatabaseSettings(
     settings.set(ENABLE_BATCH_UPDATES, batchInsertEnabled)
     settings.set(MAX_BATCH_SIZE, batchInsertSize)
   }
+
+  override def toString: String = redactedToString(this)
 }
 
 object DatabaseSettings {

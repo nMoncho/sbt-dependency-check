@@ -163,10 +163,12 @@ object AnalyzerSettings {
       enabled: Option[Boolean]          = None,
       url: Option[URL]                  = None,
       parallelAnalysis: Option[Boolean] = None,
-      apiToken: Option[String]          = None,
-      username: Option[String]          = None,
-      bearerToken: Option[String]       = None,
-      usesProxy: Option[Boolean]        = None
+      @redacted
+      apiToken: Option[String] = None,
+      username: Option[String] = None,
+      @redacted
+      bearerToken: Option[String] = None,
+      usesProxy: Option[Boolean]  = None
   ) {
 
     def configure(settings: Settings): Unit = {
@@ -178,6 +180,8 @@ object AnalyzerSettings {
       settings.set(ANALYZER_ARTIFACTORY_BEARER_TOKEN, bearerToken)
       settings.set(ANALYZER_ARTIFACTORY_USES_PROXY, usesProxy)
     }
+
+    override def toString: String = redactedToString(this)
   }
 
   object Artifactory {
@@ -293,10 +297,12 @@ object AnalyzerSettings {
     * @param validForHours controls the skipping of the check for Known Exploited Vulnerabilities updates.
     */
   case class KnownExploitedVulnerabilities(
-      enabled: Option[Boolean]    = None,
-      url: Option[URL]            = None,
-      username: Option[String]    = None,
-      password: Option[String]    = None,
+      enabled: Option[Boolean] = None,
+      url: Option[URL]         = None,
+      username: Option[String] = None,
+      @redacted
+      password: Option[String] = None,
+      @redacted
       bearerToken: Option[String] = None,
       validForHours: Option[Int]  = None
   ) {
@@ -308,6 +314,8 @@ object AnalyzerSettings {
       settings.set(KEV_BEARER_TOKEN, bearerToken)
       settings.set(KEV_CHECK_VALID_FOR_HOURS, validForHours)
     }
+
+    override def toString: String = redactedToString(this)
   }
 
   object KnownExploitedVulnerabilities {
@@ -334,8 +342,10 @@ object AnalyzerSettings {
       retryCount: Option[Int]           = None,
       parallelAnalysis: Option[Boolean] = None,
       username: Option[String]          = None,
-      password: Option[String]          = None,
-      bearerToken: Option[String]       = None
+      @redacted
+      password: Option[String] = None,
+      @redacted
+      bearerToken: Option[String] = None
   ) {
 
     def configure(settings: Settings): Unit = {
@@ -349,6 +359,8 @@ object AnalyzerSettings {
       settings.set(ANALYZER_CENTRAL_PASSWORD, password)
       settings.set(ANALYZER_CENTRAL_BEARER_TOKEN, bearerToken)
     }
+
+    override def toString: String = redactedToString(this)
 
   }
 
@@ -365,9 +377,10 @@ object AnalyzerSettings {
     * @param usesProxy whether to use the proxy to reach Nexus
     */
   case class Nexus(
-      enabled: Option[Boolean]   = None,
-      url: Option[URL]           = None,
-      username: Option[String]   = None,
+      enabled: Option[Boolean] = None,
+      url: Option[URL]         = None,
+      username: Option[String] = None,
+      @redacted
       password: Option[String]   = None,
       usesProxy: Option[Boolean] = None
   ) {
@@ -379,6 +392,8 @@ object AnalyzerSettings {
       settings.set(ANALYZER_NEXUS_PASSWORD, password)
       settings.set(ANALYZER_NEXUS_USES_PROXY, usesProxy)
     }
+
+    override def toString: String = redactedToString(this)
 
   }
 
@@ -443,7 +458,8 @@ object AnalyzerSettings {
       useCache: Option[Boolean]               = None,
       warnOnlyOnRemoteErrors: Option[Boolean] = None,
       username: Option[String]                = None,
-      password: Option[String]                = None
+      @redacted
+      password: Option[String] = None
   ) {
 
     def configure(settings: Settings): Unit = {
@@ -456,6 +472,8 @@ object AnalyzerSettings {
       settings.set(ANALYZER_OSSINDEX_USER, username)
       settings.set(ANALYZER_OSSINDEX_PASSWORD, password)
     }
+
+    override def toString: String = redactedToString(this)
 
   }
 
@@ -553,9 +571,11 @@ object AnalyzerSettings {
       filterNonVulnerable: Option[Boolean] = None,
       url: Option[URL]                     = None,
       username: Option[String]             = None,
-      password: Option[String]             = None,
-      bearerToken: Option[String]          = None,
-      validForHours: Option[Int]           = None
+      @redacted
+      password: Option[String] = None,
+      @redacted
+      bearerToken: Option[String] = None,
+      validForHours: Option[Int]  = None
   ) {
 
     def configure(settings: Settings): Unit = {
@@ -569,6 +589,8 @@ object AnalyzerSettings {
       settings.set(ANALYZER_RETIREJS_REPO_JS_BEARER_TOKEN, bearerToken)
       settings.set(ANALYZER_RETIREJS_REPO_VALID_FOR_HOURS, validForHours)
     }
+
+    override def toString: String = redactedToString(this)
 
   }
 

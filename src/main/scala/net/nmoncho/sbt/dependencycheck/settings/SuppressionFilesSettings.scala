@@ -21,7 +21,9 @@ import sbt.URL
 case class SuppressionFilesSettings(
     files: Seq[String],
     user: Option[String],
+    @redacted
     password: Option[String],
+    @redacted
     bearerToken: Option[String]
 ) {
 
@@ -31,6 +33,8 @@ case class SuppressionFilesSettings(
     settings.set(SUPPRESSION_FILE_PASSWORD, password)
     settings.set(SUPPRESSION_FILE_BEARER_TOKEN, bearerToken)
   }
+
+  override def toString: String = redactedToString(this)
 
 }
 

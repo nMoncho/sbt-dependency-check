@@ -25,6 +25,7 @@ import sbt.URL
   * @param dataFeed NVD Data Feed Configuration
   */
 case class NvdApiSettings(
+    @redacted
     apiKey: String                 = "",
     endpoint: Option[String]       = None,
     requestDelay: Option[Duration] = None,
@@ -44,6 +45,8 @@ case class NvdApiSettings(
     dataFeed.configure(settings)
   }
 
+  override def toString: String = redactedToString(this)
+
 }
 
 object NvdApiSettings {
@@ -59,11 +62,13 @@ object NvdApiSettings {
     * @param bearerToken token to authenticate to the NVD Data feed. For use when NVD API Data is hosted as datafeeds locally on a site requiring HTTP-Bearer-authentication.
     */
   case class DataFeed(
-      url: Option[URL]            = None,
-      startYear: Option[Int]      = None,
-      validForDays: Option[Int]   = None,
-      username: Option[String]    = None,
-      password: Option[String]    = None,
+      url: Option[URL]          = None,
+      startYear: Option[Int]    = None,
+      validForDays: Option[Int] = None,
+      username: Option[String]  = None,
+      @redacted
+      password: Option[String] = None,
+      @redacted
       bearerToken: Option[String] = None
   ) {
     def configure(settings: Settings): Unit = {
@@ -74,6 +79,8 @@ object NvdApiSettings {
       settings.set(NVD_API_DATAFEED_PASSWORD, password)
       settings.set(NVD_API_DATAFEED_BEARER_TOKEN, bearerToken)
     }
+
+    override def toString: String = redactedToString(this)
   }
 
   object DataFeed {
