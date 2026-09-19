@@ -44,7 +44,10 @@ class CleanupEngineSuite extends munit.FunSuite {
       )
       verify(engine).close()
       verify(settings).cleanup(true) // cleanup still runs after a close() failure
-      assert(log.sb.result().contains("Failed to close"), "the close failure is surfaced as a warning")
+      assert(
+        log.sb.result().contains("Failed to close"),
+        "the close failure is surfaced as a warning"
+      )
     } finally {
       Thread.currentThread().setContextClassLoader(original)
     }

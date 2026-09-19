@@ -72,6 +72,20 @@ package object dependencycheck {
       ) >= failCvssScore) ||
       (failCvssScore <= 0.0f)
 
+  /** The highest CVSS base score present on a vulnerability across CVSS v2, v3, and v4, or 0.0 when
+    * none carries a numeric score (for example a vulnerability that only fails via the KEV flag or a
+    * must-fail CVE id). Used to pick and label the most severe offending finding.
+    */
+  def vulnerabilityScore(v: Vulnerability): Double = {
+    val scores = Seq(
+      Option(v.getCvssV2).flatMap(c => Option(c.getCvssData.getBaseScore)),
+      Option(v.getCvssV3).flatMap(c => Option(c.getCvssData.getBaseScore)),
+      Option(v.getCvssV4).flatMap(c => Option(c.getCvssData.getBaseScore))
+    ).flatten.map(_.doubleValue())
+
+    if (scores.isEmpty) 0.0 else scores.max
+  }
+
   /** Policy describing which vulnerabilities should fail the build.
     *
     * A vulnerability fails the build when it meets the CVSS threshold, or its id is in the must-fail

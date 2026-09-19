@@ -301,20 +301,34 @@ package object tasks {
   )(implicit log: Logger): Unit = {
     import scala.jdk.CollectionConverters.*
 
-    val hasFailingVulnerabilities = engine.getDependencies.exists { p =>
-      p.getVulnerabilities.asScala.exists(failurePolicy.isFailing)
+    val offending = engine.getDependencies.toSeq.flatMap { dependency =>
+      dependency.getVulnerabilities.asScala.toSeq
+        .filter(failurePolicy.isFailing)
+        .map(vulnerability => (dependency, vulnerability))
     }
 
-    if (hasFailingVulnerabilities) {
+    if (offending.nonEmpty) {
       SummaryReport.showSummary(name, engine.getDependencies, failurePolicy, summaryReport)
+
+      val noun = if (offending.size == 1) "vulnerability" else "vulnerabilities"
 
       if (warnOnly) {
         log.warn(
-          s"Vulnerabilities failing the configured policy were found in [$name], but 'dependencyCheckWarnOnly' is enabled so the build will not fail."
+          s"Found [${offending.size}] $noun failing the configured policy in [$name], but " +
+            "'dependencyCheckWarnOnly' is enabled so the build will not fail."
         )
       } else {
+        // Name the most severe offender so the failure line alone is actionable.
+        val (topDependency, topVulnerability) =
+          offending.maxBy { case (_, vulnerability) => vulnerabilityScore(vulnerability) }
+        val topScore  = vulnerabilityScore(topVulnerability)
+        val scoreText = if (topScore > 0.0) s" (CVSS $topScore)" else ""
+
         throw new VulnerabilityFoundException(
-          s"Vulnerability failing the configured policy found (CVSS threshold [${failurePolicy.failCvssScore}])"
+          s"[$name] has [${offending.size}] $noun failing the configured policy " +
+            s"(CVSS threshold [${failurePolicy.failCvssScore}]); highest: " +
+            s"[${topVulnerability.getName}] in [${topDependency.getFileName}]$scoreText. " +
+            "See the dependency-check report for details."
         )
       }
     }
