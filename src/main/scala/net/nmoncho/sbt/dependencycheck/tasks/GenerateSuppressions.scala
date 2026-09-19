@@ -7,6 +7,8 @@
 package net.nmoncho.sbt.dependencycheck
 package tasks
 
+import scala.util.control.NonFatal
+
 import net.nmoncho.sbt.dependencycheck.Keys.dependencyCheckSkip
 import net.nmoncho.sbt.dependencycheck.Keys.dependencyCheckSuppressions
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
@@ -158,7 +160,7 @@ object GenerateSuppressions {
 
       parser.parseSuppressionRules(file).asScala.map(SuppressionRule.fromOwasp).toSeq
     } catch {
-      case t: Throwable =>
+      case NonFatal(t) =>
         log.warn(
           s"Failed parsing suppression rules from file [${file.name}], skipping file..."
         )
