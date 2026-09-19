@@ -28,8 +28,10 @@ case class HostedSuppressionsSettings(
     forceUpdate: Option[Boolean] = None,
     validForHours: Option[Int]   = None,
     username: Option[String]     = None,
-    password: Option[String]     = None,
-    bearerToken: Option[String]  = None
+    @redacted
+    password: Option[String] = None,
+    @redacted
+    bearerToken: Option[String] = None
 ) {
   def configure(settings: Settings): Unit = {
     settings.set(HOSTED_SUPPRESSIONS_ENABLED, enabled)
@@ -41,6 +43,8 @@ case class HostedSuppressionsSettings(
     settings.set(HOSTED_SUPPRESSIONS_PASSWORD, password)
     settings.set(HOSTED_SUPPRESSIONS_BEARER_TOKEN, bearerToken)
   }
+
+  override def toString: String = redactedToString(this)
 }
 
 object HostedSuppressionsSettings {
