@@ -25,13 +25,13 @@ import sbt.URL
   * @param dataFeed NVD Data Feed Configuration
   */
 case class NvdApiSettings(
-    apiKey: String,
-    endpoint: Option[String],
-    requestDelay: Option[Duration],
-    maxRetryCount: Option[Int],
-    validForHours: Option[Int],
-    resultsPerPage: Option[Int],
-    dataFeed: DataFeed
+    apiKey: String                 = "",
+    endpoint: Option[String]       = None,
+    requestDelay: Option[Duration] = None,
+    maxRetryCount: Option[Int]     = None,
+    validForHours: Option[Int]     = None,
+    resultsPerPage: Option[Int]    = None,
+    dataFeed: DataFeed             = DataFeed.Default
 ) {
 
   def apply(settings: Settings): Unit = {
@@ -47,27 +47,7 @@ case class NvdApiSettings(
 }
 
 object NvdApiSettings {
-  val Default: NvdApiSettings =
-    new NvdApiSettings("", None, None, None, None, None, DataFeed.Default)
-
-  def apply(
-      apiKey: String                 = "",
-      endpoint: Option[String]       = None,
-      requestDelay: Option[Duration] = None,
-      maxRetryCount: Option[Int]     = None,
-      validForHours: Option[Int]     = None,
-      resultsPerPage: Option[Int]    = None,
-      dataFeed: DataFeed             = DataFeed.Default
-  ): NvdApiSettings =
-    new NvdApiSettings(
-      apiKey,
-      endpoint,
-      requestDelay,
-      maxRetryCount,
-      validForHours,
-      resultsPerPage,
-      dataFeed
-    )
+  val Default: NvdApiSettings = NvdApiSettings()
 
   /** Data Feed Settings
     *
@@ -79,12 +59,12 @@ object NvdApiSettings {
     * @param bearerToken token to authenticate to the NVD Data feed. For use when NVD API Data is hosted as datafeeds locally on a site requiring HTTP-Bearer-authentication.
     */
   case class DataFeed(
-      url: Option[URL],
-      startYear: Option[Int],
-      validForDays: Option[Int],
-      username: Option[String],
-      password: Option[String],
-      bearerToken: Option[String]
+      url: Option[URL]            = None,
+      startYear: Option[Int]      = None,
+      validForDays: Option[Int]   = None,
+      username: Option[String]    = None,
+      password: Option[String]    = None,
+      bearerToken: Option[String] = None
   ) {
     def apply(settings: Settings): Unit = {
       settings.set(NVD_API_DATAFEED_URL, url)
@@ -97,15 +77,6 @@ object NvdApiSettings {
   }
 
   object DataFeed {
-    val Default: DataFeed = new DataFeed(None, None, None, None, None, None)
-
-    def apply(
-        url: Option[URL]            = None,
-        startYear: Option[Int]      = None,
-        validForDays: Option[Int]   = None,
-        username: Option[String]    = None,
-        password: Option[String]    = None,
-        bearerToken: Option[String] = None
-    ): DataFeed = new DataFeed(url, startYear, validForDays, username, password, bearerToken)
+    val Default: DataFeed = DataFeed()
   }
 }

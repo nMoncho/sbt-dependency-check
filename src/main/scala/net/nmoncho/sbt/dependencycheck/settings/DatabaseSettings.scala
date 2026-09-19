@@ -26,13 +26,13 @@ import org.owasp.dependencycheck.utils.Settings.KEYS._
   * @param batchInsertSize Size of database batch inserts
   */
 case class DatabaseSettings(
-    driverName: Option[String],
-    driverPath: Option[String],
-    connectionString: Option[String],
-    username: Option[String],
-    password: Option[String],
-    batchInsertEnabled: Option[Boolean],
-    batchInsertSize: Option[Int]
+    driverName: Option[String]          = None,
+    driverPath: Option[String]          = None,
+    connectionString: Option[String]    = None,
+    username: Option[String]            = None,
+    password: Option[String]            = None,
+    batchInsertEnabled: Option[Boolean] = None,
+    batchInsertSize: Option[Int]        = None
 ) {
 
   def apply(settings: Settings): Unit = {
@@ -48,25 +48,5 @@ case class DatabaseSettings(
 }
 
 object DatabaseSettings {
-  val Default: DatabaseSettings =
-    new DatabaseSettings(None, None, None, None, None, None, None)
-
-  def apply(
-      driverName: Option[String]          = None,
-      driverPath: Option[String]          = None,
-      connectionString: Option[String]    = None,
-      username: Option[String]            = None,
-      password: Option[String]            = None,
-      batchInsertEnabled: Option[Boolean] = None,
-      batchInsertSize: Option[Int]        = None
-  ): DatabaseSettings =
-    new DatabaseSettings(
-      driverName,
-      driverPath,
-      connectionString,
-      username,
-      password,
-      batchInsertEnabled,
-      batchInsertSize
-    )
+  val Default: DatabaseSettings = DatabaseSettings()
 }

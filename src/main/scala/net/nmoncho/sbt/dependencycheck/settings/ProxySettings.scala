@@ -14,7 +14,7 @@ import org.owasp.dependencycheck.utils.Settings.KEYS._
   * @param nonProxyHosts The properties key for the non proxy hosts.
   */
 case class ProxySettings(
-    nonProxyHosts: Option[Seq[String]]
+    nonProxyHosts: Option[Seq[String]] = None
 ) {
 
   def apply(settings: Settings): Unit = {
@@ -39,8 +39,5 @@ case class ProxySettings(
 }
 
 object ProxySettings {
-  val Default: ProxySettings = new ProxySettings(None)
-
-  def apply(nonProxyHosts: Option[Seq[String]] = None): ProxySettings =
-    new ProxySettings(nonProxyHosts)
+  val Default: ProxySettings = ProxySettings()
 }
