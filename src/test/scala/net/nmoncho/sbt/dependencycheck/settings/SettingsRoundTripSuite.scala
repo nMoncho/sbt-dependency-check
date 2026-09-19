@@ -6,7 +6,6 @@
 
 package net.nmoncho.sbt.dependencycheck.settings
 
-import java.io.File
 import java.time.Duration
 
 import org.owasp.dependencycheck.utils.Settings
@@ -106,14 +105,14 @@ class SettingsRoundTripSuite extends munit.FunSuite {
   }
 
   test("DatabaseSettings.apply maps every field to the correct OWASP key") {
-    val dataDir  = new File("target/round-trip-data")
     val database = DatabaseSettings(
-      driverName       = Some("org.postgresql.Driver"),
-      connectionString = Some("jdbc:postgresql://localhost/odc"),
-      username         = Some("db-user"),
-      password         = Some("db-pass"),
-      dataDirectory    = Some(dataDir),
-      batchInsertSize  = Some(500)
+      driverName         = Some("org.postgresql.Driver"),
+      driverPath         = Some("/opt/drivers/postgresql.jar"),
+      connectionString   = Some("jdbc:postgresql://localhost/odc"),
+      username           = Some("db-user"),
+      password           = Some("db-pass"),
+      batchInsertEnabled = Some(false),
+      batchInsertSize    = Some(500)
     )
 
     val settings = new Settings()
@@ -122,14 +121,18 @@ class SettingsRoundTripSuite extends munit.FunSuite {
 
       assertEquals(settings.getString(DB_DRIVER_NAME), "org.postgresql.Driver", "driver name")
       assertEquals(
+        settings.getString(DB_DRIVER_PATH),
+        "/opt/drivers/postgresql.jar",
+        "driver path"
+      )
+      assertEquals(
         settings.getString(DB_CONNECTION_STRING),
         "jdbc:postgresql://localhost/odc",
         "connection string"
       )
       assertEquals(settings.getString(DB_USER), "db-user", "db username")
       assertEquals(settings.getString(DB_PASSWORD), "db-pass", "db password")
-      // Regression: `dataDirectory` was never applied to DATA_DIRECTORY
-      assertEquals(settings.getString(DATA_DIRECTORY), dataDir.getAbsolutePath, "data directory")
+      assertEquals(settings.getString(ENABLE_BATCH_UPDATES), "false", "batch insert enabled")
       assertEquals(settings.getString(MAX_BATCH_SIZE), "500", "batch insert size")
     } finally settings.cleanup(true)
   }
