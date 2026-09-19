@@ -147,11 +147,7 @@ package object tasks {
       reportFormats: Seq[Format],
       summaryReport: SummaryReport
   )(implicit log: Logger): Unit = {
-    addSuppressionRules(suppressionRules, engine)
-    addDependencies(dependencies, engine)
-    scanSet.foreach(file => engine.scan(file))
-
-    engine.analyzeDependencies()
+    runAnalysis(engine, dependencies, suppressionRules, scanSet)
 
     if (reportFormats.isEmpty) {
       log.info("No Report Format was selected for the Dependency Check Analysis")
@@ -168,6 +164,22 @@ package object tasks {
     }
 
     failOnFoundVulnerabilities(failurePolicy, warnOnly, engine, projectName, summaryReport)
+  }
+
+  /** Adds suppression rules and dependencies to the engine, scans the scan set, and runs the OWASP
+    * analysis. Shared by [[analyzeProject]] and the suppression-baseline task.
+    */
+  private[tasks] def runAnalysis(
+      engine: Engine,
+      dependencies: Set[Attributed[File]],
+      suppressionRules: Set[SuppressionRule],
+      scanSet: Seq[File]
+  )(implicit log: Logger): Unit = {
+    addSuppressionRules(suppressionRules, engine)
+    addDependencies(dependencies, engine)
+    scanSet.foreach(file => engine.scan(file))
+
+    engine.analyzeDependencies()
   }
 
   private def addSuppressionRules(rules: Set[SuppressionRule], engine: Engine)(

@@ -59,9 +59,15 @@ The following tasks are available:
 | `dependencyCheckListSettings`           | List the settings used during the analysis.                                                                                                                               |
 | `dependencyCheckListUnusedSuppressions` | List unused suppressions, only considering suppression files or rules defined in the project definition (ie. build.sbt), not hosted suppressions nor packed suppressions. |
 | `dependencyCheckListSuppressions`       | List suppression rules added to the Owasp Engine which are defined in the project definition (ie. build.sbt), or are imported packaged suppressions.                      |
+| `dependencyCheckGenerateSuppressions`   | Runs the analysis and writes a suppression XML baseline of the vulnerabilities currently found, so an existing project can baseline known findings and fail only on new ones. |
 
 The reports will be written to `crossTarget.value` by default. This can be overwritten by setting `dependencyCheckOutputDirectory`.
 See [Configuration](#configuration) for details.
+
+`dependencyCheckGenerateSuppressions` writes `dependency-check-suppressions.xml` into `dependencyCheckOutputDirectory`, with one
+`<suppress>` entry per vulnerable dependency (targeted by Package URL, SHA1, or file path) listing the CVEs found. Review the
+file, then wire it in via `dependencyCheckSuppressions` to baseline existing findings so only new vulnerabilities fail the build.
+The entries are editable, so you can add an `until` date to make a suppression temporary or trim CVEs you do not want to ignore.
 
 #### `dependencyCheck` Arguments
 

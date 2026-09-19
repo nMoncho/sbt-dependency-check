@@ -123,4 +123,7 @@ object Keys {
   lazy val dependencyCheckListSuppressions: InputKey[Unit] = inputKey(
     "List suppression rules added to the Owasp Engine which are defined in the project definition (ie. build.sbt), or are imported packaged suppressions."
   )
+  lazy val dependencyCheckGenerateSuppressions: TaskKey[Unit] = taskKey(
+    "Runs the analysis and writes a suppression XML baseline covering the vulnerabilities currently found, so an existing project can baseline known findings and fail only on new ones."
+  )
 }
