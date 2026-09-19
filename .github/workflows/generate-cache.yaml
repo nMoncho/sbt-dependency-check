@@ -3,7 +3,7 @@ name: Generate CVE Cache
 on: workflow_dispatch
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   LOG_LEVEL: INFO
