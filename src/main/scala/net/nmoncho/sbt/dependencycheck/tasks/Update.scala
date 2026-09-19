@@ -30,9 +30,16 @@ object Update {
     try {
       engine.doUpdates()
     } catch {
-      case t: Throwable if NonFatal(t) =>
-        log.error("An exception occurred connecting to the local database:")
-        logFailure(t)
+      case NonFatal(t) =>
+        // NVD data-update failures are usually remote (NVD API throttling/HTTP 403/429, connectivity,
+        // or a missing API key), not a local database problem. Surface the actionable hint here; the
+        // stack trace is logged once by `withEngine`, which re-catches the rethrown exception.
+        log.error(
+          "Failed to update the NVD data. This is often caused by NVD API rate limiting or " +
+            "connectivity. Set an NVD API key via `dependencyCheckNvdApi` (see " +
+            "https://nvd.nist.gov/developers/request-an-api-key), and consider increasing its " +
+            "`requestDelay` or `maxRetryCount`."
+        )
         throw t
     }
 
