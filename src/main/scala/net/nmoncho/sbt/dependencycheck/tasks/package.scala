@@ -228,7 +228,7 @@ package object tasks {
         new java.util.ArrayList[OwaspSuppressionRule]()
     }
 
-  private def addSuppressionRules(rules: Set[SuppressionRule], engine: Engine)(
+  private[tasks] def addSuppressionRules(rules: Set[SuppressionRule], engine: Engine)(
       implicit log: Logger
   ): Unit = {
     import scala.jdk.CollectionConverters.*
@@ -273,7 +273,7 @@ package object tasks {
       }
     )
 
-  private def addEvidence(
+  private[tasks] def addEvidence(
       moduleId: ModuleID,
       dependency: Dependency
   ): Unit = {
@@ -294,7 +294,7 @@ package object tasks {
     )
   }
 
-  private def getIdentifier(artifact: MavenArtifact, moduleId: ModuleID): Identifier =
+  private[tasks] def getIdentifier(artifact: MavenArtifact, moduleId: ModuleID): Identifier =
     Try {
       new PurlIdentifier(
         "sbt",
