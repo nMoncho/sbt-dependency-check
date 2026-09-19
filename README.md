@@ -214,6 +214,16 @@ define these suppressions.
 
 Feel read more about this on our [wiki](https://github.com/nMoncho/sbt-dependency-check/wiki/SUPPRESSIONS).
 
+> **Trust boundary for packaged suppressions.** When `packagedEnabled` is turned on, suppression
+> rules shipped inside your dependencies' JARs (`packaged-suppressions-file.xml`) are imported into
+> the scan. Such a rule can suppress arbitrary CVEs, including ones in other dependencies, so a
+> packaged suppression is as trusted as the code of the dependency that ships it. The default filter
+> is `BlacklistAll` (packaged suppressions from no dependency are trusted); prefer an explicit
+> per-GAV allowlist over `WhitelistAll`, which trusts every dependency's suppressions. Imported
+> packaged rules are marked `base`, so they do not appear in the report's "suppressed" section; the
+> plugin logs, at info level, which dependency contributed how many rules, and
+> `dependencyCheckListSuppressions` lists them.
+
 #### Analyzer Settings
 
 Analyzers, as the name imply, are a way to analyze dependencies or artifacts.

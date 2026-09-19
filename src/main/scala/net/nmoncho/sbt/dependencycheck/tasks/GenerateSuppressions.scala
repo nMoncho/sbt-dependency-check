@@ -65,11 +65,21 @@ object GenerateSuppressions {
             tempDir,
             (filename: String) => filename == PackagedSuppressionsFilename
           ).flatMap { file =>
-            log.debug(s"Extracting packaged suppressions file from JAR [${file.name}]")
+            val rules = parseSuppressionFile(parser, file)
 
-            parseSuppressionFile(parser, file)
-              // Make all imported packaged suppressions "base", so they don't show on this project's reports.
-              .map(_.copy(base = true))
+            // Packaged suppressions are as trusted as the dependency that ships them: they can
+            // suppress arbitrary CVEs, including ones in other dependencies. Log which dependency
+            // contributed how many rules, at info level, so this trust boundary is visible (imported
+            // rules are otherwise `base = true` and hidden from the report's suppressed section).
+            if (rules.nonEmpty) {
+              log.info(
+                s"Importing [${rules.size}] packaged suppression rule(s) from dependency " +
+                  s"[${dependency.data.getName}]; these are trusted as that dependency's own code"
+              )
+            }
+
+            // Make all imported packaged suppressions "base", so they don't show on this project's reports.
+            rules.map(_.copy(base = true))
           }
         }
       }
