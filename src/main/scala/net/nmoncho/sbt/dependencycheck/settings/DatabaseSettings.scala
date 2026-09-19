@@ -8,18 +8,20 @@ package net.nmoncho.sbt.dependencycheck.settings
 
 import org.owasp.dependencycheck.utils.Settings
 import org.owasp.dependencycheck.utils.Settings.KEYS._
-import sbt.File
 
 /** Database Settings
   *
   * Database where vulnerabilities are stored for the analysis.
+  *
+  * The data directory (base path for the embedded DB and cached resources) is configured with the
+  * top-level `dependencyCheckDataDirectory` setting, which writes the same OWASP `DATA_DIRECTORY`
+  * key.
   *
   * @param driverName the database driver class name. An embedded database is used by default
   * @param driverPath the database driver class path
   * @param connectionString the database connection string
   * @param username username to use when connecting to the database
   * @param password password to use when connecting to the database
-  * @param dataDirectory base path to use for the data directory (for embedded db and other cached resources from the Internet)
   * @param batchInsertEnabled adds capabilities to batch insert. Tested on PostgreSQL and H2
   * @param batchInsertSize Size of database batch inserts
   */
@@ -29,7 +31,6 @@ case class DatabaseSettings(
     connectionString: Option[String],
     username: Option[String],
     password: Option[String],
-    dataDirectory: Option[File],
     batchInsertEnabled: Option[Boolean],
     batchInsertSize: Option[Int]
 ) {
@@ -41,8 +42,6 @@ case class DatabaseSettings(
     settings.set(DB_USER, username)
     settings.set(DB_PASSWORD, password)
 
-    settings.set(DATA_DIRECTORY, dataDirectory)
-
     settings.set(ENABLE_BATCH_UPDATES, batchInsertEnabled)
     settings.set(MAX_BATCH_SIZE, batchInsertSize)
   }
@@ -50,7 +49,7 @@ case class DatabaseSettings(
 
 object DatabaseSettings {
   val Default: DatabaseSettings =
-    new DatabaseSettings(None, None, None, None, None, None, None, None)
+    new DatabaseSettings(None, None, None, None, None, None, None)
 
   def apply(
       driverName: Option[String]          = None,
@@ -58,7 +57,6 @@ object DatabaseSettings {
       connectionString: Option[String]    = None,
       username: Option[String]            = None,
       password: Option[String]            = None,
-      dataDirectory: Option[File]         = None,
       batchInsertEnabled: Option[Boolean] = None,
       batchInsertSize: Option[Int]        = None
   ): DatabaseSettings =
@@ -68,7 +66,6 @@ object DatabaseSettings {
       connectionString,
       username,
       password,
-      dataDirectory,
       batchInsertEnabled,
       batchInsertSize
     )

@@ -77,7 +77,7 @@ The task `dependencyCheck` supports arguments that can be used to change its beh
 - `single-report`: A single report will be generated for this project, and all aggregates if any. This works the same
   way as the task `dependencyCheckAggregate`.
 - `all-projects`: A single report will be generated for all projects. This works the same way as the task `dependencyCheckAllProjects`.
-  **Important**: This argument needs to be used together with `single-report`.
+  A single combined report is always produced for all projects, so `single-report` is implied and does not need to be passed alongside it.
 
 This task also supports modifying how the reporting summary is shown at the end:
 
