@@ -1,2 +1,7 @@
 /.bsp/
 target/
+
+# Local OWASP dependency-check data directory / embedded H2 database (large binaries)
+cve-data/
+*.mv.db
+*.trace.db
