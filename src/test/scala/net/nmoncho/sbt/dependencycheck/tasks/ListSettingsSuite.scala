@@ -23,6 +23,28 @@ class ListSettingsSuite extends munit.FunSuite {
     assert(result.contains("data.password: ********"), "sensitive settings are masked properly")
   }
 
+  test("credentials embedded in a connection string are redacted") {
+    implicit val log: StringLogger = new StringLogger
+
+    val settings = new Settings()
+    try {
+      settings.setString(
+        Settings.KEYS.DB_CONNECTION_STRING,
+        "jdbc:mysql://dbuser:s3cret@host:3306/odc"
+      )
+
+      ListSettings(settings, ScopesSettings.Default)
+
+      val result = log.sb.result()
+      assert(
+        result.contains("data.connection_string: jdbc:mysql://****@host:3306/odc"),
+        s"embedded userinfo should be redacted:\n$result"
+      )
+      assert(!result.contains("s3cret"), "the embedded password must never be printed")
+      assert(!result.contains("dbuser"), "the embedded username must never be printed")
+    } finally settings.cleanup(true)
+  }
+
   private lazy val expected =
     """	ScopesSettings:
       |	  compile: true
