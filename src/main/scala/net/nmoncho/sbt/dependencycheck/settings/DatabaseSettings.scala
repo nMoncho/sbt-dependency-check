@@ -41,6 +41,8 @@ case class DatabaseSettings(
     settings.set(DB_USER, username)
     settings.set(DB_PASSWORD, password)
 
+    settings.set(DATA_DIRECTORY, dataDirectory)
+
     settings.set(ENABLE_BATCH_UPDATES, batchInsertEnabled)
     settings.set(MAX_BATCH_SIZE, batchInsertSize)
   }

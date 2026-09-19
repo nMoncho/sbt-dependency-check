@@ -106,7 +106,6 @@ case class AnalyzerSettings(
     settings.set(ANALYZER_CPE_ENABLED, cpeEnabled)
     settings.set(ANALYZER_CPE_SUPPRESSION_ENABLED, cpeSuppressionEnabled)
     settings.set(ANALYZER_DART_ENABLED, dartEnabled)
-    settings.set(ANALYZER_DART_ENABLED, dartEnabled)
     settings.set(ANALYZER_DEPENDENCY_BUNDLING_ENABLED, dependencyBundlingEnabled)
     settings.set(ANALYZER_DEPENDENCY_MERGING_ENABLED, dependencyMergingEnabled)
     settings.set(ANALYZER_EXPERIMENTAL_ENABLED, experimentalEnabled)
@@ -187,45 +186,46 @@ object AnalyzerSettings {
   )
 
   def apply(
-      additionalZipExtensions: Option[Seq[String]]         = None,
-      archiveEnabled: Option[Boolean]                      = None,
-      artifactory: Artifactory                             = Artifactory.Default,
-      autoconfEnabled: Option[Boolean]                     = None,
-      cmakeEnabled: Option[Boolean]                        = None,
-      cpanFileEnabled: Option[Boolean]                     = None,
-      cpeEnabled: Option[Boolean]                          = None,
-      cpeSuppressionEnabled: Option[Boolean]               = None,
-      dartEnabled: Option[Boolean]                         = None,
-      dependencyBundlingEnabled: Option[Boolean]           = None,
-      dependencyMergingEnabled: Option[Boolean]            = None,
-      dotNet: DotNet                                       = DotNet.Default,
-      elixir: Elixir                                       = Elixir.Default,
-      experimentalEnabler: Option[Boolean]                 = None,
-      failOnUnusedSuppressionRule: Option[Boolean]         = None,
-      falsePositiveEnabled: Option[Boolean]                = None,
-      filenameEnabled: Option[Boolean]                     = None,
-      fileVersionEnabled: Option[Boolean]                  = None,
-      golang: Golang                                       = Golang.Default,
-      hints: Hints                                         = Hints.Default,
-      jarEnabled: Option[Boolean]                          = None,
-      knownExploitedEnabled: KnownExploitedVulnerabilities = KnownExploitedVulnerabilities.Default,
-      mavenCentral: MavenCentral                           = MavenCentral.Default,
-      mavenInstallEnabled: Option[Boolean]                 = None,
-      nexus: Nexus                                         = Nexus.Default,
-      node: Node                                           = Node.Default,
-      nvdCveEnabled: Option[Boolean]                       = None,
-      openSslEnabled: Option[Boolean]                      = None,
-      ossIndex: OssIndex                                   = OssIndex.Default,
-      php: Php                                             = Php.Default,
-      pnmp: Pnpm                                           = Pnpm.Default,
-      python: Python                                       = Python.Default,
-      retiredEnabled: Option[Boolean]                      = None,
-      retireJS: RetireJS                                   = RetireJS.Default,
-      ruby: Ruby                                           = Ruby.Default,
-      swift: Swift                                         = Swift.Default,
-      versionFilterEnabled: Option[Boolean]                = None,
-      vulnerabilitySuppressionEnabled: Option[Boolean]     = None,
-      yarn: Yarn                                           = Yarn.Default
+      additionalZipExtensions: Option[Seq[String]]                 = None,
+      archiveEnabled: Option[Boolean]                              = None,
+      artifactory: Artifactory                                     = Artifactory.Default,
+      autoconfEnabled: Option[Boolean]                             = None,
+      cmakeEnabled: Option[Boolean]                                = None,
+      cpanFileEnabled: Option[Boolean]                             = None,
+      cpeEnabled: Option[Boolean]                                  = None,
+      cpeSuppressionEnabled: Option[Boolean]                       = None,
+      dartEnabled: Option[Boolean]                                 = None,
+      dependencyBundlingEnabled: Option[Boolean]                   = None,
+      dependencyMergingEnabled: Option[Boolean]                    = None,
+      dotNet: DotNet                                               = DotNet.Default,
+      elixir: Elixir                                               = Elixir.Default,
+      experimentalEnabled: Option[Boolean]                         = None,
+      failOnUnusedSuppressionRule: Option[Boolean]                 = None,
+      falsePositiveEnabled: Option[Boolean]                        = None,
+      filenameEnabled: Option[Boolean]                             = None,
+      fileVersionEnabled: Option[Boolean]                          = None,
+      golang: Golang                                               = Golang.Default,
+      hints: Hints                                                 = Hints.Default,
+      jarEnabled: Option[Boolean]                                  = None,
+      knownExploitedVulnerabilities: KnownExploitedVulnerabilities =
+        KnownExploitedVulnerabilities.Default,
+      mavenCentral: MavenCentral                       = MavenCentral.Default,
+      mavenInstallEnabled: Option[Boolean]             = None,
+      nexus: Nexus                                     = Nexus.Default,
+      node: Node                                       = Node.Default,
+      nvdCveEnabled: Option[Boolean]                   = None,
+      openSslEnabled: Option[Boolean]                  = None,
+      ossIndex: OssIndex                               = OssIndex.Default,
+      php: Php                                         = Php.Default,
+      pnmp: Pnpm                                       = Pnpm.Default,
+      python: Python                                   = Python.Default,
+      retiredEnabled: Option[Boolean]                  = None,
+      retireJS: RetireJS                               = RetireJS.Default,
+      ruby: Ruby                                       = Ruby.Default,
+      swift: Swift                                     = Swift.Default,
+      versionFilterEnabled: Option[Boolean]            = None,
+      vulnerabilitySuppressionEnabled: Option[Boolean] = None,
+      yarn: Yarn                                       = Yarn.Default
   ): AnalyzerSettings = new AnalyzerSettings(
     additionalZipExtensions,
     archiveEnabled,
@@ -240,7 +240,7 @@ object AnalyzerSettings {
     dependencyMergingEnabled,
     dotNet,
     elixir,
-    experimentalEnabler,
+    experimentalEnabled,
     failOnUnusedSuppressionRule,
     falsePositiveEnabled,
     filenameEnabled,
@@ -248,7 +248,7 @@ object AnalyzerSettings {
     golang,
     hints,
     jarEnabled,
-    knownExploitedEnabled,
+    knownExploitedVulnerabilities,
     mavenCentral,
     mavenInstallEnabled,
     nexus,
@@ -399,7 +399,7 @@ object AnalyzerSettings {
   ) {
 
     def apply(settings: Settings): Unit = {
-      settings.set(ANALYZER_GOLANG_DEP_ENABLED, moduleAnalyzerEnabled)
+      settings.set(ANALYZER_GOLANG_DEP_ENABLED, dependencyAnalyzerEnabled)
       settings.set(ANALYZER_GOLANG_MOD_ENABLED, moduleAnalyzerEnabled)
       settings.set(ANALYZER_GOLANG_PATH, path)
     }
@@ -463,7 +463,7 @@ object AnalyzerSettings {
       settings.set(KEV_USER, username)
       settings.set(KEV_PASSWORD, password)
       settings.set(KEV_BEARER_TOKEN, bearerToken)
-      settings.set(KEV_CHECK_VALID_FOR_HOURS, url)
+      settings.set(KEV_CHECK_VALID_FOR_HOURS, validForHours)
     }
   }
 
@@ -573,8 +573,8 @@ object AnalyzerSettings {
     def apply(settings: Settings): Unit = {
       settings.set(ANALYZER_NEXUS_ENABLED, enabled)
       settings.set(ANALYZER_NEXUS_URL, url)
-      settings.set(ANALYZER_CENTRAL_USER, username)
-      settings.set(ANALYZER_CENTRAL_PASSWORD, password)
+      settings.set(ANALYZER_NEXUS_USER, username)
+      settings.set(ANALYZER_NEXUS_PASSWORD, password)
       settings.set(ANALYZER_NEXUS_USES_PROXY, usesProxy)
     }
 
@@ -617,7 +617,7 @@ object AnalyzerSettings {
       settings.set(ANALYZER_NODE_AUDIT_ENABLED, auditEnabled)
       settings.set(ANALYZER_NODE_AUDIT_URL, auditUrl)
       settings.set(ANALYZER_NODE_AUDIT_SKIPDEV, auditSkipDevDependencies)
-      settings.set(ANALYZER_NODE_AUDIT_USE_CACHE, auditSkipDevDependencies)
+      settings.set(ANALYZER_NODE_AUDIT_USE_CACHE, auditUsesCache)
 
       settings.set(ANALYZER_NODE_PACKAGE_ENABLED, packageEnabled)
       settings.set(ANALYZER_NODE_PACKAGE_SKIPDEV, packageSkipDevDependencies)
@@ -721,7 +721,7 @@ object AnalyzerSettings {
   ) {
 
     def apply(settings: Settings): Unit = {
-      settings.set(ANALYZER_COMPOSER_LOCK_ENABLED, composerLockSkipDevDependencies)
+      settings.set(ANALYZER_COMPOSER_LOCK_ENABLED, composerLockEnabled)
       settings.set(ANALYZER_COMPOSER_LOCK_SKIP_DEV, composerLockSkipDevDependencies)
     }
   }
@@ -777,7 +777,7 @@ object AnalyzerSettings {
 
     def apply(settings: Settings): Unit = {
       settings.set(ANALYZER_PIP_ENABLED, pipEnabled)
-      settings.set(ANALYZER_PIPFILE_ENABLED, pipEnabled)
+      settings.set(ANALYZER_PIPFILE_ENABLED, pipFileEnabled)
 
       settings.set(ANALYZER_PYTHON_DISTRIBUTION_ENABLED, distributionEnabled)
       settings.set(ANALYZER_PYTHON_PACKAGE_ENABLED, packageEnabled)
