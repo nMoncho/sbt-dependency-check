@@ -15,9 +15,7 @@ import net.nmoncho.sbt.dependencycheck.Keys._
 import net.nmoncho.sbt.dependencycheck.settings.ScopesSettings
 import net.nmoncho.sbt.dependencycheck.settings.SummaryReport
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
-import org.owasp.dependencycheck.analyzer.AbstractSuppressionAnalyzer.SUPPRESSION_OBJECT_KEY
 import org.owasp.dependencycheck.reporting.ReportGenerator
-import org.owasp.dependencycheck.xml.suppression.{ SuppressionRule => DcSuppressionRule }
 import sbt.Keys._
 import sbt._
 import sbt.complete.Parser
@@ -126,10 +124,7 @@ object Check {
               }
 
             if (listUnusedSuppressions) {
-              val unusedSuppressions = engine
-                .getObject(SUPPRESSION_OBJECT_KEY)
-                .asInstanceOf[java.util.List[DcSuppressionRule]]
-                .asScala
+              val unusedSuppressions = suppressionRules(engine).asScala
                 .filter(sup => !sup.isMatched && !sup.isBase)
 
               if (unusedSuppressions.nonEmpty) {
