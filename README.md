@@ -29,8 +29,15 @@ The best way to get started is to install the plugin, set your [NVD API Key](#nv
 ```sbt
 import net.nmoncho.sbt.dependencycheck.settings._
 
-dependencyCheckNvdApi := NvdApiSettings(apiKey = "YOUR_NVD_API_KEY")
+// Read the NVD API key from an environment variable so it is never committed to VCS.
+dependencyCheckNvdApi := sys.env
+  .get("NVD_API_KEY")
+  .map(key => NvdApiSettings(key))
+  .getOrElse(NvdApiSettings.Default)
 ```
+
+Do not hardcode the key in a VCS-tracked `build.sbt`; see [Sensitive Configuration](#sensitive-configuration)
+for ways to keep it (and other credentials) out of source control.
 
 And then just run:
 
@@ -195,13 +202,18 @@ dependencyCheckNvdApi := NvdApiSettings.Default.copy(maxRetryCount = Some(50))
 
 #### Sensitive Configuration
 
-`DependencyCheck` may use sensitive information like usernames, passwords, and Bearer Tokens. Although these could be
-added as SBT Setting Keys this is discouraged in order to avoid committing sensitive information to your VCS. Here are
-some options to that:
+`DependencyCheck` may use sensitive information like the NVD API key, usernames, passwords, and Bearer Tokens. Although
+these could be added as SBT Setting Keys this is discouraged in order to avoid committing sensitive information to your
+VCS. Here are some options to that:
 
+- Read the value from the environment, as the [Getting Started](#getting-started) example does for the NVD API key:
+  `dependencyCheckNvdApi := sys.env.get("NVD_API_KEY").map(NvdApiSettings(_)).getOrElse(NvdApiSettings.Default)`.
 - Install this plugin globally under `~/.sbt/<version>/plugins.sbt`, then define these values on that file.
 - Set the setting `dependencyCheckSettingsFile` using an external `dependencycheck.properties`.
 - Use System Properties when running an SBT Task: `sbt -Danalyzer.central.password=12348765 dependencyCheck`
+
+The NVD API key is low sensitivity (it is free and revocable), but keeping it out of VCS is still good practice and
+avoids leaking it through your git history.
 
 #### NVD API
 
