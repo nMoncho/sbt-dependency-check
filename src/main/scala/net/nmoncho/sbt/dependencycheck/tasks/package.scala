@@ -206,6 +206,28 @@ package object tasks {
     engine.analyzeDependencies()
   }
 
+  /** Reads the OWASP engine's suppression-rule list, stored under `SUPPRESSION_OBJECT_KEY`.
+    *
+    * Returns an empty list when the key is unset and, if the engine ever stores something other than
+    * a `java.util.List` under it, logs a clear message and returns an empty list instead of failing
+    * with an opaque error later. Centralises the otherwise-unchecked interop cast used by both the
+    * suppression-adding and the unused-suppressions paths.
+    */
+  private[tasks] def suppressionRules(
+      engine: Engine
+  )(implicit log: Logger): java.util.List[OwaspSuppressionRule] =
+    engine.getObject(SUPPRESSION_OBJECT_KEY) match {
+      case null =>
+        new java.util.ArrayList[OwaspSuppressionRule]()
+      case list: java.util.List[_] =>
+        list.asInstanceOf[java.util.List[OwaspSuppressionRule]]
+      case other =>
+        log.warn(
+          s"Expected a list under the Owasp suppression key but found [${other.getClass.getName}]; ignoring it"
+        )
+        new java.util.ArrayList[OwaspSuppressionRule]()
+    }
+
   private def addSuppressionRules(rules: Set[SuppressionRule], engine: Engine)(
       implicit log: Logger
   ): Unit = {
@@ -219,9 +241,7 @@ package object tasks {
         // in the project being analyzed (i.e. in the `build.sbt` or imported as packaged suppressions)
         analyzer.prepare(engine)
         if (analyzer.isEnabled) {
-          val engineRules = Option(engine.getObject(SUPPRESSION_OBJECT_KEY))
-            .map(_.asInstanceOf[java.util.List[OwaspSuppressionRule]])
-            .getOrElse(new java.util.ArrayList[OwaspSuppressionRule]())
+          val engineRules = suppressionRules(engine)
 
           engineRules.addAll(rules.map(_.toOwasp).asJavaCollection)
           engine.putObject(SUPPRESSION_OBJECT_KEY, engineRules)
