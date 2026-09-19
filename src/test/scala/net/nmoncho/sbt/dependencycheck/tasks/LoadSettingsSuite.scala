@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.time.Duration
 
+import net.nmoncho.sbt.dependencycheck.ConfigurationException
 import net.nmoncho.sbt.dependencycheck.Utils.StringLogger
 import net.nmoncho.sbt.dependencycheck.settings.ScopesSettings
 import org.owasp.dependencycheck.utils.Settings
@@ -108,5 +109,33 @@ class LoadSettingsSuite extends munit.FunSuite {
       settings.cleanup(true)
       Files.deleteIfExists(file)
     }
+  }
+
+  test("loadBaseSettings fails fast when a present settings file cannot be read") {
+    implicit val log: StringLogger = new StringLogger
+
+    // A directory exists but cannot be opened as a properties file: the load must fail loudly
+    // instead of silently continuing with defaults.
+    val dir = Files.createTempDirectory("dependencycheck-settings").toFile
+    try {
+      intercept[ConfigurationException] {
+        LoadSettings.loadBaseSettings(dir)
+      }
+    } finally dir.delete()
+  }
+
+  test("loadBaseSettings falls back to defaults when no file or resource is found") {
+    implicit val log: StringLogger = new StringLogger
+
+    val missing  = new File("does-not-exist-dependencycheck-xyz.properties")
+    val settings = LoadSettings.loadBaseSettings(missing)
+    try {
+      // No exception, and the OWASP defaults (including the mask) are present.
+      assert(
+        Option(settings.getString(DB_DRIVER_NAME)).contains("org.h2.Driver"),
+        "OWASP defaults should be used when no settings file is found"
+      )
+      assert(log.sb.result().contains("continuing with OWASP defaults"), "the fallback is surfaced")
+    } finally settings.cleanup(true)
   }
 }

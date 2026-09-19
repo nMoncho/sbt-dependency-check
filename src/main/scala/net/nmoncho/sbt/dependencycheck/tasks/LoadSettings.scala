@@ -9,9 +9,11 @@ package tasks
 
 import java.io.File
 import java.io.FileInputStream
+import java.io.InputStream
 import java.time.Duration
 
 import scala.util.Using
+import scala.util.control.NonFatal
 
 import net.nmoncho.sbt.dependencycheck.Keys
 import org.owasp.dependencycheck.utils.Settings
@@ -62,20 +64,43 @@ object LoadSettings {
     * defaults, in particular `odc.settings.mask`, so secrets stay masked in
     * `dependencyCheckListSettings`; `mergeProperties` makes an external properties file a partial
     * override rather than a full replacement of every default.
+    *
+    * A settings file that is present but cannot be opened or parsed is a misconfiguration, so it
+    * fails fast with a [[ConfigurationException]] rather than being silently swallowed and replaced
+    * with defaults. When no file and no resource are found, the OWASP defaults are used (with a
+    * warning), which is the expected behaviour when no settings file is provided.
     */
-  private[tasks] def loadBaseSettings(propertiesFile: File)(implicit log: Logger): Settings =
-    Using {
-      if (propertiesFile.exists()) new FileInputStream(propertiesFile)
-      else getClass.getClassLoader.getResourceAsStream(propertiesFile.getPath)
-    } { is =>
-      val settings = new Settings()
-      settings.mergeProperties(is)
-      settings
-    }.recover { case t: Throwable =>
-      log.error(s"Failed to load 'dependencyCheckSettingsFile' at [$propertiesFile]")
-      logThrowable(t)
-      new Settings()
-    }.get
+  private[tasks] def loadBaseSettings(propertiesFile: File)(implicit log: Logger): Settings = {
+    val settings = new Settings()
+
+    def fail(t: Throwable): Nothing = {
+      settings.cleanup(true)
+      throw new ConfigurationException(
+        s"Failed to load 'dependencyCheckSettingsFile' at [$propertiesFile]",
+        t
+      )
+    }
+
+    val stream: Option[InputStream] =
+      if (propertiesFile.exists()) {
+        try Some(new FileInputStream(propertiesFile))
+        catch { case NonFatal(t) => fail(t) }
+      } else {
+        Option(getClass.getClassLoader.getResourceAsStream(propertiesFile.getPath))
+      }
+
+    stream match {
+      case Some(is) =>
+        try Using.resource(is)(in => settings.mergeProperties(in))
+        catch { case NonFatal(t) => fail(t) }
+      case None =>
+        log.warn(
+          s"No 'dependencyCheckSettingsFile' found at [$propertiesFile]; continuing with OWASP defaults"
+        )
+    }
+
+    settings
+  }
 
   /** Applies the top-level plugin settings (name, auto-update, timeouts, data directory) onto the
     * OWASP [[Settings]], performing the required unit conversions.
