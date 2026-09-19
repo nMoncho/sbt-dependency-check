@@ -7,6 +7,12 @@ on:
 permissions:
   contents: read
 
+# Avoid overlapping runs for the same ref. On main, do not cancel in progress so a superseded run
+# can still finish its "Save generated CVE Database" step.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 env:
   LOG_LEVEL: INFO
   DATA_DIRECTORY: /tmp/cve-data/
