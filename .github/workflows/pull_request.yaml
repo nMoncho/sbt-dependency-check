@@ -16,7 +16,10 @@ env:
   LOG_LEVEL: INFO
   DATA_DIRECTORY: /tmp/cve-data
   CI: true
-  NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+  # NVD_API_KEY is intentionally NOT exposed to pull_request builds: fork PRs never receive secrets
+  # (the key would be empty), and same-repo PRs run the PR's own code, so injecting it here is an
+  # unnecessary exposure. PR runs rely on the restored CVE cache; the key lives on the trusted
+  # push (main.yaml) and workflow_dispatch (generate-cache.yaml) runs that populate that cache.
 
 jobs:
   build:
