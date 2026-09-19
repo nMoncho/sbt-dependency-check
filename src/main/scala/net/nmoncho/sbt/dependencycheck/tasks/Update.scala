@@ -11,10 +11,8 @@ import scala.util.control.NonFatal
 
 import net.nmoncho.sbt.dependencycheck.DependencyCheckPlugin.engineSettings
 import org.owasp.dependencycheck.Engine
-import sbt.Def
 import sbt.Keys.streams
-import sbt.Logger
-import sbt.Task
+import sbt._
 
 object Update {
 
@@ -24,7 +22,11 @@ object Update {
     withEngine(engineSettings.value) { engine =>
       Update(engine)
     }
-  }
+    // Tagged NonParallel so it is serialized with every other `withEngine` caller under the exclusive
+    // NonParallel restriction; this prevents two untagged engine tasks (e.g. `all dependencyCheckUpdate`
+    // across a multi-project build, or Update running alongside Purge) from concurrently reconfiguring
+    // the process-global `Downloader` singleton and racing on the shared NVD data directory.
+  } tag NonParallel
 
   def apply(engine: Engine)(implicit log: Logger): Unit =
     try {
