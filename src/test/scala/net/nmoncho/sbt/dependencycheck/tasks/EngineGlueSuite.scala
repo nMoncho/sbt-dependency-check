@@ -9,7 +9,7 @@ package net.nmoncho.sbt.dependencycheck.tasks
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.{ eq => eqTo }
 import org.mockito.Mockito._
 import org.owasp.dependencycheck.Engine
 import org.owasp.dependencycheck.analyzer.AbstractSuppressionAnalyzer.SUPPRESSION_OBJECT_KEY
@@ -49,7 +49,10 @@ class EngineGlueSuite extends munit.FunSuite {
 
     val id = getIdentifier(artifact, moduleId)
 
-    assert(id.isInstanceOf[GenericIdentifier], s"expected a GenericIdentifier but got [${id.getClass}]")
+    assert(
+      id.isInstanceOf[GenericIdentifier],
+      s"expected a GenericIdentifier but got [${id.getClass}]"
+    )
     assertEquals(id.asInstanceOf[GenericIdentifier].getValue, "sbt:org.example:widget:1.2.3")
   }
 
@@ -79,7 +82,11 @@ class EngineGlueSuite extends munit.FunSuite {
 
     val captor = ArgumentCaptor.forClass(classOf[java.util.List[OwaspSuppressionRule]])
     verify(engine).putObject(eqTo(SUPPRESSION_OBJECT_KEY), captor.capture())
-    assertEquals(captor.getValue.size, 1, "the project's suppression rule should be stored on the engine")
+    assertEquals(
+      captor.getValue.size,
+      1,
+      "the project's suppression rule should be stored on the engine"
+    )
   }
 
   test("addSuppressionRules does not touch the engine when the suppression analyzer is disabled") {
