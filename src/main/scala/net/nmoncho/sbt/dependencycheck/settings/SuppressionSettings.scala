@@ -32,9 +32,9 @@ case class SuppressionSettings(
     packagedFilter: SuppressionSettings.PackagedFilter
 ) {
 
-  def apply(settings: Settings): Unit = {
-    files(settings)
-    hosted(settings)
+  def configure(settings: Settings): Unit = {
+    files.configure(settings)
+    hosted.configure(settings)
   }
 }
 

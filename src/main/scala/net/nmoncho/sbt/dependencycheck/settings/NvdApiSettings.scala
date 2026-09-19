@@ -34,14 +34,14 @@ case class NvdApiSettings(
     dataFeed: DataFeed             = DataFeed.Default
 ) {
 
-  def apply(settings: Settings): Unit = {
+  def configure(settings: Settings): Unit = {
     settings.setStringIfNotEmpty(NVD_API_KEY, apiKey)
     settings.set(NVD_API_ENDPOINT, endpoint)
     settings.set(NVD_API_DELAY, requestDelay.map(_.toMillis))
     settings.set(NVD_API_MAX_RETRY_COUNT, maxRetryCount)
     settings.set(NVD_API_VALID_FOR_HOURS, validForHours)
     settings.set(NVD_API_RESULTS_PER_PAGE, resultsPerPage)
-    dataFeed(settings)
+    dataFeed.configure(settings)
   }
 
 }
@@ -66,7 +66,7 @@ object NvdApiSettings {
       password: Option[String]    = None,
       bearerToken: Option[String] = None
   ) {
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(NVD_API_DATAFEED_URL, url)
       settings.set(NVD_API_DATAFEED_START_YEAR, startYear)
       settings.set(NVD_API_DATAFEED_VALID_FOR_DAYS, validForDays)

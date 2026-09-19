@@ -13,7 +13,7 @@ import org.owasp.dependencycheck.utils.Settings.KEYS._
 
 /** Round-trip tests for the settings-to-OWASP mapping layer.
   *
-  * Each `*.apply(settings)` method hand-writes the mapping from a settings field to an OWASP
+  * Each `*.configure(settings)` method hand-writes the mapping from a settings field to an OWASP
   * property key. Those mappings are easy to break by copy-paste (wrong field or wrong key), and
   * such a break silently misconfigures an analyzer rather than failing the build. These tests build
   * fully non-default settings, apply them to a real [[Settings]], and assert every key reads back
@@ -64,7 +64,7 @@ class SettingsRoundTripSuite extends munit.FunSuite {
 
     val settings = new Settings()
     try {
-      analyzer(settings)
+      analyzer.configure(settings)
 
       assertEquals(settings.getString(ANALYZER_GOLANG_DEP_ENABLED), "false", "golang dep analyzer")
       assertEquals(settings.getString(ANALYZER_GOLANG_MOD_ENABLED), "true", "golang mod analyzer")
@@ -117,7 +117,7 @@ class SettingsRoundTripSuite extends munit.FunSuite {
 
     val settings = new Settings()
     try {
-      database(settings)
+      database.configure(settings)
 
       assertEquals(settings.getString(DB_DRIVER_NAME), "org.postgresql.Driver", "driver name")
       assertEquals(
@@ -167,7 +167,7 @@ class SettingsRoundTripSuite extends munit.FunSuite {
 
     val settings = new Settings()
     try {
-      analyzer(settings)
+      analyzer.configure(settings)
 
       val expected = Seq(
         ADDITIONAL_ZIP_EXTENSIONS -> "war,ear",
@@ -220,7 +220,7 @@ class SettingsRoundTripSuite extends munit.FunSuite {
 
     val settings = new Settings()
     try {
-      nvd(settings)
+      nvd.configure(settings)
 
       assertEquals(settings.getString(NVD_API_KEY), "nvd-key", "nvd api key")
       assertEquals(settings.getString(NVD_API_ENDPOINT), "https://nvd.example/api", "nvd endpoint")
@@ -260,7 +260,7 @@ class SettingsRoundTripSuite extends munit.FunSuite {
 
     val settings = new Settings()
     try {
-      hosted(settings)
+      hosted.configure(settings)
 
       assertEquals(settings.getString(HOSTED_SUPPRESSIONS_ENABLED), "false", "hosted enabled")
       assertEquals(

@@ -31,7 +31,7 @@ case class HostedSuppressionsSettings(
     password: Option[String]     = None,
     bearerToken: Option[String]  = None
 ) {
-  def apply(settings: Settings): Unit = {
+  def configure(settings: Settings): Unit = {
     settings.set(HOSTED_SUPPRESSIONS_ENABLED, enabled)
     settings.set(HOSTED_SUPPRESSIONS_URL, url.map(_.toString))
     settings.set(HOSTED_SUPPRESSIONS_FORCEUPDATE, forceUpdate)
