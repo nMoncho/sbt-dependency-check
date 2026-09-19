@@ -74,6 +74,14 @@ The entries are editable, so you can add an `until` date to make a suppression t
 By default `dependencyCheck` will run under the selected project, or `root` if none is selected. And it will also run
 on projects aggregated by that project, like any other task on SBT, generating one report per project.
 
+> **Performance on multi-module builds.** Because `dependencyCheck` produces one report per project, it initializes a
+> separate OWASP engine for each module. The fixed per-engine cost (engine construction, analyzer loading, opening the
+> local NVD database, and the update freshness check) is therefore paid once per module. On builds with many modules this
+> can dominate the wall-clock time. If a single combined report is acceptable, prefer `dependencyCheckAggregate` or
+> `dependencyCheckAllProjects` (equivalently, the `single-report` or `all-projects` arguments below): they analyze all
+> collected dependencies with a single shared engine and pay that fixed cost only once. Note that the NVD data itself is
+> not downloaded more than once regardless of the task, since the local cache is reused across engines.
+
 The task `dependencyCheck` supports arguments that can be used to change its behavior:
 
 - `list-settings`: The settings used for the analysis will be printed before running the analysis. This works the same
