@@ -16,9 +16,9 @@ class GenerateSuppressionsBaselineSuite extends munit.FunSuite {
 
   private def dependency(
       fileName: String,
-      filePath: String            = "",
-      sha1: String                = "",
-      packageUrl: Option[String]  = None,
+      filePath: String           = "",
+      sha1: String               = "",
+      packageUrl: Option[String] = None,
       cves: Seq[String]
   ): Dependency = {
     val dependency = new Dependency()
@@ -76,7 +76,7 @@ class GenerateSuppressionsBaselineSuite extends munit.FunSuite {
   test("skips dependencies without vulnerabilities") {
     val rules = GenerateSuppressionsBaseline.rulesFrom(
       Seq(
-        dependency(fileName = "clean.jar", sha1 = "aaa", cves = Seq.empty),
+        dependency(fileName = "clean.jar", sha1      = "aaa", cves = Seq.empty),
         dependency(fileName = "vulnerable.jar", sha1 = "bbb", cves = Seq("CVE-2022-4444"))
       )
     )

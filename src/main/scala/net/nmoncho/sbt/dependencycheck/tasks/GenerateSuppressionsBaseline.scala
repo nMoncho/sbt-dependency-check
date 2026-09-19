@@ -28,12 +28,12 @@ object GenerateSuppressionsBaseline {
   def apply(): Def.Initialize[Task[Unit]] = Def.task {
     implicit val log: Logger = streams.value.log
 
-    val settings      = engineSettings.value
-    val dependencies  = Dependencies.projectDependencies.value
-    val suppressions  = GenerateSuppressions.forProject.value
-    val scan          = scanSet.value
-    val outputFile    = dependencyCheckOutputDirectory.value / OutputFileName
-    val projectName   = name.value
+    val settings     = engineSettings.value
+    val dependencies = Dependencies.projectDependencies.value
+    val suppressions = GenerateSuppressions.forProject.value
+    val scan         = scanSet.value
+    val outputFile   = dependencyCheckOutputDirectory.value / OutputFileName
+    val projectName  = name.value
 
     withEngine(settings) { engine =>
       runAnalysis(engine, dependencies, suppressions, scan)

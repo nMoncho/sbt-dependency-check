@@ -10,7 +10,6 @@ package tasks
 import java.io.File
 import java.io.FileInputStream
 import java.time.Duration
-import java.util.Properties
 
 import scala.util.Using
 
@@ -34,19 +33,7 @@ object LoadSettings {
 
     val propertiesFile = dependencyCheckSettingsFile.value
 
-    val baseSettings = Using {
-      if (propertiesFile.exists()) new FileInputStream(propertiesFile)
-      else getClass.getClassLoader.getResourceAsStream(propertiesFile.getPath)
-    } { is =>
-      val props = new Properties()
-      props.load(is)
-
-      new Settings(props)
-    }.recover { case t: Throwable =>
-      log.error(s"Failed to load 'dependencyCheckSettingsFile' at [$propertiesFile]")
-      logThrowable(t)
-      new Settings()
-    }.get
+    val baseSettings = loadBaseSettings(propertiesFile)
 
     applyBaseSettings(
       baseSettings,
@@ -66,6 +53,29 @@ object LoadSettings {
 
     baseSettings
   }
+
+  /** Loads the base OWASP [[Settings]] from `dependencyCheckSettingsFile` (a file on disk, otherwise
+    * a classpath resource of the same name), starting from OWASP's bundled defaults and merging the
+    * user's properties on top.
+    *
+    * Starting from `new Settings()` (rather than `new Settings(props)`) preserves the built-in
+    * defaults, in particular `odc.settings.mask`, so secrets stay masked in
+    * `dependencyCheckListSettings`; `mergeProperties` makes an external properties file a partial
+    * override rather than a full replacement of every default.
+    */
+  private[tasks] def loadBaseSettings(propertiesFile: File)(implicit log: Logger): Settings =
+    Using {
+      if (propertiesFile.exists()) new FileInputStream(propertiesFile)
+      else getClass.getClassLoader.getResourceAsStream(propertiesFile.getPath)
+    } { is =>
+      val settings = new Settings()
+      settings.mergeProperties(is)
+      settings
+    }.recover { case t: Throwable =>
+      log.error(s"Failed to load 'dependencyCheckSettingsFile' at [$propertiesFile]")
+      logThrowable(t)
+      new Settings()
+    }.get
 
   /** Applies the top-level plugin settings (name, auto-update, timeouts, data directory) onto the
     * OWASP [[Settings]], performing the required unit conversions.
