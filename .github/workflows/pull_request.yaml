@@ -7,6 +7,11 @@ on:
 permissions:
   contents: read
 
+# Cancel superseded runs when a PR branch is pushed again.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   LOG_LEVEL: INFO
   DATA_DIRECTORY: /tmp/cve-data
