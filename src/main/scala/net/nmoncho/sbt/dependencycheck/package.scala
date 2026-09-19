@@ -27,7 +27,7 @@ package object dependencycheck {
       import scala.jdk.CollectionConverters.*
 
       val prettyMessage = (
-        "Failed creating report:" +:
+        "Dependency-Check failed with the following exceptions:" +:
           e.getExceptions.asScala.toVector.flatMap { t =>
             s"  ${t.getLocalizedMessage}" +:
             Option(t.getCause).map { cause =>
@@ -40,7 +40,7 @@ package object dependencycheck {
       logThrowable(e)
 
     case e =>
-      log.error(s"Failed creating report: ${e.getLocalizedMessage}")
+      log.error(s"Dependency-Check failed: ${e.getLocalizedMessage}")
       logThrowable(e)
   }
 
