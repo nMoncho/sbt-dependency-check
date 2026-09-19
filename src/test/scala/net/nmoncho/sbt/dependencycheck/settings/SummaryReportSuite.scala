@@ -84,7 +84,10 @@ class SummaryReportSuite extends munit.FunSuite {
     val summary = SummaryReport.OffendingVulnerabilities.buildSummary(deps, policy)
 
     assert(summary.contains("CVE-OFFENDING"), summary)
-    assert(!summary.contains("CVE-CLEAN"), s"below-threshold finding should be filtered out: $summary")
+    assert(
+      !summary.contains("CVE-CLEAN"),
+      s"below-threshold finding should be filtered out: $summary"
+    )
     // A dependency with no offending finding is omitted entirely.
     assert(!summary.contains("clean.jar"), s"clean dependency should not appear: $summary")
   }
@@ -116,7 +119,8 @@ class SummaryReportSuite extends munit.FunSuite {
   }
 
   test("a summary of dependencies without vulnerabilities is empty") {
-    val summary = SummaryReport.AllVulnerabilities.buildSummary(Seq(dependency("clean.jar")), policy)
+    val summary =
+      SummaryReport.AllVulnerabilities.buildSummary(Seq(dependency("clean.jar")), policy)
 
     assert(summary.isEmpty, s"expected an empty summary but got: $summary")
   }
