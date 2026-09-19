@@ -8,7 +8,6 @@ package net.nmoncho.sbt.dependencycheck
 
 import net.nmoncho.sbt.dependencycheck.settings._
 import net.nmoncho.sbt.dependencycheck.tasks._
-import org.owasp.dependencycheck.reporting.ReportGenerator.Format
 import org.owasp.dependencycheck.utils.Settings
 import sbt.Keys._
 import sbt._

@@ -14,6 +14,25 @@ import sbt._
 
 object Keys {
 
+  /** Re-export of OWASP's report [[ReportGenerator.Format]] so builds can select report formats (for
+    * example `dependencyCheckFormats := Seq(Format.HTML, Format.SARIF)`) without importing OWASP
+    * packages directly.
+    */
+  type Format = ReportGenerator.Format
+
+  /** The available report formats, re-exported from OWASP's `ReportGenerator.Format`. */
+  object Format {
+    val HTML: Format    = ReportGenerator.Format.HTML
+    val XML: Format     = ReportGenerator.Format.XML
+    val CSV: Format     = ReportGenerator.Format.CSV
+    val JSON: Format    = ReportGenerator.Format.JSON
+    val JUNIT: Format   = ReportGenerator.Format.JUNIT
+    val SARIF: Format   = ReportGenerator.Format.SARIF
+    val JENKINS: Format = ReportGenerator.Format.JENKINS
+    val GITLAB: Format  = ReportGenerator.Format.GITLAB
+    val ALL: Format     = ReportGenerator.Format.ALL
+  }
+
   // Settings
   lazy val dependencyCheckFailBuildOnCVSS: SettingKey[Double] = settingKey(
     "Specifies if the build should be failed if a CVSS score above a specified level is identified. The default is 11 which means since the CVSS scores are 0-10, by default the build will never fail. More information on CVSS scores can be found at https://nvd.nist.gov/vuln-metrics/cvss"
@@ -41,7 +60,7 @@ object Keys {
     "An optional sequence of files that specify additional files and/or directories to analyze as part of the scan. If not specified, defaults to standard scala conventions."
   )
   lazy val dependencyCheckFormats: SettingKey[Seq[ReportGenerator.Format]] = settingKey(
-    "The report formats to be generated (HTML, XML, JUNIT, CSV, JSON, SARIF, JENKINS, ALL)."
+    "The report formats to be generated (HTML, XML, JUNIT, CSV, JSON, SARIF, JENKINS, GITLAB, ALL)."
   )
 
   lazy val dependencyCheckAnalysisTimeout: SettingKey[Option[Duration]] =
