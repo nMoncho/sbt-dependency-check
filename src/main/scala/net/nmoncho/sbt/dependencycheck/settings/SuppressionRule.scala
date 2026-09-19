@@ -207,11 +207,12 @@ object SuppressionRule {
 
       import scala.language.implicitConversions
 
+      // Matches the `caseSensitive = false` default used by every other construction path
+      // (`PropertyType.string`, the `.toPropertyType` extensions, `Identifier.ofSha1`) and by OWASP's
+      // suppression schema, so the same string literal has the same matching semantics regardless of
+      // which path built it.
       implicit def stringToPropertyType(str: String): PropertyType =
-        string(
-          str,
-          caseSensitive = true
-        ) // FIXME all the other default values are `false` but this one is `true` making it confusing. It should be true for all!!!
+        string(str, caseSensitive = false)
 
       implicit def regexToPropertyType(expr: Regex): PropertyType = regex(expr)
 

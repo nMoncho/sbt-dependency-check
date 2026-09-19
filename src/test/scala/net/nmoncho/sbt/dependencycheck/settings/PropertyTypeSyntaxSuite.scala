@@ -44,7 +44,9 @@ class PropertyTypeSyntaxSuite extends munit.FunSuite {
     val cve: PropertyType = "CVE-12345"
     assertEquals(cve.value, "CVE-12345")
     assert(!cve.regex)
-    assert(cve.caseSensitive)
+    // The String implicit conversion uses caseSensitive = false, consistent with every other
+    // String construction path (`PropertyType.string`, `.toPropertyType`).
+    assert(!cve.caseSensitive)
 
     val cveRegex: PropertyType = "CVE-12345".r
     assertEquals(cveRegex.value, "CVE-12345")
