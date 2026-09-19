@@ -153,6 +153,38 @@ For CI, generate a machine-readable format alongside `HTML`:
 - **GitLab dependency scanning**: generate `GITLAB` to produce a report GitLab can ingest.
 - **Generic CI or dashboards**: generate `JSON` or `XML` for programmatic processing.
 
+#### Common Examples
+
+The nested settings (`dependencyCheckAnalyzers`, `dependencyCheckNvdApi`, `dependencyCheckDatabase`, ...) are
+case classes whose companion `apply` defaults every field, so you can set a single field while keeping the
+rest at their defaults, without reconstructing the whole tree.
+
+Enable the experimental analyzers (a top-level toggle):
+
+```scala
+dependencyCheckAnalyzers := AnalyzerSettings(experimentalEnabled = Some(true))
+```
+
+Toggle a nested analyzer, for example turn off the Node Audit analyzer:
+
+```scala
+dependencyCheckAnalyzers := AnalyzerSettings(node = AnalyzerSettings.Node(auditEnabled = Some(false)))
+```
+
+Cache the NVD data in a fixed directory and run offline in CI. Populate the cache once with
+`dependencyCheckUpdate`, then disable auto-updates so the analysis never reaches the network:
+
+```scala
+dependencyCheckDataDirectory := Some((ThisBuild / baseDirectory).value / ".dependency-check-data")
+dependencyCheckAutoUpdate := false
+```
+
+To change several fields at once, `.copy` an existing value (for example the default):
+
+```scala
+dependencyCheckNvdApi := NvdApiSettings.Default.copy(maxRetryCount = Some(50))
+```
+
 #### Sensitive Configuration
 
 `DependencyCheck` may use sensitive information like usernames, passwords, and Bearer Tokens. Although these could be
