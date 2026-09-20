@@ -1,4 +1,4 @@
--> dependencyCheckAllProjects
+-> dependencyCheck --single-report --all-projects
 $ exists target/**/dependency-check-report.html
 $ absent core/target/**/dependency-check-report.html
 $ absent util/target/**/dependency-check-report.html

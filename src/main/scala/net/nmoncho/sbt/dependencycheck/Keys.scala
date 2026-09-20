@@ -104,22 +104,12 @@ object Keys {
   lazy val dependencyCheck: InputKey[Unit] = inputKey(
     "Runs dependency-check against the project and generates a report per sub project."
   )
-  lazy val dependencyCheckAggregate: TaskKey[Unit] = taskKey(
-    "Runs dependency-check against project aggregates and combines the results into a single report."
-  )
-  lazy val dependencyCheckAllProjects: TaskKey[Unit] = taskKey(
-    "Runs dependency-check against all projects and combines the results into a single report."
-  )
   lazy val dependencyCheckUpdate: TaskKey[Unit] =
     taskKey("Updates the local cache of the NVD data from NIST.")
   lazy val dependencyCheckPurge: TaskKey[Unit] =
     taskKey("Deletes the local copy of the NVD. This is used to force a refresh of the data.")
   lazy val dependencyCheckListSettings: TaskKey[Unit] =
     taskKey("List the settings used during the analysis.")
-  lazy val dependencyCheckListUnusedSuppressions: TaskKey[Unit] =
-    taskKey(
-      "List unused suppressions, only considering suppression files, not hosted suppressions nor packed suppressions."
-    )
   lazy val dependencyCheckListSuppressions: InputKey[Unit] = inputKey(
     "List suppression rules added to the Owasp Engine which are defined in the project definition (ie. build.sbt), or are imported packaged suppressions."
   )

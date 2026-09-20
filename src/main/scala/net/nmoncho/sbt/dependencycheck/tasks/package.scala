@@ -56,18 +56,23 @@ package object tasks {
     case object OffendingVulnerabilitiesSummary extends ParseOptions
   }
 
-  private[tasks] val PerProject  = (Space ~> token("per-project")) ^^^ ProjectSelection.PerProject
-  private[tasks] val AllProjects = (Space ~> token("all-projects")) ^^^ ProjectSelection.AllProjects
-  private[tasks] val Aggregate   = (Space ~> token("aggregate")) ^^^ ProjectSelection.Aggregate
+  private[tasks] val PerProject =
+    (Space ~> (token("--per-project") | token("-p"))) ^^^ ProjectSelection.PerProject
+  private[tasks] val AllProjects =
+    (Space ~> (token("--all-projects") | token("-a"))) ^^^ ProjectSelection.AllProjects
+  private[tasks] val Aggregate =
+    (Space ~> (token("--aggregate") | token("-g"))) ^^^ ProjectSelection.Aggregate
 
   private[tasks] val ListSettingsArg =
-    (Space ~> token("list-settings")) ^^^ ParseOptions.ListSettings
+    (Space ~> (token("--list-settings") | token("-l"))) ^^^ ParseOptions.ListSettings
   private[tasks] val SingleReportArg =
-    (Space ~> token("single-report")) ^^^ ParseOptions.SingleReport
+    (Space ~> (token("--single-report") | token("-s"))) ^^^ ParseOptions.SingleReport
   private[tasks] val AllProjectsArg =
-    (Space ~> token("all-projects")) ^^^ ParseOptions.AllProjects
+    (Space ~> (token("--all-projects") | token("-a"))) ^^^ ParseOptions.AllProjects
   private[tasks] val ListUnusedSuppressionsArg =
-    (Space ~> token("list-unused-suppressions")) ^^^ ParseOptions.ListUnusedSuppressions
+    (Space ~> (token("--list-unused-suppressions") | token(
+      "-u"
+    ))) ^^^ ParseOptions.ListUnusedSuppressions
 
   private[tasks] val OriginalSummaryArg =
     (Space ~> token("original-summary")) ^^^ ParseOptions.OriginalSummary

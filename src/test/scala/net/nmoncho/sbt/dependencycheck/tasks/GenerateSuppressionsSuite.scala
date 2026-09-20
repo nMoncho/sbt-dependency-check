@@ -106,7 +106,8 @@ class GenerateSuppressionsSuite extends munit.FunSuite {
     // The exported file should contain every rule from the base suppressions fixture plus the one
     // injected build rule. Asserting that relationship (rather than a magic count tied to the
     // fixture's current size) keeps the test meaningful if the fixture is ever refreshed.
-    val baseRules = GenerateSuppressions.parseSuppressionFile(new SuppressionParser, suppressionFile)
+    val baseRules =
+      GenerateSuppressions.parseSuppressionFile(new SuppressionParser, suppressionFile)
 
     assert(parsed.nonEmpty, "packaged rules should be parseable")
     assertEquals(parsed.size, baseRules.size + 1)
