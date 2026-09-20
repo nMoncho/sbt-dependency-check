@@ -54,6 +54,10 @@ reports are being written to.
 
 After this, feel free to take a look at the available tasks and settings.
 
+### Migrating from v1.x
+
+If you're migrating from v1.x, then please read [this guide](MIGRATION_V2.md).
+
 ### Tasks
 
 The following tasks are available:
@@ -93,13 +97,11 @@ on projects aggregated by that project, like any other task on SBT, generating o
 
 The task `dependencyCheck` supports arguments that can be used to change its behavior:
 
-- `list-settings`: The settings used for the analysis will be printed before running the analysis. This works the same
-  way as the task `dependencyCheckListSettings`.
-- `list-unused-suppressions`: Any unused suppression rule will be printed after the analysis. This works the same way as
-  the task `dependencyCheckListUnusedSuppressions`.
-- `single-report`: A single report will be generated for this project, and all aggregates if any. This works the same
-  way as the task `dependencyCheckAggregate`.
-- `all-projects`: A single report will be generated for all projects. This works the same way as the task `dependencyCheckAllProjects`.
+- `--list-settings` or `-l`: The settings used for the analysis will be printed before running the analysis.
+- `--list-unused-suppressions` or `-u`: Any unused suppression rule will be printed after the analysis.
+- `--single-report` or `-s`: A single report will be generated for this project, and all aggregates if any.
+- `--all-projects` or `-a`: A single report will be generated for all projects. **Important**: This arguments needs to be used
+  together with `--single-report`.
   A single combined report is always produced for all projects, so `single-report` is implied and does not need to be passed alongside it.
 
 This task also supports modifying how the reporting summary is shown at the end:

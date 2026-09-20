@@ -1,4 +1,4 @@
-> dependencyCheckAggregate
+> dependencyCheck --single-report
 $ exists target/**/dependency-check-report.html
 $ absent core/target/**/dependency-check-report.html
 > check
