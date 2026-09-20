@@ -16,6 +16,7 @@ import sbt._
   *
   * For more information, see <a href="https://jeremylong.github.io/DependencyCheck/analyzers/index.html">File Type Analyzers</a>
   *
+  * @param additionalZipExtensions additional file extensions to be treated as zip archives when scanning.
   * @param archiveEnabled whether the Archive analyzer is enabled.
   * @param artifactory Artifactory Settings.
   * @param autoconfEnabled whether the autoconf analyzer should be used.
@@ -554,7 +555,7 @@ object AnalyzerSettings {
 
   /** RetireJS Settings
     *
-    * @param enabled hether the RetireJS analyzer is enabled
+    * @param enabled whether the RetireJS analyzer is enabled
     * @param forceUpdate whether the RetireJS repository will be updated regardless of the autoupdate settings
     * @param filters whether the RetireJS analyzer file content filters
     * @param filterNonVulnerable whether the RetireJS analyzer should filter out non-vulnerable dependencies
