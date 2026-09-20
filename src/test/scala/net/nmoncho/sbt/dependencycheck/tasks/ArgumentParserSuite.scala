@@ -18,12 +18,12 @@ class ArgumentParserSuite extends munit.FunSuite {
   private def parseArgs(input: String): Either[String, Seq[ParseOptions]] =
     Parser.parse(input, Check.argumentsParser)
 
-  test("each argument token maps to its ParseOptions") {
-    assertEquals(parseArgs(" list-settings"), Right(Seq(ParseOptions.ListSettings)))
-    assertEquals(parseArgs(" single-report"), Right(Seq(ParseOptions.SingleReport)))
-    assertEquals(parseArgs(" all-projects"), Right(Seq(ParseOptions.AllProjects)))
+  test("each long-form argument maps to its ParseOptions") {
+    assertEquals(parseArgs(" --list-settings"), Right(Seq(ParseOptions.ListSettings)))
+    assertEquals(parseArgs(" --single-report"), Right(Seq(ParseOptions.SingleReport)))
+    assertEquals(parseArgs(" --all-projects"), Right(Seq(ParseOptions.AllProjects)))
     assertEquals(
-      parseArgs(" list-unused-suppressions"),
+      parseArgs(" --list-unused-suppressions"),
       Right(Seq(ParseOptions.ListUnusedSuppressions))
     )
     assertEquals(parseArgs(" original-summary"), Right(Seq(ParseOptions.OriginalSummary)))
@@ -37,48 +37,71 @@ class ArgumentParserSuite extends munit.FunSuite {
     )
   }
 
+  test("each short-form flag maps to the same ParseOptions as its long form") {
+    assertEquals(parseArgs(" -l"), Right(Seq(ParseOptions.ListSettings)))
+    assertEquals(parseArgs(" -s"), Right(Seq(ParseOptions.SingleReport)))
+    assertEquals(parseArgs(" -a"), Right(Seq(ParseOptions.AllProjects)))
+    assertEquals(parseArgs(" -u"), Right(Seq(ParseOptions.ListUnusedSuppressions)))
+  }
+
   test("no arguments parse to an empty sequence") {
     assertEquals(parseArgs(""), Right(Seq.empty[ParseOptions]))
   }
 
   test("arguments are accepted in any order and combination") {
     assertEquals(
-      parseArgs(" single-report all-projects"),
+      parseArgs(" --single-report --all-projects"),
       Right(Seq(ParseOptions.SingleReport, ParseOptions.AllProjects))
     )
     assertEquals(
-      parseArgs(" all-projects single-report"),
+      parseArgs(" --all-projects --single-report"),
       Right(Seq(ParseOptions.AllProjects, ParseOptions.SingleReport))
     )
+    // Long and short forms mix freely, and a bare summary arg combines with the flags.
     assertEquals(
-      parseArgs(" list-settings offending-vulnerabilities-summary"),
+      parseArgs(" -l offending-vulnerabilities-summary"),
       Right(Seq(ParseOptions.ListSettings, ParseOptions.OffendingVulnerabilitiesSummary))
     )
   }
 
   test("the same argument may be repeated") {
     assertEquals(
-      parseArgs(" list-settings list-settings"),
+      parseArgs(" --list-settings --list-settings"),
       Right(Seq(ParseOptions.ListSettings, ParseOptions.ListSettings))
     )
   }
 
   test("an unrecognized token fails to parse") {
     assert(parseArgs(" bogus").isLeft, "an unknown argument should not parse")
-    assert(parseArgs(" list-settings bogus").isLeft, "a trailing unknown argument should not parse")
+    assert(
+      parseArgs(" --list-settings bogus").isLeft,
+      "a trailing unknown argument should not parse"
+    )
   }
 
   test("projectSelectionParser maps the selection tokens and defaults to none") {
     assertEquals(
-      Parser.parse(" per-project", projectSelectionParser),
+      Parser.parse(" --per-project", projectSelectionParser),
       Right(Some(ProjectSelection.PerProject))
     )
     assertEquals(
-      Parser.parse(" all-projects", projectSelectionParser),
+      Parser.parse(" -p", projectSelectionParser),
+      Right(Some(ProjectSelection.PerProject))
+    )
+    assertEquals(
+      Parser.parse(" --all-projects", projectSelectionParser),
       Right(Some(ProjectSelection.AllProjects))
     )
     assertEquals(
-      Parser.parse(" aggregate", projectSelectionParser),
+      Parser.parse(" -a", projectSelectionParser),
+      Right(Some(ProjectSelection.AllProjects))
+    )
+    assertEquals(
+      Parser.parse(" --aggregate", projectSelectionParser),
+      Right(Some(ProjectSelection.Aggregate))
+    )
+    assertEquals(
+      Parser.parse(" -g", projectSelectionParser),
       Right(Some(ProjectSelection.Aggregate))
     )
     assertEquals(Parser.parse("", projectSelectionParser), Right(None))
