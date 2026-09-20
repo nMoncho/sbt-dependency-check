@@ -252,7 +252,7 @@ A regular build then restores it and points `DATA_DIRECTORY` at it:
         run: sbt dependencyCheck
 ```
 
-Feel read more about this on our [wiki](https://github.com/nMoncho/sbt-dependency-check/wiki/NVD-API)
+Feel free to read more about this on our [wiki](https://github.com/nMoncho/sbt-dependency-check/wiki/NVD-API)
 
 #### Suppression Settings
 
@@ -284,7 +284,7 @@ where `suppressions.xml` follows the DependencyCheck suppression schema:
 </suppressions>
 ```
 
-Feel read more about this on our [wiki](https://github.com/nMoncho/sbt-dependency-check/wiki/SUPPRESSIONS).
+Feel free to read more about this on our [wiki](https://github.com/nMoncho/sbt-dependency-check/wiki/SUPPRESSIONS).
 
 > **Trust boundary for packaged suppressions.** When `packagedEnabled` is turned on, suppression
 > rules shipped inside your dependencies' JARs (`packaged-suppressions-file.xml`) are imported into
@@ -315,7 +315,7 @@ dependencyCheckAnalyzers := AnalyzerSettings(
 )
 ```
 
-Feel read more about this on our [wiki](https://github.com/nMoncho/sbt-dependency-check/wiki/ANALYZERS).
+Feel free to read more about this on our [wiki](https://github.com/nMoncho/sbt-dependency-check/wiki/ANALYZERS).
 
 ### Running behind a proxy
 
