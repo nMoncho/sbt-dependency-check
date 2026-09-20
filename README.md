@@ -58,16 +58,16 @@ After this, feel free to take a look at the available tasks and settings.
 
 The following tasks are available:
 
-| Task                                    | Description                                                                                                                                                               |
-|:----------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `dependencyCheck`                       | Runs dependency-check against the project and generates a report per sub project.                                                                                         |
-| `dependencyCheckAggregate`              | Runs dependency-check against project aggregates and combines the results into a single report.                                                                           |
-| `dependencyCheckAllProjects`            | Runs dependency-check against all projects and combines the results into a single report.                                                                                 |
-| `dependencyCheckUpdate`                 | Updates the local cache of the NVD data from NIST.                                                                                                                        |
-| `dependencyCheckPurge`                  | Deletes the local copy of the NVD. This is used to force a refresh of the data.                                                                                           |
-| `dependencyCheckListSettings`           | List the settings used during the analysis.                                                                                                                               |
-| `dependencyCheckListUnusedSuppressions` | List unused suppressions, only considering suppression files or rules defined in the project definition (ie. build.sbt), not hosted suppressions nor packed suppressions. |
-| `dependencyCheckListSuppressions`       | List suppression rules added to the Owasp Engine which are defined in the project definition (ie. build.sbt), or are imported packaged suppressions.                      |
+| Task                                    | Description                                                                                                                                                                   |
+|:----------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `dependencyCheck`                       | Runs dependency-check against the project and generates a report per sub project.                                                                                             |
+| `dependencyCheckAggregate`              | Runs dependency-check against project aggregates and combines the results into a single report.                                                                               |
+| `dependencyCheckAllProjects`            | Runs dependency-check against all projects and combines the results into a single report.                                                                                     |
+| `dependencyCheckUpdate`                 | Updates the local cache of the NVD data from NIST.                                                                                                                            |
+| `dependencyCheckPurge`                  | Deletes the local copy of the NVD. This is used to force a refresh of the data.                                                                                               |
+| `dependencyCheckListSettings`           | List the settings used during the analysis.                                                                                                                                   |
+| `dependencyCheckListUnusedSuppressions` | List unused suppressions, only considering suppression files or rules defined in the project definition (ie. build.sbt), not hosted suppressions nor packed suppressions.     |
+| `dependencyCheckListSuppressions`       | List suppression rules added to the Owasp Engine which are defined in the project definition (ie. build.sbt), or are imported packaged suppressions.                          |
 | `dependencyCheckGenerateSuppressions`   | Runs the analysis and writes a suppression XML baseline of the vulnerabilities currently found, so an existing project can baseline known findings and fail only on new ones. |
 
 The reports will be written to `crossTarget.value` by default. This can be overwritten by setting `dependencyCheckOutputDirectory`.
@@ -131,7 +131,7 @@ some configuration convenience.
 | `dependencyCheckJUnitFailBuildOnCVSS`  | If using the jUnit, specifies the CVSS score that is considered a `test` failure when generating a jUnit style report                                                                | 0.0                                                                            |
 | `dependencyCheckFailOnCves`            | CVE ids (e.g. `CVE-2021-44228`) that must always fail the build when found, regardless of their CVSS score                                                                           | empty                                                                          |
 | `dependencyCheckFailOnKnownExploited`  | Fail the build when any dependency has a Known Exploited Vulnerability (KEV), regardless of its CVSS score                                                                           | `false`                                                                        |
-| `dependencyCheckWarnOnly`              | Report vulnerabilities that would fail the build (summary and report) without failing the build                                                                                     | `false`                                                                        |
+| `dependencyCheckWarnOnly`              | Report vulnerabilities that would fail the build (summary and report) without failing the build                                                                                      | `false`                                                                        |
 | `dependencyCheckSkip`                  | Skips this project on the dependency-check analysis                                                                                                                                  | `false`                                                                        |
 | `dependencyCheckScopes`                | What library dependency scopes are considered during the analysis                                                                                                                    | Compile = true, Test = false, Runtime = true, Provided = true, Optional = true |
 | `dependencyCheckScanSet`               | An optional sequence of files that specify additional files and/or directories to analyze as part of the scan                                                                        | Standard Scala conventions                                                     |
@@ -370,3 +370,8 @@ dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "<ver
 
 Setting these in your regular `build.sbt` has no effect here, because the conflict is on the
 meta-build classpath rather than your application's.
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to build, test, and style
+the project, and the [Security Policy](SECURITY.md) for how to report a vulnerability in the plugin.
