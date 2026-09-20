@@ -18,6 +18,8 @@ addSbtPlugin("net.nmoncho" % "sbt-dependency-check" % "2.0.0")
 
 The minimum SBT version supported is `1.9.0`.
 
+Upgrading from a 1.x release? See the [Migration guide](MIGRATION.md) for the 2.0.0 breaking changes.
+
 ## Usage
 
 ### Getting Started
@@ -222,7 +224,33 @@ Key;
 see [Requesting an API Key](https://nvd.nist.gov/developers/request-an-api-key). Without an NVD API Key, updating will
 be **extremely slow**.
 
-In a CI environment one must use a caching strategy, like caching the CVE Database.
+In a CI environment you should cache the CVE database so every build does not re-download it from the NVD API. Wire
+`dependencyCheckDataDirectory` to a stable path (here read from an environment variable) so the cache can be restored
+into it:
+
+```sbt
+ThisBuild / dependencyCheckDataDirectory := sys.env.get("DATA_DIRECTORY").map(new File(_))
+```
+
+Populate that cache once with an NVD API key (for example on a schedule or manually), then restore it read-only on push
+and pull-request builds so those builds never need the secret. This repository's own
+[`generate-cache.yaml`](.github/workflows/generate-cache.yaml) workflow is the populate step: it runs
+`sbt 'testOnly *DbSuite'` with `DATA_DIRECTORY` and `NVD_API_KEY` set, then saves the folder with `actions/cache/save`.
+A regular build then restores it and points `DATA_DIRECTORY` at it:
+
+```yaml
+      - name: Restore CVE Database
+        uses: actions/cache/restore@v6
+        with:
+          path: /tmp/cve-data
+          key: ${{ runner.os }}-cve-cache-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-cve-cache-
+      - name: Run dependency-check
+        env:
+          DATA_DIRECTORY: /tmp/cve-data
+        run: sbt dependencyCheck
+```
 
 Feel read more about this on our [wiki](https://github.com/nMoncho/sbt-dependency-check/wiki/NVD-API)
 
@@ -231,6 +259,30 @@ Feel read more about this on our [wiki](https://github.com/nMoncho/sbt-dependenc
 Due to [how dependency-check identifies libraries](https://dependency-check.github.io/DependencyCheck/general/internals.html)
 false positives may occur (i.e. a CPE was identified that is incorrect). `sbt-dependency-check` offer several ways to
 define these suppressions.
+
+A minimal setup wires one or more suppression XML files and/or inline rules through `dependencyCheckSuppressions`:
+
+```sbt
+import net.nmoncho.sbt.dependencycheck.settings._
+
+dependencyCheckSuppressions := SuppressionSettings(
+  files        = SuppressionFilesSettings.files()(new File("suppressions.xml")),
+  suppressions = Seq(SuppressionRule(cvssBelow = Seq(7.0)))
+)
+```
+
+where `suppressions.xml` follows the DependencyCheck suppression schema:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    <suppress>
+        <notes><![CDATA[ known false positive for commons-cli ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-cli/commons\-cli@.*$</packageUrl>
+        <cpe>cpe:/a:spirit-project:spirit</cpe>
+    </suppress>
+</suppressions>
+```
 
 Feel read more about this on our [wiki](https://github.com/nMoncho/sbt-dependency-check/wiki/SUPPRESSIONS).
 
@@ -249,6 +301,19 @@ Feel read more about this on our [wiki](https://github.com/nMoncho/sbt-dependenc
 Analyzers, as the name imply, are a way to analyze dependencies or artifacts.
 [DependencyCheck](https://github.com/dependency-check/DependencyCheck) offers an extensive
 list of analyzers out of the box.
+
+Each analyzer can be toggled or configured through `dependencyCheckAnalyzers`. Because every field defaults, you can
+change one without restating the rest, for example to enable the experimental analyzers and disable the remote OSS Index
+analyzer:
+
+```sbt
+import net.nmoncho.sbt.dependencycheck.settings._
+
+dependencyCheckAnalyzers := AnalyzerSettings(
+  experimentalEnabled = Some(true),
+  ossIndex            = AnalyzerSettings.OssIndex(enabled = Some(false))
+)
+```
 
 Feel read more about this on our [wiki](https://github.com/nMoncho/sbt-dependency-check/wiki/ANALYZERS).
 
