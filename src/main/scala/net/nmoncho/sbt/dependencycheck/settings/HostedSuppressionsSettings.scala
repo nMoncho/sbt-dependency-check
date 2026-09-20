@@ -23,15 +23,17 @@ import org.owasp.dependencycheck.utils.Settings.KEYS._
   * @param bearerToken the hosted suppressions bearer token. For use when hosted suppressions are mirrored locally on a site requiring HTTP-Bearer-authentication
   */
 case class HostedSuppressionsSettings(
-    enabled: Option[Boolean],
-    url: Option[URL],
-    forceUpdate: Option[Boolean],
-    validForHours: Option[Int],
-    username: Option[String],
-    password: Option[String],
-    bearerToken: Option[String]
+    enabled: Option[Boolean]     = None,
+    url: Option[URL]             = None,
+    forceUpdate: Option[Boolean] = None,
+    validForHours: Option[Int]   = None,
+    username: Option[String]     = None,
+    @redacted
+    password: Option[String] = None,
+    @redacted
+    bearerToken: Option[String] = None
 ) {
-  def apply(settings: Settings): Unit = {
+  def configure(settings: Settings): Unit = {
     settings.set(HOSTED_SUPPRESSIONS_ENABLED, enabled)
     settings.set(HOSTED_SUPPRESSIONS_URL, url.map(_.toString))
     settings.set(HOSTED_SUPPRESSIONS_FORCEUPDATE, forceUpdate)
@@ -41,28 +43,10 @@ case class HostedSuppressionsSettings(
     settings.set(HOSTED_SUPPRESSIONS_PASSWORD, password)
     settings.set(HOSTED_SUPPRESSIONS_BEARER_TOKEN, bearerToken)
   }
+
+  override def toString: String = redactedToString(this)
 }
 
 object HostedSuppressionsSettings {
-  val Default: HostedSuppressionsSettings =
-    new HostedSuppressionsSettings(None, None, None, None, None, None, None)
-
-  def apply(
-      enabled: Option[Boolean]     = None,
-      url: Option[URL]             = None,
-      forceUpdate: Option[Boolean] = None,
-      validForHours: Option[Int]   = None,
-      username: Option[String]     = None,
-      password: Option[String]     = None,
-      bearerToken: Option[String]  = None
-  ): HostedSuppressionsSettings =
-    new HostedSuppressionsSettings(
-      enabled,
-      url,
-      forceUpdate,
-      validForHours,
-      username,
-      password,
-      bearerToken
-    )
+  val Default: HostedSuppressionsSettings = HostedSuppressionsSettings()
 }

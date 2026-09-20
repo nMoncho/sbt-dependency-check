@@ -12,8 +12,6 @@ import sbt._
 
 object AggregateCheck {
 
-  def apply(): Def.Initialize[Task[Unit]] = Check().toTask(" single-report")
-
   def dependencies(): Def.Initialize[Task[Set[Attributed[File]]]] = Def.task {
     dependenciesFilter.value.toSet.flatten
   }

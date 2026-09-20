@@ -44,11 +44,23 @@ object ListSettings {
       if (value != null && masks.exists(_.test(key))) {
         log.info(s"\t$key: ********")
       } else {
-        log.info(s"\t$key: $value")
+        log.info(s"\t$key: ${redactUserInfo(value)}")
       }
     }
     log.info("\n\n")
   }
+
+  // Matches the `user[:password]@` userinfo of a URL/JDBC connection string (e.g.
+  // `jdbc:mysql://user:secret@host/db`), which OWASP's key-name mask does not cover. Group 1 keeps
+  // the leading `//` so the URL stays readable after the credentials are stripped.
+  private val UserInfoPattern = Pattern.compile("(//)[^/@\\s:]+(?::[^/@\\s]+)?@")
+
+  /** Redacts any embedded `user:password@` credentials from a printed value, leaving the rest of the
+    * connection string / URL intact for diagnostics.
+    */
+  private def redactUserInfo(value: String): String =
+    if (value == null) null
+    else UserInfoPattern.matcher(value).replaceAll("$1****@")
 
   /** Collect all [[Settings.KEYS]] values
     *

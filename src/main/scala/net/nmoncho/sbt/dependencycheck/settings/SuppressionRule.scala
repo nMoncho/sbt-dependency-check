@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.regex.Pattern
 
-import scala.util.Try
+import scala.util.control.NonFatal
 import scala.util.matching.Regex
 import scala.xml.Elem
 import scala.xml.PCData
@@ -207,11 +207,12 @@ object SuppressionRule {
 
       import scala.language.implicitConversions
 
+      // Matches the `caseSensitive = false` default used by every other construction path
+      // (`PropertyType.string`, the `.toPropertyType` extensions, `Identifier.ofSha1`) and by OWASP's
+      // suppression schema, so the same string literal has the same matching semantics regardless of
+      // which path built it.
       implicit def stringToPropertyType(str: String): PropertyType =
-        string(
-          str,
-          caseSensitive = true
-        ) // FIXME all the other default values are `false` but this one is `true` making it confusing. It should be true for all!!!
+        string(str, caseSensitive = false)
 
       implicit def regexToPropertyType(expr: Regex): PropertyType = regex(expr)
 
@@ -223,40 +224,44 @@ object SuppressionRule {
   def fromOwasp(rule: OwaspSuppressionRule)(implicit log: Logger): SuppressionRule = {
     import scala.jdk.CollectionConverters.*
 
-    def getPackageUrl(): Option[PropertyType] = Try {
-      classOf[OwaspSuppressionRule].getDeclaredFields
-        .find(_.getName == "packageUrl")
-        .map { field =>
-          field.setAccessible(true)
-          PropertyType.fromOwasp(field.get(rule).asInstanceOf[OwaspPropertyType])
-        }
-    }.recover { case t: Throwable =>
-      log.warn("Failed to get 'packageUrl' using reflection")
-      logThrowable(t)
-      None
-    }.toOption
-      .flatten
+    // OWASP's SuppressionRule exposes no getter for `packageUrl` or `vulnerabilityNames`, so both are
+    // read reflectively. Isolated in one helper that warns both on reflective failure and when the
+    // field is absent (a future dependency-check rename), so the degraded state is never fully
+    // silent. It is additionally guarded by the round-trip test in SuppressionRuleSuite.
+    def readField(name: String): Option[AnyRef] =
+      classOf[OwaspSuppressionRule].getDeclaredFields.find(_.getName == name) match {
+        case Some(field) =>
+          try {
+            field.setAccessible(true)
+            Option(field.get(rule))
+          } catch {
+            case NonFatal(t) =>
+              log.warn(s"Failed to read '$name' from the Owasp suppression rule using reflection")
+              logThrowable(t)
+              None
+          }
 
-    def getVulnerabilityNames(): Seq[PropertyType] = Try {
-      classOf[OwaspSuppressionRule].getDeclaredFields
-        .find(_.getName == "vulnerabilityNames")
-        .map { field =>
-          field.setAccessible(true)
-          field
-            .get(rule)
-            .asInstanceOf[java.util.List[OwaspPropertyType]]
-            .asScala
+        case None =>
+          log.warn(
+            s"Field '$name' was not found on the Owasp suppression rule; the dependency-check API " +
+              "may have changed and some suppression data may be dropped."
+          )
+          None
+      }
+
+    def getPackageUrl(): Option[PropertyType] =
+      readField("packageUrl").map(value =>
+        PropertyType.fromOwasp(value.asInstanceOf[OwaspPropertyType])
+      )
+
+    def getVulnerabilityNames(): Seq[PropertyType] =
+      readField("vulnerabilityNames")
+        .map(
+          _.asInstanceOf[java.util.List[OwaspPropertyType]].asScala
             .map(PropertyType.fromOwasp)
             .toSeq
-        }
-    }.recover { case t: Throwable =>
-      log.warn("Failed to get 'vulnerabilityNames' using reflection")
-      logThrowable(t)
-      t.printStackTrace()
-      None
-    }.toOption
-      .flatten
-      .getOrElse(Seq.empty[PropertyType])
+        )
+        .getOrElse(Seq.empty[PropertyType])
 
     val identifier = if (rule.hasGav) {
       Some(Identifier(PropertyType.fromOwasp(rule.getGav), Gav))

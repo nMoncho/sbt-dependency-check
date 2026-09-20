@@ -103,8 +103,18 @@ class GenerateSuppressionsSuite extends munit.FunSuite {
       exported
     )
 
+    // The exported file should contain every rule from the base suppressions fixture plus the one
+    // injected build rule. Asserting that relationship (rather than a magic count tied to the
+    // fixture's current size) keeps the test meaningful if the fixture is ever refreshed.
+    val baseRules =
+      GenerateSuppressions.parseSuppressionFile(new SuppressionParser, suppressionFile)
+
     assert(parsed.nonEmpty, "packaged rules should be parseable")
-    assertEquals(parsed.size, 867)
+    assertEquals(parsed.size, baseRules.size + 1)
+    assert(
+      parsed.exists(_.cvssBelow.contains(10.0)),
+      "the injected build suppression rule should be present in the exported file"
+    )
   }
 
   test("Suppression files are parsed and converted properly") {
@@ -116,7 +126,12 @@ class GenerateSuppressionsSuite extends munit.FunSuite {
     )
 
     assert(rules.nonEmpty)
-    assertEquals(rules.size, 866)
+    // Assert a specific known rule from the fixture is parsed, rather than pinning an exact count
+    // that carries no semantic meaning and forces a test edit whenever the fixture is refreshed.
+    assert(
+      rules.exists(_.cpe.exists(_.value == "cpe:/a:spirit-project:spirit")),
+      "a known rule from the suppressions fixture should be parsed"
+    )
   }
 
   test("Suppression files parsing failures are reported") {

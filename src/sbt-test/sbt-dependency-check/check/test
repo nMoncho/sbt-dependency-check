@@ -1,4 +1,4 @@
-> dependencyCheck list-settings
+> dependencyCheck --list-settings --list-unused-suppressions
 $ exists target/**/dependency-check-report.html
 > checkAddedSuppressions 0
 > checkLogContains "jBCrypt-0.4.1.jar" "The jar 'jBCrypt-0.4.1.jar' should be included in the analysis because is a runtime dependency"
@@ -20,7 +20,7 @@ $ exists target/**/resource_managed/main/packaged-suppressions-file.xml
 
 > set dependencyCheckFailBuildOnCVSS := 10.0
 > set dependencyCheckSuppressions := net.nmoncho.sbt.dependencycheck.settings.SuppressionSettings(files = net.nmoncho.sbt.dependencycheck.settings.SuppressionFilesSettings.files()(new File("unused-suppressions.xml")), suppressions = Seq(net.nmoncho.sbt.dependencycheck.settings.SuppressionRule(cvssBelow = Seq(1.0))))
-> dependencyCheckListUnusedSuppressions
+> dependencyCheck --list-unused-suppressions
 > checkLogContains "Found [2] unused suppressions for project [root]" "There should be 2 unused suppressions, one from 'unused-suppressions.xml', and another from the build suppressions"
 
 # Cleanup settings

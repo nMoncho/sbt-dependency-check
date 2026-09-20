@@ -8,7 +8,6 @@ package net.nmoncho.sbt.dependencycheck
 
 import net.nmoncho.sbt.dependencycheck.settings._
 import net.nmoncho.sbt.dependencycheck.tasks._
-import org.owasp.dependencycheck.reporting.ReportGenerator.Format
 import org.owasp.dependencycheck.utils.Settings
 import sbt.Keys._
 import sbt._
@@ -29,6 +28,9 @@ object DependencyCheckPlugin extends AutoPlugin {
     dependencyCheckSettingsFile := new File("dependencycheck.properties"),
     dependencyCheckFailBuildOnCVSS := 11.0,
     dependencyCheckJUnitFailBuildOnCVSS := None,
+    dependencyCheckFailOnCves := Seq.empty,
+    dependencyCheckFailOnKnownExploited := false,
+    dependencyCheckWarnOnly := false,
     dependencyCheckFormats := List(Format.HTML),
     dependencyCheckAnalysisTimeout := None,
     dependencyCheckDataDirectory := None,
@@ -46,38 +48,28 @@ object DependencyCheckPlugin extends AutoPlugin {
     dependencyCheckSkip := false,
     dependencyCheckScanSet := List(baseDirectory.value / "src" / "main" / "resources"),
     dependencyCheck := dependencyCheckTask.evaluated,
-    dependencyCheckAggregate := dependencyCheckAggregateTask.value,
-    dependencyCheckAllProjects := dependencyCheckAllProjectsTask.value,
     dependencyCheckUpdate := dependencyCheckUpdateTask.value,
     dependencyCheckPurge := dependencyCheckPurgeTask.value,
     dependencyCheckListSettings := dependencyCheckListTask.value,
-    dependencyCheckListUnusedSuppressions := dependencyCheckListUnusedTask.value,
     dependencyCheckListSuppressions := ListSuppressions().evaluated,
+    dependencyCheckGenerateSuppressions := GenerateSuppressionsBaseline().value,
     Compile / resourceGenerators += GenerateSuppressions.exportPackagedSuppressions(),
     dependencyCheckOutputDirectory := crossTarget.value,
     dependencyCheck / aggregate := false,
-    dependencyCheckAggregate / aggregate := false,
-    dependencyCheckAllProjects / aggregate := false,
     dependencyCheckUpdate / aggregate := false,
     dependencyCheckPurge / aggregate := false,
-    dependencyCheckListSettings / aggregate := false,
     dependencyCheckListSuppressions / aggregate := false,
+    dependencyCheckGenerateSuppressions / aggregate := false,
     Global / concurrentRestrictions += Tags.exclusive(NonParallel)
   )
 
   private def dependencyCheckTask: Def.Initialize[InputTask[Unit]] = Check()
-
-  private def dependencyCheckAggregateTask: Def.Initialize[Task[Unit]] = AggregateCheck()
-
-  private def dependencyCheckAllProjectsTask: Def.Initialize[Task[Unit]] = AllProjectsCheck()
 
   private def dependencyCheckUpdateTask: Def.Initialize[Task[Unit]] = Update()
 
   private def dependencyCheckPurgeTask: Def.Initialize[Task[Unit]] = Purge()
 
   private def dependencyCheckListTask: Def.Initialize[Task[Unit]] = ListSettings()
-
-  private def dependencyCheckListUnusedTask: Def.Initialize[Task[Unit]] = ListUnusedSuppressions()
 
   lazy val engineSettings: Def.Initialize[Task[Settings]] = LoadSettings()
 

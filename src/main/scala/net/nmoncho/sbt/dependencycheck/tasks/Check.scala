@@ -15,9 +15,7 @@ import net.nmoncho.sbt.dependencycheck.Keys._
 import net.nmoncho.sbt.dependencycheck.settings.ScopesSettings
 import net.nmoncho.sbt.dependencycheck.settings.SummaryReport
 import net.nmoncho.sbt.dependencycheck.settings.SuppressionRule
-import org.owasp.dependencycheck.analyzer.AbstractSuppressionAnalyzer.SUPPRESSION_OBJECT_KEY
 import org.owasp.dependencycheck.reporting.ReportGenerator
-import org.owasp.dependencycheck.xml.suppression.{ SuppressionRule => DcSuppressionRule }
 import sbt.Keys._
 import sbt._
 import sbt.complete.Parser
@@ -28,10 +26,27 @@ object Check {
   private[tasks] val argumentsParser: Parser[Seq[ParseOptions]] =
     (ListSettingsArg | SingleReportArg | AllProjectsArg | ListUnusedSuppressionsArg | OriginalSummaryArg | AllVulnerabilitiesSummaryArg | OffendingVulnerabilitiesSummaryArg).*
 
+  /** Selects the analysis mode from the parsed command arguments.
+    *
+    * `all-projects` always produces a single combined report across every project (the behaviour of
+    * the `dependencyCheckAllProjects` task), so it maps to [[ProjectSelection.AllProjects]] whether
+    * or not `single-report` is also given. `single-report` on its own aggregates the invoked
+    * project together with its aggregates into a single report. With neither argument, a report is
+    * generated per project.
+    */
+  private[tasks] def selectProjectMode(
+      allProjects: Boolean,
+      singleReport: Boolean
+  ): ProjectSelection =
+    if (allProjects) ProjectSelection.AllProjects
+    else if (singleReport) ProjectSelection.Aggregate
+    else ProjectSelection.PerProject
+
   private case class CheckSettings(
       name: String,
       scopes: ScopesSettings,
-      failureScore: Double,
+      failurePolicy: FailurePolicy,
+      warnOnly: Boolean,
       scanSet: Seq[File],
       engineSettings: org.owasp.dependencycheck.utils.Settings,
       dependencies: Set[Attributed[File]],
@@ -61,14 +76,10 @@ object Check {
     }
 
     val dependenciesAndSuppressionsTask = Def.taskDyn {
-      if (singleReport && allProjects) {
-        allProjectsSettings.map(Seq(_))
-      } else if (singleReport) {
-        aggregateProjectsSettings.map(Seq(_))
-      } else if (!singleReport) {
-        aggregateProjectsFilter.map(_.flatten)
-      } else {
-        sys.error("'all-projects' argument isn't supported without the use of 'single-project'")
+      selectProjectMode(allProjects = allProjects, singleReport = singleReport) match {
+        case ProjectSelection.AllProjects => allProjectsSettings.map(Seq(_))
+        case ProjectSelection.Aggregate => aggregateProjectsSettings.map(Seq(_))
+        case ProjectSelection.PerProject => aggregateProjectsFilter.map(_.flatten)
       }
     }
 
@@ -98,7 +109,8 @@ object Check {
                   checkSettings.dependencies,
                   checkSettings.suppressions,
                   checkSettings.scanSet,
-                  checkSettings.failureScore,
+                  checkSettings.failurePolicy,
+                  checkSettings.warnOnly,
                   checkSettings.outputDirectory,
                   checkSettings.reportFormats,
                   summary
@@ -112,10 +124,7 @@ object Check {
               }
 
             if (listUnusedSuppressions) {
-              val unusedSuppressions = engine
-                .getObject(SUPPRESSION_OBJECT_KEY)
-                .asInstanceOf[java.util.List[DcSuppressionRule]]
-                .asScala
+              val unusedSuppressions = suppressionRules(engine).asScala
                 .filter(sup => !sup.isMatched && !sup.isBase)
 
               if (unusedSuppressions.nonEmpty) {
@@ -146,7 +155,12 @@ object Check {
     CheckSettings(
       name.value,
       dependencyCheckScopes.value,
-      dependencyCheckFailBuildOnCVSS.value,
+      FailurePolicy(
+        dependencyCheckFailBuildOnCVSS.value,
+        dependencyCheckFailOnCves.value.toSet,
+        dependencyCheckFailOnKnownExploited.value
+      ),
+      dependencyCheckWarnOnly.value,
       scanSet.value,
       engineSettings.value,
       AllProjectsCheck.dependencies().value,
@@ -160,7 +174,12 @@ object Check {
     CheckSettings(
       name.value,
       dependencyCheckScopes.value,
-      dependencyCheckFailBuildOnCVSS.value,
+      FailurePolicy(
+        dependencyCheckFailBuildOnCVSS.value,
+        dependencyCheckFailOnCves.value.toSet,
+        dependencyCheckFailOnKnownExploited.value
+      ),
+      dependencyCheckWarnOnly.value,
       scanSet.value,
       engineSettings.value,
       AggregateCheck.dependencies().value,
@@ -186,7 +205,12 @@ object Check {
             CheckSettings(
               name.value,
               dependencyCheckScopes.value,
-              dependencyCheckFailBuildOnCVSS.value,
+              FailurePolicy(
+                dependencyCheckFailBuildOnCVSS.value,
+                dependencyCheckFailOnCves.value.toSet,
+                dependencyCheckFailOnKnownExploited.value
+              ),
+              dependencyCheckWarnOnly.value,
               scanSet.value,
               engineSettings.value,
               Dependencies.projectDependencies.value,

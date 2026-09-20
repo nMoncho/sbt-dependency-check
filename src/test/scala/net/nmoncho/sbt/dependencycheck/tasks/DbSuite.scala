@@ -21,22 +21,37 @@ class DbSuite extends munit.FunSuite {
   override def munitTimeout: Duration = new FiniteDuration(30, TimeUnit.MINUTES)
 
   test("Pull DB") {
-    for {
+    val cacheEnv = for {
       _ <- envOrNone("CI").filter(_.toBoolean)
       _ <- envOrNone("FORCE_REFRESH").filter(_.toBoolean)
       folder <- envOrNone("DATA_DIRECTORY")
       nvdApiKey <- envOrNone("NVD_API_KEY")
-    } yield {
-      println(s"Generating CVE Cache on folder [$folder] with NVD key [$nvdApiKey]")
+    } yield (folder, nvdApiKey)
 
-      val settings = new Settings()
-      settings.setStringIfNotEmpty(DATA_DIRECTORY, folder)
-      settings.setStringIfNotEmpty(NVD_API_KEY, nvdApiKey)
+    // This integration test populates the shared CVE cache against the live NVD API, so it only runs
+    // in the cache-generation workflow, which sets all four variables. Use `assume` so that when they
+    // are absent the test is reported as skipped, rather than silently passing while asserting nothing
+    // (which previously gave false confidence that an integration test had run).
+    assume(
+      cacheEnv.isDefined,
+      "Skipping 'Pull DB': requires CI, FORCE_REFRESH, DATA_DIRECTORY and NVD_API_KEY, which are set " +
+        "only by the CVE cache-generation workflow (generate-cache.yaml)."
+    )
 
-      withEngine(settings) { engine =>
-        engine.analyzeDependencies()
-      }(using Logger.Null)
-    }
+    val (folder, nvdApiKey) = cacheEnv.get
+
+    // Do not log the NVD API key itself; only report that one was provided.
+    println(
+      s"Generating CVE Cache on folder [$folder] (NVD API key present: ${nvdApiKey.nonEmpty})"
+    )
+
+    val settings = new Settings()
+    settings.setStringIfNotEmpty(DATA_DIRECTORY, folder)
+    settings.setStringIfNotEmpty(NVD_API_KEY, nvdApiKey)
+
+    withEngine(settings) { engine =>
+      engine.analyzeDependencies()
+    }(using Logger.Null)
   }
 
 }

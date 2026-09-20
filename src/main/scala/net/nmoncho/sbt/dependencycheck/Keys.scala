@@ -14,6 +14,25 @@ import sbt._
 
 object Keys {
 
+  /** Re-export of OWASP's report [[ReportGenerator.Format]] so builds can select report formats (for
+    * example `dependencyCheckFormats := Seq(Format.HTML, Format.SARIF)`) without importing OWASP
+    * packages directly.
+    */
+  type Format = ReportGenerator.Format
+
+  /** The available report formats, re-exported from OWASP's `ReportGenerator.Format`. */
+  object Format {
+    val HTML: Format    = ReportGenerator.Format.HTML
+    val XML: Format     = ReportGenerator.Format.XML
+    val CSV: Format     = ReportGenerator.Format.CSV
+    val JSON: Format    = ReportGenerator.Format.JSON
+    val JUNIT: Format   = ReportGenerator.Format.JUNIT
+    val SARIF: Format   = ReportGenerator.Format.SARIF
+    val JENKINS: Format = ReportGenerator.Format.JENKINS
+    val GITLAB: Format  = ReportGenerator.Format.GITLAB
+    val ALL: Format     = ReportGenerator.Format.ALL
+  }
+
   // Settings
   lazy val dependencyCheckFailBuildOnCVSS: SettingKey[Double] = settingKey(
     "Specifies if the build should be failed if a CVSS score above a specified level is identified. The default is 11 which means since the CVSS scores are 0-10, by default the build will never fail. More information on CVSS scores can be found at https://nvd.nist.gov/vuln-metrics/cvss"
@@ -22,6 +41,15 @@ object Keys {
     settingKey(
       "If using the jUnit, specifies the CVSS score that is considered a \"test\" failure when generating a jUnit style report. The default value is 0 - all vulnerabilities are considered a failure."
     )
+  lazy val dependencyCheckFailOnCves: SettingKey[Seq[String]] = settingKey(
+    "CVE ids (e.g. \"CVE-2021-44228\") that must always fail the build when found, regardless of their CVSS score. Defaults to an empty list."
+  )
+  lazy val dependencyCheckFailOnKnownExploited: SettingKey[Boolean] = settingKey(
+    "If true, the build fails when any dependency has a Known Exploited Vulnerability (KEV), regardless of its CVSS score. Requires the Known Exploited Vulnerabilities analyzer (enabled by default). Defaults to false."
+  )
+  lazy val dependencyCheckWarnOnly: SettingKey[Boolean] = settingKey(
+    "If true, vulnerabilities that would fail the build are reported (summary and report) but do not fail the build. Defaults to false."
+  )
   lazy val dependencyCheckSkip: SettingKey[Boolean] = settingKey(
     "Skips this project on the dependency-check analysis."
   )
@@ -32,7 +60,7 @@ object Keys {
     "An optional sequence of files that specify additional files and/or directories to analyze as part of the scan. If not specified, defaults to standard scala conventions."
   )
   lazy val dependencyCheckFormats: SettingKey[Seq[ReportGenerator.Format]] = settingKey(
-    "The report formats to be generated (HTML, XML, JUNIT, CSV, JSON, SARIF, JENKINS, ALL)."
+    "The report formats to be generated (HTML, XML, JUNIT, CSV, JSON, SARIF, JENKINS, GITLAB, ALL)."
   )
 
   lazy val dependencyCheckAnalysisTimeout: SettingKey[Option[Duration]] =
@@ -76,23 +104,16 @@ object Keys {
   lazy val dependencyCheck: InputKey[Unit] = inputKey(
     "Runs dependency-check against the project and generates a report per sub project."
   )
-  lazy val dependencyCheckAggregate: TaskKey[Unit] = taskKey(
-    "Runs dependency-check against project aggregates and combines the results into a single report."
-  )
-  lazy val dependencyCheckAllProjects: TaskKey[Unit] = taskKey(
-    "Runs dependency-check against all projects and combines the results into a single report."
-  )
   lazy val dependencyCheckUpdate: TaskKey[Unit] =
     taskKey("Updates the local cache of the NVD data from NIST.")
   lazy val dependencyCheckPurge: TaskKey[Unit] =
     taskKey("Deletes the local copy of the NVD. This is used to force a refresh of the data.")
   lazy val dependencyCheckListSettings: TaskKey[Unit] =
     taskKey("List the settings used during the analysis.")
-  lazy val dependencyCheckListUnusedSuppressions: TaskKey[Unit] =
-    taskKey(
-      "List unused suppressions, only considering suppression files, not hosted suppressions nor packed suppressions."
-    )
   lazy val dependencyCheckListSuppressions: InputKey[Unit] = inputKey(
     "List suppression rules added to the Owasp Engine which are defined in the project definition (ie. build.sbt), or are imported packaged suppressions."
+  )
+  lazy val dependencyCheckGenerateSuppressions: TaskKey[Unit] = taskKey(
+    "Runs the analysis and writes a suppression XML baseline covering the vulnerabilities currently found, so an existing project can baseline known findings and fail only on new ones."
   )
 }

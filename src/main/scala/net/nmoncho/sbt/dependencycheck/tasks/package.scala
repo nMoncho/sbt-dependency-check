@@ -56,18 +56,23 @@ package object tasks {
     case object OffendingVulnerabilitiesSummary extends ParseOptions
   }
 
-  private[tasks] val PerProject  = (Space ~> token("per-project")) ^^^ ProjectSelection.PerProject
-  private[tasks] val AllProjects = (Space ~> token("all-projects")) ^^^ ProjectSelection.AllProjects
-  private[tasks] val Aggregate   = (Space ~> token("aggregate")) ^^^ ProjectSelection.Aggregate
+  private[tasks] val PerProject =
+    (Space ~> (token("--per-project") | token("-p"))) ^^^ ProjectSelection.PerProject
+  private[tasks] val AllProjects =
+    (Space ~> (token("--all-projects") | token("-a"))) ^^^ ProjectSelection.AllProjects
+  private[tasks] val Aggregate =
+    (Space ~> (token("--aggregate") | token("-g"))) ^^^ ProjectSelection.Aggregate
 
   private[tasks] val ListSettingsArg =
-    (Space ~> token("list-settings")) ^^^ ParseOptions.ListSettings
+    (Space ~> (token("--list-settings") | token("-l"))) ^^^ ParseOptions.ListSettings
   private[tasks] val SingleReportArg =
-    (Space ~> token("single-report")) ^^^ ParseOptions.SingleReport
+    (Space ~> (token("--single-report") | token("-s"))) ^^^ ParseOptions.SingleReport
   private[tasks] val AllProjectsArg =
-    (Space ~> token("all-projects")) ^^^ ParseOptions.AllProjects
+    (Space ~> (token("--all-projects") | token("-a"))) ^^^ ParseOptions.AllProjects
   private[tasks] val ListUnusedSuppressionsArg =
-    (Space ~> token("list-unused-suppressions")) ^^^ ParseOptions.ListUnusedSuppressions
+    (Space ~> (token("--list-unused-suppressions") | token(
+      "-u"
+    ))) ^^^ ParseOptions.ListUnusedSuppressions
 
   private[tasks] val OriginalSummaryArg =
     (Space ~> token("original-summary")) ^^^ ParseOptions.OriginalSummary
@@ -101,10 +106,34 @@ package object tasks {
       }
 
     } finally {
-      engine.close()
-      engine.getSettings.cleanup(true)
-      Thread.currentThread().setContextClassLoader(oldClassLoader)
+      cleanupEngine(engine, oldClassLoader)
     }
+  }
+
+  /** Closes the engine, cleans up its settings, and restores the thread context classloader.
+    *
+    * Each step is guarded independently so a failure in one does not skip the others. In particular
+    * the classloader restore must always run: the context classloader is swapped on a reused sbt
+    * worker thread, so a skipped restore could corrupt later tasks. Guarding also prevents a
+    * secondary cleanup failure from masking the primary exception being propagated out of
+    * [[withEngine]]'s `try`.
+    */
+  private[tasks] def cleanupEngine(engine: Engine, oldClassLoader: ClassLoader)(
+      implicit log: Logger
+  ): Unit = {
+    try engine.close()
+    catch {
+      case NonFatal(t) =>
+        log.warn(s"Failed to close the dependency-check engine: ${t.getMessage}")
+    }
+
+    try engine.getSettings.cleanup(true)
+    catch {
+      case NonFatal(t) =>
+        log.warn(s"Failed to clean up the dependency-check settings: ${t.getMessage}")
+    }
+
+    Thread.currentThread().setContextClassLoader(oldClassLoader)
   }
 
   def logAddDependencies(
@@ -141,16 +170,13 @@ package object tasks {
       dependencies: Set[Attributed[File]],
       suppressionRules: Set[SuppressionRule],
       scanSet: Seq[File],
-      failCvssScore: Double,
+      failurePolicy: FailurePolicy,
+      warnOnly: Boolean,
       outputDir: File,
       reportFormats: Seq[Format],
       summaryReport: SummaryReport
   )(implicit log: Logger): Unit = {
-    addSuppressionRules(suppressionRules, engine)
-    addDependencies(dependencies, engine)
-    scanSet.foreach(file => engine.scan(file))
-
-    engine.analyzeDependencies()
+    runAnalysis(engine, dependencies, suppressionRules, scanSet)
 
     if (reportFormats.isEmpty) {
       log.info("No Report Format was selected for the Dependency Check Analysis")
@@ -166,10 +192,48 @@ package object tasks {
       )
     }
 
-    failOnFoundVulnerabilities(failCvssScore, engine, projectName, summaryReport)
+    failOnFoundVulnerabilities(failurePolicy, warnOnly, engine, projectName, summaryReport)
   }
 
-  private def addSuppressionRules(rules: Set[SuppressionRule], engine: Engine)(
+  /** Adds suppression rules and dependencies to the engine, scans the scan set, and runs the OWASP
+    * analysis. Shared by [[analyzeProject]] and the suppression-baseline task.
+    */
+  private[tasks] def runAnalysis(
+      engine: Engine,
+      dependencies: Set[Attributed[File]],
+      suppressionRules: Set[SuppressionRule],
+      scanSet: Seq[File]
+  )(implicit log: Logger): Unit = {
+    addSuppressionRules(suppressionRules, engine)
+    addDependencies(dependencies, engine)
+    scanSet.foreach(file => engine.scan(file))
+
+    engine.analyzeDependencies()
+  }
+
+  /** Reads the OWASP engine's suppression-rule list, stored under `SUPPRESSION_OBJECT_KEY`.
+    *
+    * Returns an empty list when the key is unset and, if the engine ever stores something other than
+    * a `java.util.List` under it, logs a clear message and returns an empty list instead of failing
+    * with an opaque error later. Centralises the otherwise-unchecked interop cast used by both the
+    * suppression-adding and the unused-suppressions paths.
+    */
+  private[tasks] def suppressionRules(
+      engine: Engine
+  )(implicit log: Logger): java.util.List[OwaspSuppressionRule] =
+    engine.getObject(SUPPRESSION_OBJECT_KEY) match {
+      case null =>
+        new java.util.ArrayList[OwaspSuppressionRule]()
+      case list: java.util.List[_] =>
+        list.asInstanceOf[java.util.List[OwaspSuppressionRule]]
+      case other =>
+        log.warn(
+          s"Expected a list under the Owasp suppression key but found [${other.getClass.getName}]; ignoring it"
+        )
+        new java.util.ArrayList[OwaspSuppressionRule]()
+    }
+
+  private[tasks] def addSuppressionRules(rules: Set[SuppressionRule], engine: Engine)(
       implicit log: Logger
   ): Unit = {
     import scala.jdk.CollectionConverters.*
@@ -182,9 +246,7 @@ package object tasks {
         // in the project being analyzed (i.e. in the `build.sbt` or imported as packaged suppressions)
         analyzer.prepare(engine)
         if (analyzer.isEnabled) {
-          val engineRules = Option(engine.getObject(SUPPRESSION_OBJECT_KEY))
-            .map(_.asInstanceOf[java.util.List[OwaspSuppressionRule]])
-            .getOrElse(new java.util.ArrayList[OwaspSuppressionRule]())
+          val engineRules = suppressionRules(engine)
 
           engineRules.addAll(rules.map(_.toOwasp).asJavaCollection)
           engine.putObject(SUPPRESSION_OBJECT_KEY, engineRules)
@@ -216,7 +278,7 @@ package object tasks {
       }
     )
 
-  private def addEvidence(
+  private[tasks] def addEvidence(
       moduleId: ModuleID,
       dependency: Dependency
   ): Unit = {
@@ -237,7 +299,7 @@ package object tasks {
     )
   }
 
-  private def getIdentifier(artifact: MavenArtifact, moduleId: ModuleID): Identifier =
+  private[tasks] def getIdentifier(artifact: MavenArtifact, moduleId: ModuleID): Identifier =
     Try {
       new PurlIdentifier(
         "sbt",
@@ -256,23 +318,44 @@ package object tasks {
     }
 
   private def failOnFoundVulnerabilities(
-      failCvssScore: Double,
+      failurePolicy: FailurePolicy,
+      warnOnly: Boolean,
       engine: Engine,
       name: String,
       summaryReport: SummaryReport
   )(implicit log: Logger): Unit = {
     import scala.jdk.CollectionConverters.*
 
-    val hasFailingVulnerabilities = engine.getDependencies.exists { p =>
-      p.getVulnerabilities.asScala.exists(failingVulnerability(_, failCvssScore))
+    val offending = engine.getDependencies.toSeq.flatMap { dependency =>
+      dependency.getVulnerabilities.asScala.toSeq
+        .filter(failurePolicy.isFailing)
+        .map(vulnerability => (dependency, vulnerability))
     }
 
-    if (hasFailingVulnerabilities) {
-      SummaryReport.showSummary(name, engine.getDependencies, failCvssScore, summaryReport)
+    if (offending.nonEmpty) {
+      SummaryReport.showSummary(name, engine.getDependencies, failurePolicy, summaryReport)
 
-      throw new VulnerabilityFoundException(
-        s"Vulnerability with CVSS score higher than [$failCvssScore] found"
-      )
+      val noun = if (offending.size == 1) "vulnerability" else "vulnerabilities"
+
+      if (warnOnly) {
+        log.warn(
+          s"Found [${offending.size}] $noun failing the configured policy in [$name], but " +
+            "'dependencyCheckWarnOnly' is enabled so the build will not fail."
+        )
+      } else {
+        // Name the most severe offender so the failure line alone is actionable.
+        val (topDependency, topVulnerability) =
+          offending.maxBy { case (_, vulnerability) => vulnerabilityScore(vulnerability) }
+        val topScore  = vulnerabilityScore(topVulnerability)
+        val scoreText = if (topScore > 0.0) s" (CVSS $topScore)" else ""
+
+        throw new VulnerabilityFoundException(
+          s"[$name] has [${offending.size}] $noun failing the configured policy " +
+            s"(CVSS threshold [${failurePolicy.failCvssScore}]); highest: " +
+            s"[${topVulnerability.getName}] in [${topDependency.getFileName}]$scoreText. " +
+            "See the dependency-check report for details."
+        )
+      }
     }
   }
 

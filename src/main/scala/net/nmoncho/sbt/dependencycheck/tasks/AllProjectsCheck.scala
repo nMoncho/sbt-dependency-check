@@ -11,8 +11,6 @@ import sbt._
 
 object AllProjectsCheck {
 
-  def apply(): Def.Initialize[Task[Unit]] = Check().toTask(" single-report all-projects")
-
   def dependencies(): Def.Initialize[Task[Set[Attributed[File]]]] = Def.task {
     dependenciesFilter.value.toSet.flatten
   }

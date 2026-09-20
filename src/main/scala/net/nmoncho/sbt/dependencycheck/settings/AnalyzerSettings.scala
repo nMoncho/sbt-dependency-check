@@ -16,6 +16,7 @@ import sbt._
   *
   * For more information, see <a href="https://jeremylong.github.io/DependencyCheck/analyzers/index.html">File Type Analyzers</a>
   *
+  * @param additionalZipExtensions additional file extensions to be treated as zip archives when scanning.
   * @param archiveEnabled whether the Archive analyzer is enabled.
   * @param artifactory Artifactory Settings.
   * @param autoconfEnabled whether the autoconf analyzer should be used.
@@ -45,7 +46,7 @@ import sbt._
   * @param openSslEnabled whether the OpenSSL analyzer is enabled.
   * @param ossIndex OSS Index Settings.
   * @param php PHP Settings.
-  * @param pnmp PNPM Settings.
+  * @param pnpm PNPM Settings.
   * @param python Python Settings.
   * @param retiredEnabled whether the retired analyzers are enabled.
   * @param retireJS RetireJS Settings.
@@ -56,48 +57,49 @@ import sbt._
   * @param yarn Yarn Settings.
   */
 case class AnalyzerSettings(
-    additionalZipExtensions: Option[Seq[String]],
-    archiveEnabled: Option[Boolean],
-    artifactory: AnalyzerSettings.Artifactory,
-    autoconfEnabled: Option[Boolean],
-    cmakeEnabled: Option[Boolean],
-    cpanFileEnabled: Option[Boolean],
-    cpeEnabled: Option[Boolean],
-    cpeSuppressionEnabled: Option[Boolean],
-    dartEnabled: Option[Boolean],
-    dependencyBundlingEnabled: Option[Boolean],
-    dependencyMergingEnabled: Option[Boolean],
-    dotNet: AnalyzerSettings.DotNet,
-    elixir: AnalyzerSettings.Elixir,
-    experimentalEnabled: Option[Boolean],
-    failOnUnusedSuppressionRule: Option[Boolean],
-    falsePositiveEnabled: Option[Boolean],
-    filenameEnabled: Option[Boolean],
-    fileVersionEnabled: Option[Boolean],
-    golang: AnalyzerSettings.Golang,
-    hints: AnalyzerSettings.Hints,
-    jarEnabled: Option[Boolean],
-    knownExploitedVulnerabilities: AnalyzerSettings.KnownExploitedVulnerabilities,
-    mavenCentral: AnalyzerSettings.MavenCentral,
-    mavenInstallEnabled: Option[Boolean],
-    nexus: AnalyzerSettings.Nexus,
-    node: AnalyzerSettings.Node,
-    nvdCveEnabled: Option[Boolean],
-    openSslEnabled: Option[Boolean],
-    ossIndex: AnalyzerSettings.OssIndex,
-    php: AnalyzerSettings.Php,
-    pnmp: AnalyzerSettings.Pnpm,
-    python: AnalyzerSettings.Python,
-    retiredEnabled: Option[Boolean],
-    retireJS: AnalyzerSettings.RetireJS,
-    ruby: AnalyzerSettings.Ruby,
-    swift: AnalyzerSettings.Swift,
-    versionFilterEnabled: Option[Boolean],
-    vulnerabilitySuppressionEnabled: Option[Boolean],
-    yarn: AnalyzerSettings.Yarn
+    additionalZipExtensions: Option[Seq[String]] = None,
+    archiveEnabled: Option[Boolean]              = None,
+    artifactory: AnalyzerSettings.Artifactory    = AnalyzerSettings.Artifactory.Default,
+    autoconfEnabled: Option[Boolean]             = None,
+    cmakeEnabled: Option[Boolean]                = None,
+    cpanFileEnabled: Option[Boolean]             = None,
+    cpeEnabled: Option[Boolean]                  = None,
+    cpeSuppressionEnabled: Option[Boolean]       = None,
+    dartEnabled: Option[Boolean]                 = None,
+    dependencyBundlingEnabled: Option[Boolean]   = None,
+    dependencyMergingEnabled: Option[Boolean]    = None,
+    dotNet: AnalyzerSettings.DotNet              = AnalyzerSettings.DotNet.Default,
+    elixir: AnalyzerSettings.Elixir              = AnalyzerSettings.Elixir.Default,
+    experimentalEnabled: Option[Boolean]         = None,
+    failOnUnusedSuppressionRule: Option[Boolean] = None,
+    falsePositiveEnabled: Option[Boolean]        = None,
+    filenameEnabled: Option[Boolean]             = None,
+    fileVersionEnabled: Option[Boolean]          = None,
+    golang: AnalyzerSettings.Golang              = AnalyzerSettings.Golang.Default,
+    hints: AnalyzerSettings.Hints                = AnalyzerSettings.Hints.Default,
+    jarEnabled: Option[Boolean]                  = None,
+    knownExploitedVulnerabilities: AnalyzerSettings.KnownExploitedVulnerabilities =
+      AnalyzerSettings.KnownExploitedVulnerabilities.Default,
+    mavenCentral: AnalyzerSettings.MavenCentral      = AnalyzerSettings.MavenCentral.Default,
+    mavenInstallEnabled: Option[Boolean]             = None,
+    nexus: AnalyzerSettings.Nexus                    = AnalyzerSettings.Nexus.Default,
+    node: AnalyzerSettings.Node                      = AnalyzerSettings.Node.Default,
+    nvdCveEnabled: Option[Boolean]                   = None,
+    openSslEnabled: Option[Boolean]                  = None,
+    ossIndex: AnalyzerSettings.OssIndex              = AnalyzerSettings.OssIndex.Default,
+    php: AnalyzerSettings.Php                        = AnalyzerSettings.Php.Default,
+    pnpm: AnalyzerSettings.Pnpm                      = AnalyzerSettings.Pnpm.Default,
+    python: AnalyzerSettings.Python                  = AnalyzerSettings.Python.Default,
+    retiredEnabled: Option[Boolean]                  = None,
+    retireJS: AnalyzerSettings.RetireJS              = AnalyzerSettings.RetireJS.Default,
+    ruby: AnalyzerSettings.Ruby                      = AnalyzerSettings.Ruby.Default,
+    swift: AnalyzerSettings.Swift                    = AnalyzerSettings.Swift.Default,
+    versionFilterEnabled: Option[Boolean]            = None,
+    vulnerabilitySuppressionEnabled: Option[Boolean] = None,
+    yarn: AnalyzerSettings.Yarn                      = AnalyzerSettings.Yarn.Default
 ) {
 
-  def apply(settings: Settings): Unit = {
+  def configure(settings: Settings): Unit = {
     settings.set(ADDITIONAL_ZIP_EXTENSIONS, additionalZipExtensions.map(_.mkString(",")))
     settings.set(ANALYZER_ARCHIVE_ENABLED, archiveEnabled)
     settings.set(ANALYZER_AUTOCONF_ENABLED, autoconfEnabled)
@@ -105,7 +107,6 @@ case class AnalyzerSettings(
     settings.set(ANALYZER_CPANFILE_ENABLED, cpanFileEnabled)
     settings.set(ANALYZER_CPE_ENABLED, cpeEnabled)
     settings.set(ANALYZER_CPE_SUPPRESSION_ENABLED, cpeSuppressionEnabled)
-    settings.set(ANALYZER_DART_ENABLED, dartEnabled)
     settings.set(ANALYZER_DART_ENABLED, dartEnabled)
     settings.set(ANALYZER_DEPENDENCY_BUNDLING_ENABLED, dependencyBundlingEnabled)
     settings.set(ANALYZER_DEPENDENCY_MERGING_ENABLED, dependencyMergingEnabled)
@@ -122,151 +123,32 @@ case class AnalyzerSettings(
     settings.set(ANALYZER_VERSION_FILTER_ENABLED, versionFilterEnabled)
     settings.set(ANALYZER_VULNERABILITY_SUPPRESSION_ENABLED, vulnerabilitySuppressionEnabled)
 
-    artifactory(settings)
-    dotNet(settings)
-    elixir(settings)
-    golang(settings)
-    hints(settings)
-    knownExploitedVulnerabilities(settings)
-    mavenCentral(settings)
-    nexus(settings)
-    node(settings)
-    ossIndex(settings)
-    php(settings)
-    pnmp(settings)
-    python(settings)
-    retireJS(settings)
-    ruby(settings)
-    swift(settings)
-    yarn(settings)
+    artifactory.configure(settings)
+    dotNet.configure(settings)
+    elixir.configure(settings)
+    golang.configure(settings)
+    hints.configure(settings)
+    knownExploitedVulnerabilities.configure(settings)
+    mavenCentral.configure(settings)
+    nexus.configure(settings)
+    node.configure(settings)
+    ossIndex.configure(settings)
+    php.configure(settings)
+    pnpm.configure(settings)
+    python.configure(settings)
+    retireJS.configure(settings)
+    ruby.configure(settings)
+    swift.configure(settings)
+    yarn.configure(settings)
   }
+
+  @deprecated("Use `pnpm` instead (this misspelled accessor will be removed)", "2.1.0")
+  def pnmp: AnalyzerSettings.Pnpm = pnpm
 }
 
 object AnalyzerSettings {
 
-  val Default: AnalyzerSettings = new AnalyzerSettings(
-    additionalZipExtensions         = None,
-    archiveEnabled                  = None,
-    artifactory                     = Artifactory.Default,
-    autoconfEnabled                 = None,
-    cmakeEnabled                    = None,
-    cpanFileEnabled                 = None,
-    cpeEnabled                      = None,
-    cpeSuppressionEnabled           = None,
-    dartEnabled                     = None,
-    dependencyBundlingEnabled       = None,
-    dependencyMergingEnabled        = None,
-    dotNet                          = DotNet.Default,
-    elixir                          = Elixir.Default,
-    experimentalEnabled             = None,
-    failOnUnusedSuppressionRule     = None,
-    falsePositiveEnabled            = None,
-    filenameEnabled                 = None,
-    fileVersionEnabled              = None,
-    golang                          = Golang.Default,
-    hints                           = Hints.Default,
-    jarEnabled                      = None,
-    knownExploitedVulnerabilities   = KnownExploitedVulnerabilities.Default,
-    mavenCentral                    = MavenCentral.Default,
-    mavenInstallEnabled             = None,
-    nexus                           = Nexus.Default,
-    node                            = Node.Default,
-    nvdCveEnabled                   = None,
-    openSslEnabled                  = None,
-    ossIndex                        = OssIndex.Default,
-    php                             = Php.Default,
-    pnmp                            = Pnpm.Default,
-    python                          = Python.Default,
-    retiredEnabled                  = None,
-    retireJS                        = RetireJS.Default,
-    ruby                            = Ruby.Default,
-    swift                           = Swift.Default,
-    versionFilterEnabled            = None,
-    vulnerabilitySuppressionEnabled = None,
-    yarn                            = Yarn.Default
-  )
-
-  def apply(
-      additionalZipExtensions: Option[Seq[String]]         = None,
-      archiveEnabled: Option[Boolean]                      = None,
-      artifactory: Artifactory                             = Artifactory.Default,
-      autoconfEnabled: Option[Boolean]                     = None,
-      cmakeEnabled: Option[Boolean]                        = None,
-      cpanFileEnabled: Option[Boolean]                     = None,
-      cpeEnabled: Option[Boolean]                          = None,
-      cpeSuppressionEnabled: Option[Boolean]               = None,
-      dartEnabled: Option[Boolean]                         = None,
-      dependencyBundlingEnabled: Option[Boolean]           = None,
-      dependencyMergingEnabled: Option[Boolean]            = None,
-      dotNet: DotNet                                       = DotNet.Default,
-      elixir: Elixir                                       = Elixir.Default,
-      experimentalEnabler: Option[Boolean]                 = None,
-      failOnUnusedSuppressionRule: Option[Boolean]         = None,
-      falsePositiveEnabled: Option[Boolean]                = None,
-      filenameEnabled: Option[Boolean]                     = None,
-      fileVersionEnabled: Option[Boolean]                  = None,
-      golang: Golang                                       = Golang.Default,
-      hints: Hints                                         = Hints.Default,
-      jarEnabled: Option[Boolean]                          = None,
-      knownExploitedEnabled: KnownExploitedVulnerabilities = KnownExploitedVulnerabilities.Default,
-      mavenCentral: MavenCentral                           = MavenCentral.Default,
-      mavenInstallEnabled: Option[Boolean]                 = None,
-      nexus: Nexus                                         = Nexus.Default,
-      node: Node                                           = Node.Default,
-      nvdCveEnabled: Option[Boolean]                       = None,
-      openSslEnabled: Option[Boolean]                      = None,
-      ossIndex: OssIndex                                   = OssIndex.Default,
-      php: Php                                             = Php.Default,
-      pnmp: Pnpm                                           = Pnpm.Default,
-      python: Python                                       = Python.Default,
-      retiredEnabled: Option[Boolean]                      = None,
-      retireJS: RetireJS                                   = RetireJS.Default,
-      ruby: Ruby                                           = Ruby.Default,
-      swift: Swift                                         = Swift.Default,
-      versionFilterEnabled: Option[Boolean]                = None,
-      vulnerabilitySuppressionEnabled: Option[Boolean]     = None,
-      yarn: Yarn                                           = Yarn.Default
-  ): AnalyzerSettings = new AnalyzerSettings(
-    additionalZipExtensions,
-    archiveEnabled,
-    artifactory,
-    autoconfEnabled,
-    cmakeEnabled,
-    cpanFileEnabled,
-    cpeEnabled,
-    cpeSuppressionEnabled,
-    dartEnabled,
-    dependencyBundlingEnabled,
-    dependencyMergingEnabled,
-    dotNet,
-    elixir,
-    experimentalEnabler,
-    failOnUnusedSuppressionRule,
-    falsePositiveEnabled,
-    filenameEnabled,
-    fileVersionEnabled,
-    golang,
-    hints,
-    jarEnabled,
-    knownExploitedEnabled,
-    mavenCentral,
-    mavenInstallEnabled,
-    nexus,
-    node,
-    nvdCveEnabled,
-    openSslEnabled,
-    ossIndex,
-    php,
-    pnmp,
-    python,
-    retiredEnabled,
-    retireJS,
-    ruby,
-    swift,
-    versionFilterEnabled,
-    vulnerabilitySuppressionEnabled,
-    yarn
-  )
+  val Default: AnalyzerSettings = AnalyzerSettings()
 
   /** Artifactory Settings
     *
@@ -279,16 +161,18 @@ object AnalyzerSettings {
     * @param usesProxy whether the proxy should be used to reach Artifactory
     */
   case class Artifactory(
-      enabled: Option[Boolean],
-      url: Option[URL],
-      parallelAnalysis: Option[Boolean],
-      apiToken: Option[String],
-      username: Option[String],
-      bearerToken: Option[String],
-      usesProxy: Option[Boolean]
+      enabled: Option[Boolean]          = None,
+      url: Option[URL]                  = None,
+      parallelAnalysis: Option[Boolean] = None,
+      @redacted
+      apiToken: Option[String] = None,
+      username: Option[String] = None,
+      @redacted
+      bearerToken: Option[String] = None,
+      usesProxy: Option[Boolean]  = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_ARTIFACTORY_ENABLED, enabled)
       settings.set(ANALYZER_ARTIFACTORY_URL, url)
       settings.set(ANALYZER_ARTIFACTORY_PARALLEL_ANALYSIS, parallelAnalysis)
@@ -297,21 +181,12 @@ object AnalyzerSettings {
       settings.set(ANALYZER_ARTIFACTORY_BEARER_TOKEN, bearerToken)
       settings.set(ANALYZER_ARTIFACTORY_USES_PROXY, usesProxy)
     }
+
+    override def toString: String = redactedToString(this)
   }
 
   object Artifactory {
-    val Default: Artifactory = new Artifactory(None, None, None, None, None, None, None)
-
-    def apply(
-        enabled: Option[Boolean]          = None,
-        url: Option[URL]                  = None,
-        parallelAnalysis: Option[Boolean] = None,
-        apiToken: Option[String]          = None,
-        username: Option[String]          = None,
-        bearerToken: Option[String]       = None,
-        usesProxy: Option[Boolean]        = None
-    ): Artifactory =
-      new Artifactory(enabled, url, parallelAnalysis, apiToken, username, bearerToken, usesProxy)
+    val Default: Artifactory = Artifactory()
   }
 
   /** .NET Settings
@@ -324,15 +199,15 @@ object AnalyzerSettings {
     * @param msBuildProjectEnabled whether the .NET MSBuild Project analyzer is enabled
     */
   case class DotNet(
-      assemblyEnabled: Option[Boolean],
-      assemblyPath: Option[File],
-      nuspecEnabled: Option[Boolean],
-      nugetConfEnabled: Option[Boolean],
-      libManEnabled: Option[Boolean],
-      msBuildProjectEnabled: Option[Boolean]
+      assemblyEnabled: Option[Boolean]       = None,
+      assemblyPath: Option[File]             = None,
+      nuspecEnabled: Option[Boolean]         = None,
+      nugetConfEnabled: Option[Boolean]      = None,
+      libManEnabled: Option[Boolean]         = None,
+      msBuildProjectEnabled: Option[Boolean] = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_ASSEMBLY_ENABLED, assemblyEnabled)
       settings.set(ANALYZER_ASSEMBLY_DOTNET_PATH, assemblyPath)
       settings.set(ANALYZER_NUSPEC_ENABLED, nuspecEnabled)
@@ -343,24 +218,7 @@ object AnalyzerSettings {
   }
 
   object DotNet {
-    val Default: DotNet = new DotNet(None, None, None, None, None, None)
-
-    def apply(
-        assemblyEnabled: Option[Boolean]       = None,
-        assemblyPath: Option[File]             = None,
-        nuspecEnabled: Option[Boolean]         = None,
-        nugetConfEnabled: Option[Boolean]      = None,
-        libManEnabled: Option[Boolean]         = None,
-        msBuildProjectEnabled: Option[Boolean] = None
-    ): DotNet =
-      new DotNet(
-        assemblyEnabled,
-        assemblyPath,
-        nuspecEnabled,
-        nugetConfEnabled,
-        libManEnabled,
-        msBuildProjectEnabled
-      )
+    val Default: DotNet = DotNet()
   }
 
   /** Elixir Settings
@@ -369,21 +227,18 @@ object AnalyzerSettings {
     * @param mixAuditPath The path to mix_audit, if available
     */
   case class Elixir(
-      mixAuditEnabled: Option[Boolean],
-      mixAuditPath: Option[File]
+      mixAuditEnabled: Option[Boolean] = None,
+      mixAuditPath: Option[File]       = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_MIX_AUDIT_ENABLED, mixAuditEnabled)
       settings.set(ANALYZER_MIX_AUDIT_PATH, mixAuditPath)
     }
   }
 
   object Elixir {
-    val Default: Elixir = new Elixir(None, None)
-
-    def apply(mixAuditEnabled: Option[Boolean] = None, mixAuditPath: Option[File] = None): Elixir =
-      new Elixir(mixAuditEnabled, mixAuditPath)
+    val Default: Elixir = Elixir()
   }
 
   /** Golang Settings
@@ -393,27 +248,20 @@ object AnalyzerSettings {
     * @param path The path to go, if available
     */
   case class Golang(
-      dependencyAnalyzerEnabled: Option[Boolean],
-      moduleAnalyzerEnabled: Option[Boolean],
-      path: Option[File]
+      dependencyAnalyzerEnabled: Option[Boolean] = None,
+      moduleAnalyzerEnabled: Option[Boolean]     = None,
+      path: Option[File]                         = None
   ) {
 
-    def apply(settings: Settings): Unit = {
-      settings.set(ANALYZER_GOLANG_DEP_ENABLED, moduleAnalyzerEnabled)
+    def configure(settings: Settings): Unit = {
+      settings.set(ANALYZER_GOLANG_DEP_ENABLED, dependencyAnalyzerEnabled)
       settings.set(ANALYZER_GOLANG_MOD_ENABLED, moduleAnalyzerEnabled)
       settings.set(ANALYZER_GOLANG_PATH, path)
     }
   }
 
   object Golang {
-    val Default: Golang = new Golang(None, None, None)
-
-    def apply(
-        dependencyAnalyzerEnabled: Option[Boolean] = None,
-        moduleAnalyzerEnabled: Option[Boolean]     = None,
-        path: Option[File]                         = None
-    ): Golang =
-      new Golang(dependencyAnalyzerEnabled, moduleAnalyzerEnabled, path)
+    val Default: Golang = Golang()
   }
 
   /** Hints Settings
@@ -421,15 +269,15 @@ object AnalyzerSettings {
     * @param enabled whether the Hint analyzer is enabled
     * @param hintsFile path to the hints file
     */
-  case class Hints(enabled: Option[Boolean], hintsFile: Option[String]) {
-    def apply(settings: Settings): Unit = {
+  case class Hints(enabled: Option[Boolean] = None, hintsFile: Option[String] = None) {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_HINT_ENABLED, enabled)
       settings.set(HINTS_FILE, hintsFile)
     }
   }
 
   object Hints {
-    val Default: Hints = new Hints(None, None)
+    val Default: Hints = Hints()
 
     /** Enable the Hints backed by a file
       */
@@ -450,42 +298,29 @@ object AnalyzerSettings {
     * @param validForHours controls the skipping of the check for Known Exploited Vulnerabilities updates.
     */
   case class KnownExploitedVulnerabilities(
-      enabled: Option[Boolean],
-      url: Option[URL],
-      username: Option[String],
-      password: Option[String],
-      bearerToken: Option[String],
-      validForHours: Option[Int]
+      enabled: Option[Boolean] = None,
+      url: Option[URL]         = None,
+      username: Option[String] = None,
+      @redacted
+      password: Option[String] = None,
+      @redacted
+      bearerToken: Option[String] = None,
+      validForHours: Option[Int]  = None
   ) {
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_KNOWN_EXPLOITED_ENABLED, enabled)
       settings.set(KEV_URL, url)
       settings.set(KEV_USER, username)
       settings.set(KEV_PASSWORD, password)
       settings.set(KEV_BEARER_TOKEN, bearerToken)
-      settings.set(KEV_CHECK_VALID_FOR_HOURS, url)
+      settings.set(KEV_CHECK_VALID_FOR_HOURS, validForHours)
     }
+
+    override def toString: String = redactedToString(this)
   }
 
   object KnownExploitedVulnerabilities {
-    val Default: KnownExploitedVulnerabilities =
-      new KnownExploitedVulnerabilities(None, None, None, None, None, None)
-
-    def apply(
-        enabled: Option[Boolean]    = None,
-        url: Option[URL]            = None,
-        username: Option[String]    = None,
-        password: Option[String]    = None,
-        bearerToken: Option[String] = None,
-        validForHours: Option[Int]  = None
-    ): KnownExploitedVulnerabilities = new KnownExploitedVulnerabilities(
-      enabled,
-      url,
-      username,
-      password,
-      bearerToken,
-      validForHours
-    )
+    val Default: KnownExploitedVulnerabilities = KnownExploitedVulnerabilities()
   }
 
   /** Maven Central Settings
@@ -501,18 +336,20 @@ object AnalyzerSettings {
     * @param bearerToken the token to obtain content from Maven Central from an HTTP-Bearer-auth protected location. For use when the central content URL is reconfigured to a site requiring HTTP-Bearer-authentication
     */
   case class MavenCentral(
-      enabled: Option[Boolean],
-      url: Option[URL],
-      query: Option[String],
-      usesCache: Option[Boolean],
-      retryCount: Option[Int],
-      parallelAnalysis: Option[Boolean],
-      username: Option[String],
-      password: Option[String],
-      bearerToken: Option[String]
+      enabled: Option[Boolean]          = None,
+      url: Option[URL]                  = None,
+      query: Option[String]             = None,
+      usesCache: Option[Boolean]        = None,
+      retryCount: Option[Int]           = None,
+      parallelAnalysis: Option[Boolean] = None,
+      username: Option[String]          = None,
+      @redacted
+      password: Option[String] = None,
+      @redacted
+      bearerToken: Option[String] = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_CENTRAL_ENABLED, enabled)
       settings.set(ANALYZER_CENTRAL_URL, url)
       settings.set(ANALYZER_CENTRAL_QUERY, query)
@@ -524,34 +361,12 @@ object AnalyzerSettings {
       settings.set(ANALYZER_CENTRAL_BEARER_TOKEN, bearerToken)
     }
 
+    override def toString: String = redactedToString(this)
+
   }
 
   object MavenCentral {
-    val Default: MavenCentral =
-      new MavenCentral(None, None, None, None, None, None, None, None, None)
-
-    def apply(
-        enabled: Option[Boolean]          = None,
-        url: Option[URL]                  = None,
-        query: Option[String]             = None,
-        usesCache: Option[Boolean]        = None,
-        retryCount: Option[Int]           = None,
-        parallelAnalysis: Option[Boolean] = None,
-        username: Option[String]          = None,
-        password: Option[String]          = None,
-        bearerToken: Option[String]       = None
-    ): MavenCentral =
-      new MavenCentral(
-        enabled,
-        url,
-        query,
-        usesCache,
-        retryCount,
-        parallelAnalysis,
-        username,
-        password,
-        bearerToken
-      )
+    val Default: MavenCentral = MavenCentral()
   }
 
   /** Nexus Settings
@@ -563,34 +378,28 @@ object AnalyzerSettings {
     * @param usesProxy whether to use the proxy to reach Nexus
     */
   case class Nexus(
-      enabled: Option[Boolean],
-      url: Option[URL],
-      username: Option[String],
-      password: Option[String],
-      usesProxy: Option[Boolean]
+      enabled: Option[Boolean] = None,
+      url: Option[URL]         = None,
+      username: Option[String] = None,
+      @redacted
+      password: Option[String]   = None,
+      usesProxy: Option[Boolean] = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_NEXUS_ENABLED, enabled)
       settings.set(ANALYZER_NEXUS_URL, url)
-      settings.set(ANALYZER_CENTRAL_USER, username)
-      settings.set(ANALYZER_CENTRAL_PASSWORD, password)
+      settings.set(ANALYZER_NEXUS_USER, username)
+      settings.set(ANALYZER_NEXUS_PASSWORD, password)
       settings.set(ANALYZER_NEXUS_USES_PROXY, usesProxy)
     }
+
+    override def toString: String = redactedToString(this)
 
   }
 
   object Nexus {
-    val Default: Nexus = new Nexus(None, None, None, None, None)
-
-    def apply(
-        enabled: Option[Boolean]   = None,
-        url: Option[URL]           = None,
-        username: Option[String]   = None,
-        password: Option[String]   = None,
-        usesProxy: Option[Boolean] = None
-    ): Nexus =
-      new Nexus(enabled, url, username, password, usesProxy)
+    val Default: Nexus = Nexus()
   }
 
   /** Node Settings
@@ -604,20 +413,20 @@ object AnalyzerSettings {
     * @param npmCpeEnabled where the NPM CPE analyzer is enabled
     */
   case class Node(
-      auditEnabled: Option[Boolean],
-      auditUrl: Option[URL],
-      auditSkipDevDependencies: Option[Boolean],
-      auditUsesCache: Option[Boolean],
-      packageEnabled: Option[Boolean],
-      packageSkipDevDependencies: Option[Boolean],
-      npmCpeEnabled: Option[Boolean]
+      auditEnabled: Option[Boolean]               = None,
+      auditUrl: Option[URL]                       = None,
+      auditSkipDevDependencies: Option[Boolean]   = None,
+      auditUsesCache: Option[Boolean]             = None,
+      packageEnabled: Option[Boolean]             = None,
+      packageSkipDevDependencies: Option[Boolean] = None,
+      npmCpeEnabled: Option[Boolean]              = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_NODE_AUDIT_ENABLED, auditEnabled)
       settings.set(ANALYZER_NODE_AUDIT_URL, auditUrl)
       settings.set(ANALYZER_NODE_AUDIT_SKIPDEV, auditSkipDevDependencies)
-      settings.set(ANALYZER_NODE_AUDIT_USE_CACHE, auditSkipDevDependencies)
+      settings.set(ANALYZER_NODE_AUDIT_USE_CACHE, auditUsesCache)
 
       settings.set(ANALYZER_NODE_PACKAGE_ENABLED, packageEnabled)
       settings.set(ANALYZER_NODE_PACKAGE_SKIPDEV, packageSkipDevDependencies)
@@ -628,26 +437,7 @@ object AnalyzerSettings {
   }
 
   object Node {
-    val Default: Node = new Node(None, None, None, None, None, None, None)
-
-    def apply(
-        auditEnabled: Option[Boolean]               = None,
-        auditUrl: Option[URL]                       = None,
-        auditSkipDevDependencies: Option[Boolean]   = None,
-        auditUsesCache: Option[Boolean]             = None,
-        packageEnabled: Option[Boolean]             = None,
-        packageSkipDevDependencies: Option[Boolean] = None,
-        npmCpeEnabled: Option[Boolean]              = None
-    ): Node =
-      new Node(
-        auditEnabled,
-        auditUrl,
-        auditSkipDevDependencies,
-        auditUsesCache,
-        packageEnabled,
-        packageSkipDevDependencies,
-        npmCpeEnabled
-      )
+    val Default: Node = Node()
   }
 
   /** Sonatype OSS Index Settings
@@ -662,17 +452,18 @@ object AnalyzerSettings {
     * @param password the Sonatype OSS Index password
     */
   case class OssIndex(
-      enabled: Option[Boolean],
-      url: Option[URL],
-      batchSize: Option[Int],
-      requestDelay: Option[Int],
-      useCache: Option[Boolean],
-      warnOnlyOnRemoteErrors: Option[Boolean],
-      username: Option[String],
-      password: Option[String]
+      enabled: Option[Boolean]                = None,
+      url: Option[URL]                        = None,
+      batchSize: Option[Int]                  = None,
+      requestDelay: Option[Int]               = None,
+      useCache: Option[Boolean]               = None,
+      warnOnlyOnRemoteErrors: Option[Boolean] = None,
+      username: Option[String]                = None,
+      @redacted
+      password: Option[String] = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_OSSINDEX_ENABLED, enabled)
       settings.set(ANALYZER_OSSINDEX_URL, url)
       settings.set(ANALYZER_OSSINDEX_BATCH_SIZE, batchSize)
@@ -683,31 +474,12 @@ object AnalyzerSettings {
       settings.set(ANALYZER_OSSINDEX_PASSWORD, password)
     }
 
+    override def toString: String = redactedToString(this)
+
   }
 
   object OssIndex {
-    val Default: OssIndex = new OssIndex(None, None, None, None, None, None, None, None)
-
-    def apply(
-        enabled: Option[Boolean]                = None,
-        url: Option[URL]                        = None,
-        batchSize: Option[Int]                  = None,
-        requestDelay: Option[Int]               = None,
-        useCache: Option[Boolean]               = None,
-        warnOnlyOnRemoteErrors: Option[Boolean] = None,
-        username: Option[String]                = None,
-        password: Option[String]                = None
-    ): OssIndex =
-      new OssIndex(
-        enabled,
-        url,
-        batchSize,
-        requestDelay,
-        useCache,
-        warnOnlyOnRemoteErrors,
-        username,
-        password
-      )
+    val Default: OssIndex = OssIndex()
   }
 
   /** PHP Settings
@@ -716,24 +488,18 @@ object AnalyzerSettings {
     * @param composerLockSkipDevDependencies whether the PHP composer lock file analyzer should skip dev packages
     */
   case class Php(
-      composerLockEnabled: Option[Boolean],
-      composerLockSkipDevDependencies: Option[Boolean]
+      composerLockEnabled: Option[Boolean]             = None,
+      composerLockSkipDevDependencies: Option[Boolean] = None
   ) {
 
-    def apply(settings: Settings): Unit = {
-      settings.set(ANALYZER_COMPOSER_LOCK_ENABLED, composerLockSkipDevDependencies)
+    def configure(settings: Settings): Unit = {
+      settings.set(ANALYZER_COMPOSER_LOCK_ENABLED, composerLockEnabled)
       settings.set(ANALYZER_COMPOSER_LOCK_SKIP_DEV, composerLockSkipDevDependencies)
     }
   }
 
   object Php {
-    val Default: Php = new Php(None, None)
-
-    def apply(
-        composerLockEnabled: Option[Boolean]             = None,
-        composerLockSkipDevDependencies: Option[Boolean] = None
-    ): Php =
-      new Php(composerLockEnabled, composerLockSkipDevDependencies)
+    val Default: Php = Php()
   }
 
   /** pnpm Settings
@@ -742,21 +508,18 @@ object AnalyzerSettings {
     * @param path the path to pnpm if available
     */
   case class Pnpm(
-      auditEnabled: Option[Boolean],
-      path: Option[File]
+      auditEnabled: Option[Boolean] = None,
+      path: Option[File]            = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_PNPM_AUDIT_ENABLED, auditEnabled)
       settings.set(ANALYZER_PNPM_PATH, path)
     }
   }
 
   object Pnpm {
-    val Default: Pnpm = new Pnpm(None, None)
-
-    def apply(auditEnabled: Option[Boolean] = None, path: Option[File] = None): Pnpm =
-      new Pnpm(auditEnabled, path)
+    val Default: Pnpm = Pnpm()
   }
 
   /** Python Settings
@@ -768,16 +531,16 @@ object AnalyzerSettings {
     * @param poetryEnabled whether the Poetry analyzer is enabled
     */
   case class Python(
-      pipEnabled: Option[Boolean],
-      pipFileEnabled: Option[Boolean],
-      distributionEnabled: Option[Boolean],
-      packageEnabled: Option[Boolean],
-      poetryEnabled: Option[Boolean]
+      pipEnabled: Option[Boolean]          = None,
+      pipFileEnabled: Option[Boolean]      = None,
+      distributionEnabled: Option[Boolean] = None,
+      packageEnabled: Option[Boolean]      = None,
+      poetryEnabled: Option[Boolean]       = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_PIP_ENABLED, pipEnabled)
-      settings.set(ANALYZER_PIPFILE_ENABLED, pipEnabled)
+      settings.set(ANALYZER_PIPFILE_ENABLED, pipFileEnabled)
 
       settings.set(ANALYZER_PYTHON_DISTRIBUTION_ENABLED, distributionEnabled)
       settings.set(ANALYZER_PYTHON_PACKAGE_ENABLED, packageEnabled)
@@ -787,21 +550,12 @@ object AnalyzerSettings {
   }
 
   object Python {
-    val Default: Python = new Python(None, None, None, None, None)
-
-    def apply(
-        pipEnabled: Option[Boolean]          = None,
-        pipFileEnabled: Option[Boolean]      = None,
-        distributionEnabled: Option[Boolean] = None,
-        packageEnabled: Option[Boolean]      = None,
-        poetryEnabled: Option[Boolean]       = None
-    ): Python =
-      new Python(pipEnabled, pipFileEnabled, distributionEnabled, packageEnabled, poetryEnabled)
+    val Default: Python = Python()
   }
 
   /** RetireJS Settings
     *
-    * @param enabled hether the RetireJS analyzer is enabled
+    * @param enabled whether the RetireJS analyzer is enabled
     * @param forceUpdate whether the RetireJS repository will be updated regardless of the autoupdate settings
     * @param filters whether the RetireJS analyzer file content filters
     * @param filterNonVulnerable whether the RetireJS analyzer should filter out non-vulnerable dependencies
@@ -812,18 +566,20 @@ object AnalyzerSettings {
     * @param validForHours to control the skipping of the check for CVE updates
     */
   case class RetireJS(
-      enabled: Option[Boolean],
-      forceUpdate: Option[Boolean],
-      filters: Option[Seq[String]],
-      filterNonVulnerable: Option[Boolean],
-      url: Option[URL],
-      username: Option[String],
-      password: Option[String],
-      bearerToken: Option[String],
-      validForHours: Option[Int]
+      enabled: Option[Boolean]             = None,
+      forceUpdate: Option[Boolean]         = None,
+      filters: Option[Seq[String]]         = None,
+      filterNonVulnerable: Option[Boolean] = None,
+      url: Option[URL]                     = None,
+      username: Option[String]             = None,
+      @redacted
+      password: Option[String] = None,
+      @redacted
+      bearerToken: Option[String] = None,
+      validForHours: Option[Int]  = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_RETIREJS_ENABLED, enabled)
       settings.set(ANALYZER_RETIREJS_REPO_JS_URL, url)
       settings.set(ANALYZER_RETIREJS_FORCEUPDATE, forceUpdate)
@@ -835,34 +591,12 @@ object AnalyzerSettings {
       settings.set(ANALYZER_RETIREJS_REPO_VALID_FOR_HOURS, validForHours)
     }
 
+    override def toString: String = redactedToString(this)
+
   }
 
   object RetireJS {
-    val Default: RetireJS =
-      new RetireJS(None, None, None, None, None, None, None, None, None)
-
-    def apply(
-        enabled: Option[Boolean]             = None,
-        forceUpdate: Option[Boolean]         = None,
-        filters: Option[Seq[String]]         = None,
-        filterNonVulnerable: Option[Boolean] = None,
-        url: Option[URL]                     = None,
-        username: Option[String]             = None,
-        password: Option[String]             = None,
-        bearerToken: Option[String]          = None,
-        validForHours: Option[Int]           = None
-    ): RetireJS =
-      new RetireJS(
-        enabled,
-        forceUpdate,
-        filters,
-        filterNonVulnerable,
-        url,
-        username,
-        password,
-        bearerToken,
-        validForHours
-      )
+    val Default: RetireJS = RetireJS()
   }
 
   /** Ruby Settings
@@ -873,13 +607,13 @@ object AnalyzerSettings {
     * @param bundleAuditWorkingDirectory bundle-audit working directory
     */
   case class Ruby(
-      gemSpecEnabled: Option[Boolean],
-      bundleAuditEnabled: Option[Boolean],
-      bundleAuditPath: Option[File],
-      bundleAuditWorkingDirectory: Option[File]
+      gemSpecEnabled: Option[Boolean]           = None,
+      bundleAuditEnabled: Option[Boolean]       = None,
+      bundleAuditPath: Option[File]             = None,
+      bundleAuditWorkingDirectory: Option[File] = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_RUBY_GEMSPEC_ENABLED, gemSpecEnabled)
       settings.set(ANALYZER_BUNDLE_AUDIT_ENABLED, bundleAuditEnabled)
       settings.set(ANALYZER_BUNDLE_AUDIT_PATH, bundleAuditPath)
@@ -888,15 +622,7 @@ object AnalyzerSettings {
   }
 
   object Ruby {
-    val Default: Ruby = new Ruby(None, None, None, None)
-
-    def apply(
-        gemSpecEnabled: Option[Boolean]           = None,
-        bundleAuditEnabled: Option[Boolean]       = None,
-        bundleAuditPath: Option[File]             = None,
-        bundleAuditWorkingDirectory: Option[File] = None
-    ): Ruby =
-      new Ruby(gemSpecEnabled, bundleAuditEnabled, bundleAuditPath, bundleAuditWorkingDirectory)
+    val Default: Ruby = Ruby()
   }
 
   /** Swift Settings
@@ -907,13 +633,13 @@ object AnalyzerSettings {
     * @param cocoapodsEnabled whether the cocoapods analyzer is enabled
     */
   case class Swift(
-      packageManagerEnabled: Option[Boolean],
-      packageResolvedEnabled: Option[Boolean],
-      carthageEnabled: Option[Boolean],
-      cocoapodsEnabled: Option[Boolean]
+      packageManagerEnabled: Option[Boolean]  = None,
+      packageResolvedEnabled: Option[Boolean] = None,
+      carthageEnabled: Option[Boolean]        = None,
+      cocoapodsEnabled: Option[Boolean]       = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_SWIFT_PACKAGE_MANAGER_ENABLED, packageManagerEnabled)
       settings.set(ANALYZER_SWIFT_PACKAGE_RESOLVED_ENABLED, packageResolvedEnabled)
       settings.set(ANALYZER_CARTHAGE_ENABLED, carthageEnabled)
@@ -922,15 +648,7 @@ object AnalyzerSettings {
   }
 
   object Swift {
-    val Default: Swift = new Swift(None, None, None, None)
-
-    def apply(
-        packageManagerEnabled: Option[Boolean]  = None,
-        packageResolvedEnabled: Option[Boolean] = None,
-        carthageEnabled: Option[Boolean]        = None,
-        cocoapodsEnabled: Option[Boolean]       = None
-    ): Swift =
-      new Swift(packageManagerEnabled, packageResolvedEnabled, carthageEnabled, cocoapodsEnabled)
+    val Default: Swift = Swift()
   }
 
   /** Yarn Settings
@@ -939,20 +657,17 @@ object AnalyzerSettings {
     * @param path the path to Yarn if available
     */
   case class Yarn(
-      auditEnabled: Option[Boolean],
-      path: Option[File]
+      auditEnabled: Option[Boolean] = None,
+      path: Option[File]            = None
   ) {
 
-    def apply(settings: Settings): Unit = {
+    def configure(settings: Settings): Unit = {
       settings.set(ANALYZER_YARN_AUDIT_ENABLED, auditEnabled)
       settings.set(ANALYZER_YARN_PATH, path)
     }
   }
 
   object Yarn {
-    val Default: Yarn = new Yarn(None, None)
-
-    def apply(auditEnabled: Option[Boolean] = None, path: Option[File] = None): Yarn =
-      new Yarn(auditEnabled, path)
+    val Default: Yarn = Yarn()
   }
 }

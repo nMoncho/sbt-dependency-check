@@ -16,9 +16,9 @@ private[dependencycheck] object DependencyCheckCompat {
   def managedJars(
       config: Configuration,
       jarTypes: Set[String],
-      udpateReport: UpdateReport,
+      updateReport: UpdateReport,
       converter: FileConverter
   ): Classpath =
-    sbt.Classpaths.managedJars(config, jarTypes, udpateReport, converter)
+    sbt.Classpaths.managedJars(config, jarTypes, updateReport, converter)
 
 }
