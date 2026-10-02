@@ -6,8 +6,7 @@ by `sbt scripted` (or `sbt +scripted` for the cross-build).
 
 ## Network and CVE database requirement
 
-Unlike the `munit` unit tests, these run the full OWASP dependency-check engine
-(`dependencyCheck`, `dependencyCheckAggregate`, `dependencyCheckAllProjects`), which needs a
+Unlike the `munit` unit tests, these run the full OWASP dependency-check engine, which needs a
 populated CVE database to find the known-vulnerable dependencies the assertions expect. Because
 `dependencyCheckAutoUpdate` defaults to `true` and the NVD data has a validity window, a run with a
 missing or stale cache will reach the network:
