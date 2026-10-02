@@ -86,5 +86,17 @@ lazy val root = (project in file("."))
     // them over time as coverage improves. `testCoverage` runs `coverageReport`, which enforces this.
     coverageMinimumStmtTotal := 80.0,
     coverageMinimumBranchTotal := 65.0,
-    coverageFailOnMinimum := true
+    coverageFailOnMinimum := true,
+    // Binary compatibility: compare against the last published release. sbt plugins are published
+    // with the sbt/Scala binary versions in the artifact name (`_2.12_1.0` for sbt 1, `_sbt2_3` for
+    // sbt 2), so the previous artifact's name is built explicitly instead of relying on `%%`.
+    // Not gated in CI yet: this branch breaks compatibility with 2.0.0 on purpose and will ship as
+    // 3.0.0. Once 3.0.0 is released, bump the baseline below and add `+mimaReportBinaryIssues` to CI.
+    mimaPreviousArtifacts := {
+      val suffix = scalaBinaryVersion.value match {
+        case "2.12" => "_2.12_1.0"
+        case "3" => "_sbt2_3"
+      }
+      Set(organization.value % s"${name.value}$suffix" % "2.0.0")
+    }
   )
