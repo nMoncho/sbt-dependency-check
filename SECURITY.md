@@ -7,8 +7,8 @@ receives security fixes.
 
 | Version | Supported          |
 |---------|--------------------|
-| 2.x     | :white_check_mark: |
-| < 2.0   | :x:                |
+| 3.x     | :white_check_mark: |
+| < 3.0   | :x:                |
 
 The plugin wraps [OWASP dependency-check](https://github.com/dependency-check/DependencyCheck); the
 vulnerability data and scanning engine it relies on come from that project. Keeping the plugin up to

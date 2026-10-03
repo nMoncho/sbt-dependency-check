@@ -13,12 +13,12 @@ can be located in our [wiki](https://github.com/nMoncho/sbt-dependency-check/wik
 Add the plugin to your project configuration:
 
 ```scala
-addSbtPlugin("net.nmoncho" % "sbt-dependency-check" % "2.0.0")
+addSbtPlugin("net.nmoncho" % "sbt-dependency-check" % "3.0.0")
 ```
 
 The minimum SBT version supported is `1.9.0`.
 
-Upgrading from a 1.x release? See the [Migration guide](MIGRATION.md) for the 2.0.0 breaking changes.
+Upgrading from a v1.x or v2.x release? See the [Migration guide](MIGRATION.md) for the breaking changes list.
 
 ## Usage
 
@@ -38,7 +38,7 @@ dependencyCheckNvdApi := sys.env
   .getOrElse(NvdApiSettings.Default)
 ```
 
-Do not hardcode the key in a VCS-tracked `build.sbt`; see [Sensitive Configuration](#sensitive-configuration)
+We do not recommend to hardcode the key in a VCS-tracked `build.sbt`; see [Sensitive Configuration](#sensitive-configuration)
 for ways to keep it (and other credentials) out of source control.
 
 And then just run:
@@ -47,16 +47,12 @@ And then just run:
 sbt -Dlog4j2.level=info dependencyCheck
 ```
 
-The first time you run these tasks it will take some time, even a couple of minutes. The analysis will write a report
-to `target/{scala-version}/dependency-check-report.html` for SBT 1.x,
+The first time you run these tasks it will take some time, even a couple of minutes, as the whole NVD database need to be
+downloaded. The analysis will write a report  to `target/{scala-version}/dependency-check-report.html` for SBT 1.x,
 and `target/out/jvm/{scala-version}/{project}/dependency-check-report.html` for SBT 2.x. The plugin will log where the
 reports are being written to.
 
 After this, feel free to take a look at the available tasks and settings.
-
-### Migrating from v1.x
-
-If you're migrating from v1.x, then please read [this guide](MIGRATION_V2.md).
 
 ### Tasks
 
@@ -65,12 +61,9 @@ The following tasks are available:
 | Task                                    | Description                                                                                                                                                                   |
 |:----------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `dependencyCheck`                       | Runs dependency-check against the project and generates a report per sub project.                                                                                             |
-| `dependencyCheckAggregate`              | Runs dependency-check against project aggregates and combines the results into a single report.                                                                               |
-| `dependencyCheckAllProjects`            | Runs dependency-check against all projects and combines the results into a single report.                                                                                     |
 | `dependencyCheckUpdate`                 | Updates the local cache of the NVD data from NIST.                                                                                                                            |
 | `dependencyCheckPurge`                  | Deletes the local copy of the NVD. This is used to force a refresh of the data.                                                                                               |
 | `dependencyCheckListSettings`           | List the settings used during the analysis.                                                                                                                                   |
-| `dependencyCheckListUnusedSuppressions` | List unused suppressions, only considering suppression files or rules defined in the project definition (ie. build.sbt), not hosted suppressions nor packed suppressions.     |
 | `dependencyCheckListSuppressions`       | List suppression rules added to the Owasp Engine which are defined in the project definition (ie. build.sbt), or are imported packaged suppressions.                          |
 | `dependencyCheckGenerateSuppressions`   | Runs the analysis and writes a suppression XML baseline of the vulnerabilities currently found, so an existing project can baseline known findings and fail only on new ones. |
 
@@ -90,10 +83,9 @@ on projects aggregated by that project, like any other task on SBT, generating o
 > **Performance on multi-module builds.** Because `dependencyCheck` produces one report per project, it initializes a
 > separate OWASP engine for each module. The fixed per-engine cost (engine construction, analyzer loading, opening the
 > local NVD database, and the update freshness check) is therefore paid once per module. On builds with many modules this
-> can dominate the wall-clock time. If a single combined report is acceptable, prefer `dependencyCheckAggregate` or
-> `dependencyCheckAllProjects` (equivalently, the `single-report` or `all-projects` arguments below): they analyze all
-> collected dependencies with a single shared engine and pay that fixed cost only once. Note that the NVD data itself is
-> not downloaded more than once regardless of the task, since the local cache is reused across engines.
+> can be onerous. If a single combined report is acceptable, prefer using `--single-report` or `--single-report --all-projects`:
+> they analyze all collected dependencies with a single shared engine and pay that fixed cost only once. Note that the NVD data
+> itself is not downloaded more than once regardless of the task, since the local cache is reused across engines.
 
 The task `dependencyCheck` supports arguments that can be used to change its behavior:
 
@@ -106,8 +98,7 @@ The task `dependencyCheck` supports arguments that can be used to change its beh
 
 This task also supports modifying how the reporting summary is shown at the end:
 
-- `original-summary`: This is the original summary provided by previous version of the plugin. Follows the structure as
-  `org.owasp.dependencycheck.agent.DependencyCheckScanAgent.showSummary`
+- `original-summary`: This is the original summary provided by `org.owasp.dependencycheck.agent.DependencyCheckScanAgent.showSummary`
 - `all-vulnerabilities-summary`: Shows a more compact report than `original-summary`, but includes the score for each
   vulnerability.
 - `offending-vulnerabilities-summary`: Same as `all-vulnerabilities-summary` but only shows the offending vulnerabilities

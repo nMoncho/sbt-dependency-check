@@ -1,5 +1,35 @@
 # Migration guide
 
+## Upgrading to 3.0.0
+
+To migrate your project from v2.x to v3.x:
+
+1. All `dependencyCheck` tasks, like `dependencyCheckAggregate`, have been unified under one task.
+2. Use `configure` method instead of `apply` on Settings case classes.
+3. The task `dependencyCheckListUnusedSuppressions` has been removed.
+
+### Unified Tasks
+
+All dependency check tasks have been unified under `dependencyCheck`. We need to use arguments to get
+the same behavior as the previously available tasks:
+
+- `dependencyCheckAggregate`: Use `dependencyCheck single-report`
+- `dependencyCheckAllProjects`: Use `dependencyCheck single-report all-projects`
+
+### Method `configure` on Settings case classes
+
+On v1.x and v2.x whenever we wanted to configure any of the Setting case classes, like `DatabaseSettings`,
+we'd have to `copy` the default instance. To streamline this, now we can create one instance right away,
+and rely on default arguments for the values that aren't provided.
+
+In turn, instead of using `apply` we provide `configure` as a way to create instances to disambiguate what
+are we intending to do.
+
+### Task `dependencyCheckListUnusedSuppressions` has been removed
+
+Since this task actually runs an analysis, we remove this task and ask users to use the argument
+`--list-unused-suppressions` on the task `dependencyCheck`.
+
 ## Upgrading to 2.0.0
 
 Version 2.0.0 upgrades the bundled OWASP dependency-check engine from 12.2.2 to
