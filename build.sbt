@@ -74,7 +74,7 @@ lazy val root = (project in file("."))
         case "3" => Seq("-source", "17", "-target", "17")
       }
     },
-    crossScalaVersions += "3.8.4",
+    crossScalaVersions += "3.10.0",
     scriptedLaunchOpts := {
       scriptedLaunchOpts.value ++
       Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
