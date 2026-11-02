@@ -35,7 +35,7 @@ jobs:
           distribution: 'temurin'
           cache: 'sbt'
 
-      - uses: sbt/setup-sbt@82da71df4e122282484a99a8d70096bc2369dbd8 # v1.5.9
+      - uses: sbt/setup-sbt@b113b960ba361e87e08ce02a390d51871b7ee459 # v1.5.13
 
       - name: Check formatting, scalafix, and headers
         run: sbt styleCheck
