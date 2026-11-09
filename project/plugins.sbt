@@ -3,7 +3,7 @@ addSbtPlugin("org.scalameta"    % "sbt-scalafmt"    % "2.6.2")
 addSbtPlugin("org.scoverage"    % "sbt-scoverage"   % "2.4.4")
 addSbtPlugin("com.timushev.sbt" % "sbt-updates"     % "0.7.1")
 addSbtPlugin("com.github.sbt"   % "sbt-ci-release"  % "1.12.1")
-addSbtPlugin("ch.epfl.scala"    % "sbt-scalafix"    % "0.14.6")
+addSbtPlugin("ch.epfl.scala"    % "sbt-scalafix"    % "0.14.10")
 addSbtPlugin("com.typesafe"     % "sbt-mima-plugin" % "1.2.1")
 
 libraryDependencies ++= Seq(
